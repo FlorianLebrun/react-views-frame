@@ -1,0 +1,10 @@
+<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <rect height="16" width="16" y="0" x="0"
+    stroke="#6af" stroke-width="2px" 
+    fill="#000" fill-opacity="0" 
+   />
+  <polygon points="4,5 12,5 8,11" 
+    stroke="#358" stroke-width="1px" 
+    fill-opacity="1" fill="#0af"
+  />
+</svg>
