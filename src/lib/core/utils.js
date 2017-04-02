@@ -1,10 +1,10 @@
 
 export function isInheritedOf(What, Of) {
-    while (What) {
-        What = Object.getPrototypeOf(What)
-        if (What === Of) return true
-    }
-    return false
+  while (What) {
+    What = Object.getPrototypeOf(What)
+    if (What === Of) return true
+  }
+  return false
 }
 
 export function promiseResolvedOf(x) {
@@ -70,8 +70,6 @@ export function duplicateAtKeys(keys, keysCount, data) {
   return { root, oldData, newData }
 }
 
-console.log("Test1: ", setDataAtPath("/v1/v2/v3/5/8/v6", null, "hello"))
-
 export function getDataAtPath(path: string, data: Object): any {
   if (path) {
     const items = path && path.split("/")
@@ -131,7 +129,21 @@ export function removeDataAtPath(path: string, data: Object): any {
 export function displaceDataAtPath(path: string, data: Object/* , originPath: string*/): any {
   /* const keys = path && path.split("/")
   const originKeys = originPath && originPath.split("/")
-*/
+
+  // In case of displacement inside a same array
+  if (keys.length >= originKeys.length && !isNaN(originPath[originPath.length - 1])) {
+    let i
+    let isInSameArray = true
+    for (i = 0; i < originPath.length - 1; i++) {
+      if (keys[i] !== originKeys[i]) {
+        isInSameArray = false
+        break
+      }
+    }
+    if (isInSameArray) {
+
+    }
+  }*/
   return data
 }
 

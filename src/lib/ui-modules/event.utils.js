@@ -1,10 +1,13 @@
 
 export function stopEvent(e) {
-  if (e.stopPropagation) e.stopPropagation();
-  if (e.preventDefault) e.preventDefault();
-  //e.cancelBubble = true;
-  //e.returnValue = false;
-  return false;
+  if (e.stopPropagation) e.stopPropagation()
+  if (e.preventDefault) e.preventDefault()
+  return false
+}
+
+export function stopPropagation(e) {
+  if (e.stopPropagation) e.stopPropagation()
+  return false
 }
 
 export class HtmlScrollingReaction {
@@ -31,7 +34,7 @@ export class HtmlScrollingReaction {
     if (this.onMouseScroll) this.onMouseScroll(this)
     else this.scroll()
   }
-  handleCompleted(event) {
+  handleCompleted() {
     removeCurrentGrabReaction(this)
   }
 }
@@ -62,7 +65,7 @@ export class HtmlGrabReaction {
     if (this.onMouseGrab) this.onMouseGrab(this)
     else this.move()
   }
-  handleCompleted(event) {
+  handleCompleted() {
     removeCurrentGrabReaction(this)
   }
 }
@@ -91,7 +94,7 @@ export class SVGGrabReaction {
     if (this.onMouseGrab) this.onMouseGrab(this)
     else this.move()
   }
-  handleCompleted(event) {
+  handleCompleted() {
     removeCurrentGrabReaction(this)
   }
 }
@@ -104,9 +107,9 @@ function setCurrentGrabReaction(reaction) {
 function removeCurrentGrabReaction(reaction) {
   if (grabReaction === reaction) grabReaction = null
 }
-window.addEventListener('mousemove', function (e) {
+window.addEventListener("mousemove", function(e) {
   grabReaction && grabReaction.handleMouseMove(e)
 })
-window.addEventListener('mouseup', function (e) {
+window.addEventListener("mouseup", function() {
   grabReaction && grabReaction.handleCompleted()
 })

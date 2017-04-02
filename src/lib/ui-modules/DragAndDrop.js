@@ -3,6 +3,8 @@
 /* eslint-disable no-use-before-define */
 import React, { Component } from "react"
 
+import { stopPropagation } from "./event.utils"
+
 let dropHighlight: boolean = false
 let dropSuggested: DropZone = null
 const dropRegistry: Array<DropZone | number> = []
@@ -34,9 +36,9 @@ function UnregisterDropZone(zone: DropZone) {
   dropRegistry.pop()
 }
 
-function FocusDropZone() {
+function FocusDropZone(data: any) {
   dropHighlight = true
-  dropRegistry.forEach(x => x.light())
+  dropRegistry.forEach(x => x.isDroppable(data) && x.light())
 }
 
 function BlurDropZone() {
@@ -59,7 +61,7 @@ export class DragZone extends Component {
       Object.keys(bag).forEach(key => {
         evt.dataTransfer.setData(key, JSON.stringify(bag[key]))
       })
-      FocusDropZone()
+      FocusDropZone(bag)
     }
   }
   handleDragEnd = (evt) => {
@@ -67,18 +69,15 @@ export class DragZone extends Component {
     this.props.onDragEnd && this.props.onDragEnd(evt)
     BlurDropZone()
   }
-  handleStopPropagation = (evt) => {
-    evt.stopPropagation()
-  }
   render(): React$Element<any> {
     // eslint-disable-next-line no-unused-vars
     const { onDragStart, onDragEnd, ...otherProps } = this.props
     return (
       <div
         draggable
-        onMouseDown={this.handleStopPropagation}
-        onDragStart={this.handleDragStart}
-        onDragEnd={this.handleDragEnd}
+        onMouseDown={ stopPropagation }
+        onDragStart={ this.handleDragStart }
+        onDragEnd={ this.handleDragEnd }
         { ...otherProps }
       />)
   }
@@ -91,6 +90,7 @@ type DropPropsType = {
   className: string,
   selectedClassName: string,
   highlightClassName: string,
+  isDroppable?: Function
 }
 
 export class DropZone extends Component {
@@ -104,6 +104,10 @@ export class DropZone extends Component {
   }
 
   zoneId: number
+
+  isDroppable = (data: any) => {
+    return !this.props.isDroppable || this.props.isDroppable(data)
+  }
   light() {
     const dom = this.refs.zone
     if (dropHighlight && this.props.highlightClassName) {
@@ -179,16 +183,61 @@ export class DropZone extends Component {
     }
   }
   render(): React$Element<any> {
-    // eslint-disable-next-line no-unused-vars
-    const { onDrop, onDropMatch, onDropHightlight, selectedClassName, highlightClassName, ...otherProps } = this.props
+    const {
+      // eslint-disable-next-line no-unused-vars
+      onDrop, onDropMatch, onDropHightlight, selectedClassName,
+      // eslint-disable-next-line no-unused-vars
+      highlightClassName, isDroppable, ...otherProps } = this.props
     return (
       <div
-        ref={"zone"}
-        className={this.props.className}
-        onDrop={this.handleDrop}
-        onDragOver={this.handleDragOver}
-        onDragEnter={this.handleDragEnter}
-        onDragLeave={this.handleDragLeave}
+        ref={ "zone" }
+        className={ this.props.className }
+        onDrop={ this.handleDrop }
+        onDragOver={ this.handleDragOver }
+        onDragEnter={ this.handleDragEnter }
+        onDragLeave={ this.handleDragLeave }
+        { ...otherProps }
+      />)
+  }
+}
+
+export class DragDropZone extends DropZone {
+
+  handleDragStart = (evt) => {
+    const bag = this.props.onDragStart && this.props.onDragStart(evt)
+    if (bag) {
+      evt.stopPropagation()
+      Object.keys(bag).forEach(key => {
+        evt.dataTransfer.setData(key, JSON.stringify(bag[key]))
+      })
+      FocusDropZone(bag)
+    }
+  }
+  handleDragEnd = (evt) => {
+    evt.stopPropagation()
+    this.props.onDragEnd && this.props.onDragEnd(evt)
+    BlurDropZone()
+  }
+  render(): React$Element<any> {
+    const {
+      // eslint-disable-next-line no-unused-vars
+      onDrop, onDropMatch, onDropHightlight, selectedClassName,
+      // eslint-disable-next-line no-unused-vars
+      highlightClassName, isDroppable, onDragStart, onDragEnd,
+      ...otherProps,
+    } = this.props
+    return (
+      <div
+        ref={ "zone" }
+        draggable
+        className={ this.props.className }
+        onMouseDown={ stopPropagation }
+        onDragStart={ this.handleDragStart }
+        onDragEnd={ this.handleDragEnd }
+        onDrop={ this.handleDrop }
+        onDragOver={ this.handleDragOver }
+        onDragEnter={ this.handleDragEnter }
+        onDragLeave={ this.handleDragLeave }
         { ...otherProps }
       />)
   }
