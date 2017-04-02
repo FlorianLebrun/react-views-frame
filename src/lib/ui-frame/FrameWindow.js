@@ -3,7 +3,6 @@
 import React, { Component } from "react"
 
 import Application from "../application"
-import { isInheritedOf } from "../core/utils"
 
 export type WindowID = string
 
@@ -37,7 +36,7 @@ export class WindowHandle {
     this.props = desc.props
     // this.storage = desc.needStorage ? createStorage(this.id) : null
     this.keepAlive = desc.keepAlive
-    console.assert(isInheritedOf(desc.component, WindowComponent),
+    console.assert(Application.isInheritedOf(desc.component, WindowComponent),
       "Window '", desc.title, "' shall be based on WindowComponent")
   }
   update(desc: WindowDesc) {
@@ -46,7 +45,7 @@ export class WindowHandle {
     this.props = desc.props
     // this.storage = desc.needStorage ? createStorage(this.id) : null
     this.keepAlive = desc.keepAlive
-    console.assert(isInheritedOf(desc.component, WindowComponent),
+    console.assert(Application.isInheritedOf(desc.component, WindowComponent),
       "Window '", desc.title, "' shall be based on WindowComponent")
   }
   close() {

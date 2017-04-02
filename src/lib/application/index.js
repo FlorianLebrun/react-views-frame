@@ -2,6 +2,7 @@
 import * as Environment from "./environment"
 import * as Storage from "./storage"
 import * as Notification from "./notification"
+import * as Utils from "./utils"
 
 export class ApplicationInstance {
 
@@ -36,6 +37,7 @@ export function extendApplication(features: { [string]: any }) {
 extendApplication(Environment)
 extendApplication(Storage)
 extendApplication(Notification)
+extendApplication(Utils)
 
 const Application = new ApplicationInstance()
 
