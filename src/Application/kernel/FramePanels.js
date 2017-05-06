@@ -1,18 +1,21 @@
 /* eslint-disable react/no-multi-comp */
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable import/no-namespace */
+/* eslint-disable react/no-string-refs */
 import React, { Component } from "react"
-
 import { DropZone, DragZone } from "../ui-modules/DragAndDrop"
 import { HtmlGrabReaction, stopEvent } from "../ui-modules/event.utils"
+
+import { Application } from "../application"
+import { ButtonPopup } from "./FramePopup"
+import FrameMenu from "./FrameMenu"
 
 import * as UIFrame from "."
 
 export type PanelProps = {
   id: DockID,
   size: number,
-  current: WindowHandle,
-  items: Array<WindowHandle>,
+  current: WindowInstance,
+  items: Array<WindowInstance>,
 }
 
 /** ******************************
@@ -23,7 +26,7 @@ export type PanelProps = {
 
 const CSS_panel_bar_horizontal = {
   bar: "WND_panel_bar WND_panel_bar_H",
-  menu_btn: "WND_panel_menu_btn WND_center_vertical",
+  menu_btn: "WND_panel_menu_btn WND_panel_menu_btn_H WND_center_vertical",
   item_button: "WND_panel_button WND_panel_button_H",
   item_button_CURRENT: "WND_panel_button WND_panel_button_H WND_panel_button-current",
   item_button_transform: "rotate(0deg)",
@@ -31,7 +34,7 @@ const CSS_panel_bar_horizontal = {
 
 const CSS_panel_bar_vertical = {
   bar: "WND_panel_bar WND_panel_bar_V",
-  menu_btn: "WND_panel_menu_btn WND_center_horizontal",
+  menu_btn: "WND_panel_menu_btn WND_panel_menu_btn_V WND_center_horizontal",
   item_button: "WND_panel_button WND_panel_button_V",
   item_button_CURRENT: "WND_panel_button WND_panel_button_V WND_panel_button-current",
   item_button_transform: "rotate(-90deg)",
@@ -40,7 +43,7 @@ const CSS_panel_bar_vertical = {
 type PanelButtonPropsType = {
   panel: PanelProps,
   frame: Frame,
-  item: WindowHandle,
+  item: WindowInstance,
   css: any,
 }
 
@@ -74,20 +77,21 @@ class PanelButton extends Component {
     if (e.button === 1) {
       stopEvent(e)
       const item = this.props.item
-      UIFrame.removeWindow(item.id)
+      Application.removeWindow(item.id)
     }
   }
   render() {
     const { item, panel, css } = this.props
     return (
       <DragZone
-        className={ panel.current === item ? css.item_button_CURRENT : css.item_button }
-        onDragStart={ this.handleDragWindow }
-        onDragOver={ this.handleDragOver }
-        onClick={ this.handleClick }
-        onMouseDown={ this.handleClose }
+        className={panel.current === item ? css.item_button_CURRENT : css.item_button}
+        onDragStart={this.handleDragWindow}
+        onDragOver={this.handleDragOver}
+        onClick={this.handleClick}
+        onMouseDown={this.handleClose}
       >
         <div style={{ transform: css.item_button_transform }}>
+          {item.icon && <span className={"padding-right fa fa-" + item.icon} />}
           {item.title}
         </div>
       </DragZone>)
@@ -114,18 +118,22 @@ class PanelBar extends Component {
   }
   handleDropWindow = (data) => {
     if (data["window"]) {
-      UIFrame.attachWindow(data.window.id, this.props.panel.id, 0)
+      const wnd = Application.kernel.getWindow(data.window.id)
+      wnd && Application.kernel.dockWindow(wnd, this.props.panel.id, true)
     }
+  }
+  renderMenu(close) {
+    return (<FrameMenu close={close} />)
   }
   render() {
     const { panel, frame, vertical } = this.props
     const css = vertical ? CSS_panel_bar_vertical : CSS_panel_bar_horizontal
 
     // Bar render
-    return (<DropZone onDrop={ this.handleDropWindow } className={ css.bar }>
-      <div className={ css.menu_btn } />
+    return (<DropZone onDrop={this.handleDropWindow} className={css.bar}>
+      {panel.menu && <ButtonPopup className={css.menu_btn + " fa fa-caret-down"} render={this.renderMenu} />}
       {panel.items.map((item, i) => {
-        return (<PanelButton key={ i } css={ css } item={ item } panel={ panel } frame={ frame } />)
+        return (<PanelButton key={i} css={css} item={item} panel={panel} frame={frame} />)
       })}
     </DropZone>)
   }
@@ -140,13 +148,13 @@ class PanelBar extends Component {
 const CSS_panel_resizer_vertical = "WND_panel_resizer WND_panel_resizer_V"
 const CSS_panel_resizer_horizontal = "WND_panel_resizer WND_panel_resizer_H"
 
-type PanelResizerPropsType = {
+export type PanelResizerPropsType = {
   vertical: boolean,
   transformDelta: Function,
   onResize: Function,
 }
 
-class PanelResizer extends Component {
+export class PanelResizer extends Component {
   props: PanelResizerPropsType
   handleMouseDown = (e) => {
     new HtmlGrabReaction(e.target, e, this.handleMouseGrab)
@@ -156,9 +164,9 @@ class PanelResizer extends Component {
   }
   render() {
     return (<div
-      className={ this.props.vertical ? CSS_panel_resizer_vertical : CSS_panel_resizer_horizontal }
-      onMouseDown={ this.handleMouseDown }
-            />)
+      className={this.props.vertical ? CSS_panel_resizer_vertical : CSS_panel_resizer_horizontal}
+      onMouseDown={this.handleMouseDown}
+    />)
   }
 }
 
@@ -170,21 +178,6 @@ class PanelResizer extends Component {
 
 const CSS_panel_container_side = "WND_panel_container WND_panel_container_side"
 const CSS_panel_container_center = "WND_panel_container WND_panel_container_center"
-
-type WindowContainerPropsType = {
-  current: WindowInstance,
-}
-
-class WindowContainer extends Component {
-  props: WindowContainerPropsType
-  shouldComponentUpdate(nextProps) {
-    return this.props.current !== nextProps.current
-  }
-  render() {
-    const current = this.props.current
-    return current ? current.render() : null
-  }
-}
 
 type SidePanelContainerPropsType = {
   current: WindowInstance,
@@ -202,16 +195,26 @@ class SidePanelContainer extends Component {
       || curProps.vertical !== nextProps.vertical
       || curProps.size !== nextProps.size
   }
+  getSize() {
+    const container = this.refs.container
+    return this.props.vertical ? container.clientWidth : container.clientHeight
+  }
   render() {
     const { current, vertical, size } = this.props
+    const style = {
+      width: vertical ? (size + "%") : "auto",
+      height: vertical ? "auto" : (size + "%"),
+    }
+    let className = CSS_panel_container_side
+    if (current) {
+      className += " overflow-" + current.getWindowOverflow()
+    }
     return (<div
-      className={ CSS_panel_container_side }
-      style={{
-        width: vertical ? size : "auto",
-        height: vertical ? "auto" : size,
-      }}
-            >
-      <WindowContainer current={ current } />
+      ref={"container"}
+      className={className}
+      style={style}
+    >
+      <UIFrame.WindowContainer current={current} />
     </div>)
   }
 }
@@ -224,10 +227,25 @@ class CenterPanelContainer extends Component {
   props: CenterPanelContainerPropsType
   componentWillMount() {
   }
-  render() {
-    return (<div className={ CSS_panel_container_center }>
-      <WindowContainer current={ this.props.current } />
+  shouldComponentUpdate(nextProps) {
+    const curProps = this.props
+    return curProps.current !== nextProps.current
+  }
+  renderBackScreen() {
+    const kernel = this.props.frame.kernel
+    return (<div className={CSS_panel_container_center}>
+      {kernel.splashComponent && <kernel.splashComponent />}
     </div>)
+  }
+  render() {
+    const current = this.props.current
+    if (current) {
+      const className = CSS_panel_container_center + " overflow-" + current.getWindowOverflow()
+      return (<div className={className}>
+        {current.render()}
+      </div>)
+    }
+    else return this.renderBackScreen()
   }
 }
 
@@ -255,7 +273,10 @@ class SidePanel extends Component {
       || curProps.children !== nextProps.children
   }
   handleResize = (delta) => {
-    const size = Math.max(this.props.panel.size + delta, 0)
+    const csize = this.refs.container.getSize()
+    let size = this.props.panel.size
+    size += Math.max(size, 1) * delta / Math.max(csize, 1)
+    size = Math.min(Math.max(size, 0), 100)
     this.props.frame.notifyPanelResize(this.props.panel, size)
   }
 }
@@ -267,11 +288,11 @@ export class SidePanelTop extends SidePanel {
   render() {
     const { panel, frame } = this.props
     const size = panel.current ? panel.size : 0
-    return (<div className={ CSS_side_panel_horizontal }>
-      <PanelBar panel={ panel } frame={ frame } />
-      <SidePanelContainer current={ panel.current } size={ size } />
-      <PanelResizer onResize={ this.handleResize } transformDelta={ this.transformDelta } />
-      <div style={{ flex: "1 1 auto", minHeight: "0px", height: "100%" }}>{this.props.children}</div>
+    return (<div className={CSS_side_panel_horizontal}>
+      <PanelBar panel={panel} frame={frame} />
+      <SidePanelContainer ref={"container"} current={panel.current} size={size} />
+      <PanelResizer onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <div className="flex-height-100">{this.props.children}</div>
     </div>)
   }
 }
@@ -283,11 +304,11 @@ export class SidePanelBottom extends SidePanel {
   render() {
     const { panel, frame } = this.props
     const size = panel.current ? panel.size : 0
-    return (<div className={ CSS_side_panel_horizontal }>
-      <div style={{ flex: "1 1 auto", minHeight: "0px", height: "100%" }}>{this.props.children}</div>
-      <PanelResizer onResize={ this.handleResize } transformDelta={ this.transformDelta } />
-      <PanelBar panel={ panel } frame={ frame } />
-      <SidePanelContainer current={ panel.current } size={ size } />
+    return (<div className={CSS_side_panel_horizontal}>
+      <div className="flex-height-100">{this.props.children}</div>
+      <PanelResizer onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <PanelBar panel={panel} frame={frame} />
+      <SidePanelContainer ref={"container"} current={panel.current} size={size} />
     </div>)
   }
 }
@@ -295,14 +316,15 @@ export class SidePanelBottom extends SidePanel {
 export class SidePanelLeft extends SidePanel {
   transformDelta(e) {
     return e.deltaX
-  } render() {
+  }
+  render() {
     const { panel, frame } = this.props
     const size = panel.current ? panel.size : 0
-    return (<div className={ CSS_side_panel_vertical }>
-      <PanelBar vertical panel={ panel } frame={ frame } />
-      <SidePanelContainer vertical current={ panel.current } size={ size } />
-      <PanelResizer vertical onResize={ this.handleResize } transformDelta={ this.transformDelta } />
-      <div style={{ flex: "1 1 auto", minWidth: "0px" }}>{this.props.children}</div>
+    return (<div className={CSS_side_panel_vertical}>
+      <PanelBar vertical panel={panel} frame={frame} />
+      <SidePanelContainer ref={"container"} vertical current={panel.current} size={size} />
+      <PanelResizer vertical onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <div className="flex-1">{this.props.children}</div>
     </div>)
   }
 }
@@ -314,11 +336,11 @@ export class SidePanelRight extends SidePanel {
   render() {
     const { panel, frame } = this.props
     const size = panel.current ? panel.size : 0
-    return (<div className={ CSS_side_panel_vertical }>
-      <div style={{ flex: "1 1 auto", minWidth: "0px" }}>{this.props.children}</div>
-      <PanelResizer vertical onResize={ this.handleResize } transformDelta={ this.transformDelta } />
-      <SidePanelContainer vertical current={ panel.current } size={ size } />
-      <PanelBar vertical panel={ panel } frame={ frame } />
+    return (<div className={CSS_side_panel_vertical}>
+      <div className="flex-width-100">{this.props.children}</div>
+      <PanelResizer vertical onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <SidePanelContainer ref={"container"} vertical current={panel.current} size={size} />
+      <PanelBar vertical panel={panel} frame={frame} />
     </div>)
   }
 }
@@ -326,9 +348,25 @@ export class SidePanelRight extends SidePanel {
 export class CenterPanelTop extends SidePanelTop {
   render() {
     const { panel, frame } = this.props
-    return (<div className={ CSS_side_panel_horizontal }>
-      <PanelBar panel={ panel } frame={ frame } />
-      <CenterPanelContainer current={ panel.current } />
+    return (<div className={CSS_side_panel_horizontal}>
+      <PanelBar panel={panel} frame={frame} />
+      <CenterPanelContainer ref={"container"} current={panel.current} frame={frame} />
+    </div>)
+  }
+}
+
+export class SplitPanelVertical extends SidePanel {
+  transformDelta(e) {
+    return e.deltaY
+  }
+  render() {
+    const { panel, frame } = this.props
+    const size = panel.current ? panel.size : 0
+    return (<div className={CSS_side_panel_horizontal}>
+      <PanelBar panel={panel} frame={frame} />
+      <SidePanelContainer ref={"container"} current={panel.current} size={size} />
+      <PanelResizer onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <div className="flex-height-100">{this.props.children}</div>
     </div>)
   }
 }

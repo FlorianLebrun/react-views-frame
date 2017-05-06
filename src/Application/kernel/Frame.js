@@ -7,25 +7,20 @@ import { PanelProps, SidePanelTop, SidePanelLeft, SidePanelRight, SidePanelBotto
 
 import { getWindowHandle } from "."
 
-type PropsType = {
-  displayLayout: any,
-  onFrameRegister: Function,
-  onFrameUnregister: Function,
-}
-
 type StateType = {
   panels: { [string]: PanelProps },
 }
 
 export class Frame extends Component {
-  props: PropsType
   state: StateType
   componentWillMount() {
-    this.props.onFrameRegister(this)
-    this.loadDisplayLayout(this.props.displayLayout)
+    this.loadDisplayLayout(this.kernel.layout)
+  }
+  componentDidMount() {
+    this.kernel.registerFrame(this)
   }
   componentWillUnmount() {
-    this.props.onFrameUnregister(this)
+    this.kernel.registerFrame()
   }
   loadDisplayLayout = (displayLayout) => {
     const panels = {}
@@ -98,7 +93,7 @@ export class Frame extends Component {
 
     wnd.dockId = null
   }
-  attachWindow(windowId: WindowID, dockId: DockID/* , dockRank: number*/) {
+  attachWindow(windowId: WindowID, dockId: DockID, foreground: boolean) {
     const panels = this.state.panels
     const wnd = getWindowHandle(windowId)
     if (!wnd) return null
@@ -117,8 +112,8 @@ export class Frame extends Component {
     if (panel) {
       panel = {
         ...panel,
-        current: panel.current || wnd,
-        items: [ ...panel.items, wnd ],
+        current: foreground ? (wnd || panel.current) : (panel.current || wnd),
+        items: [...panel.items, wnd],
       }
       panels[dockId] = panel
     }
@@ -141,20 +136,20 @@ export class Frame extends Component {
       children: panel.child && this.renderPanel(panel.child),
     }
     switch (panel.type) {
-    case "#":
-      return (<div style={{ height: "100%", width: "100%" }}> {props.children} </div>)
-    case "side-left":
-      return React.createElement(SidePanelLeft, props)
-    case "side-top":
-      return React.createElement(SidePanelTop, props)
-    case "side-right":
-      return React.createElement(SidePanelRight, props)
-    case "side-bottom":
-      return React.createElement(SidePanelBottom, props)
-    case "center-top":
-      return React.createElement(CenterPanelTop, props)
-    default:
-      return null
+      case "#":
+        return (<div style={{ height: "100%", width: "100%" }}> {props.children} </div>)
+      case "side-left":
+        return React.createElement(SidePanelLeft, props)
+      case "side-top":
+        return React.createElement(SidePanelTop, props)
+      case "side-right":
+        return React.createElement(SidePanelRight, props)
+      case "side-bottom":
+        return React.createElement(SidePanelBottom, props)
+      case "center-top":
+        return React.createElement(CenterPanelTop, props)
+      default:
+        return null
     }
   }
   render() {

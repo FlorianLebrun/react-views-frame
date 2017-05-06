@@ -1,92 +1,62 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
-import Application from './lib'
+import Application from './Application'
+import './DevTextPlugin'
 
-class ToolboxX extends Application.WindowComponent {
-  handleClick = () => {
-    Application.addNotification({ level: "error", message: "hello" })
+export default class SplashBackground extends Component {
+  style = {
+    body: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100%",
+    },
+    title: {
+      color: "#012",
+      fontFamily: "Consolas",
+      textShadow: "5px 5px 5px #abc",
+      borderTop: "2px solid #012",
+      padding: 20,
+    },
   }
   render() {
-    return (<div style={{ backgroundColor: "red", width: 300, height: 300 }}>
-      {"Do something"}<br />
-      <button onClick={this.handleClick}>
-        {"Notify"}
-      </button>
+    return (<div style={this.style.body}>
+      <h1 style={this.style.title}>
+        {"{ react-application-frame }"}
+      </h1>
     </div>)
   }
 }
 
-class ToolboxY extends Application.WindowComponent {
-  handleClick = () => {
-    Application.addNotification({ level: "error", message: "hello" })
+
+Application.configureKernel({
+  splashComponent: SplashBackground,
+  layout: {
+    "#": {
+      type: "#",
+      child: "left",
+    },
+    "left": {
+      type: "side-left",
+      child: "bottom",
+      size: 30,
+    },
+    "bottom": {
+      type: "side-bottom",
+      child: "right",
+      size: 30,
+    },
+    "right": {
+      type: "side-right",
+      child: "center",
+      size: 30,
+    },
+    "center": {
+      type: "center-top",
+      menu: true,
+    },
   }
-  handleFrameLoad = () => {
-    const ifrm = this.refs.ifrm
-    ifrm.style.height = ifrm.contentWindow.document.body.scrollHeight + "px"
-  }
-  render() {
-    return (<iframe
-      ref={"ifrm"}
-      src={"http://fr.lipsum.com/feed/html"}
-      onLoad={this.handleFrameLoad}
-      style={{ backgroundColor: "red", width: "100%", height: "100%" }}
-    />)
-  }
-}
+})
 
-const displayLayout = {
-  "#": {
-    type: "#",
-    child: "left",
-  },
-  "left": {
-    type: "side-left",
-    child: "bottom",
-    size: 100,
-  },
-  "bottom": {
-    type: "side-bottom",
-    child: "right",
-    size: 100,
-  },
-  "right": {
-    type: "side-right",
-    child: "center",
-    size: 100,
-  },
-  "center": {
-    type: "center-top",
-  },
-}
-
-
-ReactDOM.render(Application.renderDisplayFrame(displayLayout),
-  document.getElementById("root"))
-
-Application.attachWindow(
-  Application.createWindow({
-    id: "toolbox1",
-    title: "Tool Box 1",
-    component: ToolboxX,
-  }), "left")
-
-Application.attachWindow(
-  Application.createWindow({
-    id: "toolbox2",
-    title: "Tool Box 2",
-    component: ToolboxX,
-  }), "right")
-
-Application.attachWindow(
-  Application.createWindow({
-    id: "toolbox3",
-    title: "Tool Box 3",
-    component: ToolboxY,
-  }), "bottom")
-
-Application.attachWindow(
-  Application.createWindow({
-    id: "toolbox4",
-    title: "Tool Box 4",
-    component: ToolboxY,
-  }), "center")
+ReactDOM.render(Application.renderDisplayFrame(), document.getElementById("root"))

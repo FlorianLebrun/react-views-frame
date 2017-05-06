@@ -1,7 +1,3 @@
-/* eslint-disable import/no-namespace */
-import * as Environment from "./environment"
-import * as Storage from "./storage"
-import * as Notification from "./notification"
 import * as Utils from "./utils"
 
 export class ApplicationInstance {
@@ -11,14 +7,6 @@ export class ApplicationInstance {
       if (!onlyFunction || (features[key] instanceof Function)) {
         this[key] = features[key]
       }
-    })
-  }
-  injectAsProperty(clazz) {
-    Object.defineProperty(clazz.prototype, "application", {
-      value: Application,
-      writable: false,
-      enumerable: false,
-      configurable: false,
     })
   }
 }
@@ -34,11 +22,6 @@ export function extendApplication(features: { [string]: any }) {
   })
 }
 
-extendApplication(Environment)
-extendApplication(Storage)
-extendApplication(Notification)
 extendApplication(Utils)
 
-const Application = new ApplicationInstance()
-
-export default Application
+export const Application = new ApplicationInstance()

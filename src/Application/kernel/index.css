@@ -44,7 +44,7 @@
 
 .WND_panel_resizer {
   flex: 0 0 auto;
-  background-color: #456;
+  background-color: #123;
 }
 
 .WND_panel_resizer_V {
@@ -72,7 +72,7 @@
   display: flex;
   white-space: nowrap;
   overflow: hidden;
-  background-color: #def;
+  background-color: #012;
 }
 
 .WND_panel_bar_H {
@@ -91,6 +91,7 @@
 .WND_panel_button_H {
   min-width: 30px;
   max-width: 120px;
+  margin-right: 1px;
   align-items: center;
   padding-left: 10px;
 }
@@ -98,6 +99,7 @@
 .WND_panel_button_V {
   min-height: 30px;
   max-height: 120px;
+  margin-bottom: 1px;
   align-items: center;
   justify-content: center;
 }
@@ -106,15 +108,14 @@
   flex: 1 1 auto;
   display: flex;
   overflow: hidden;
-  border: 1px #789 solid;
-  background-color: #bcd;
-  color: #567;
+  background-color: #123;
+  color: #abc;
   cursor: pointer;
 }
 
 .WND_panel_button-current {
-  background-color: #567;
-  color: #bcd;
+  background-color: #def;
+  color: #234;
 }
 
 .WND_panel_button:hover {
@@ -126,14 +127,28 @@
 /* Menu unwinder button */
 
 .WND_panel_menu_btn {
-  width: 24px;
-  height: 24px;
-  background: transparent url('./img/unwinder.svg') no-repeat center;
+  padding-left: 3px;
+  padding-right: 3px;
   cursor: pointer;
+  color: #789;
+  background-color: #123;
+  border: 1px solid #789;
+}
+
+.WND_panel_menu_btn_H {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.WND_panel_menu_btn_V {
+  text-align: center;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .WND_panel_menu_btn:hover {
-  background: transparent url('./img/unwinder_hover.svg') no-repeat center;
+  border: 1px solid #def;
+  color: #def;
 }
 
 
@@ -145,7 +160,8 @@
 
 .WND_panel_container {
   overflow: auto;
-  background-color: #567;
+  background-color: #fff;
+  /*#567;*/
 }
 
 .WND_panel_container_side {

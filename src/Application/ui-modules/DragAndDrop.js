@@ -5,6 +5,7 @@ import React, { Component } from "react"
 
 import { stopPropagation } from "./event.utils"
 
+let draggedZone: DragZone = null
 let dropHighlight: boolean = false
 let dropSuggested: DropZone = null
 const dropRegistry: Array<DropZone | number> = []
@@ -49,6 +50,29 @@ function BlurDropZone() {
 type DragPropsType = {
   onDragStart: Function,
   onDragEnd: Function,
+  style?: any,
+}
+
+function objectToDataTransfert(obj: Object, dataTransfer: Object) {
+  Object.keys(obj).forEach(key => {
+    dataTransfer.setData(key, JSON.stringify(obj[key]))
+  })
+  if (!obj["text/plain"]) {
+    dataTransfer.setData("text/plain", JSON.stringify(obj))
+  }
+}
+
+function dataTransfertToObject(dataTransfer: Object): Object {
+  const obj = {}
+  dataTransfer.types.forEach((key) => {
+    try {
+      obj[key] = JSON.parse(dataTransfer.getData(key))
+    }
+    catch (e) {
+      console.error(e)
+    }
+  })
+  return obj
 }
 
 export class DragZone extends Component {
@@ -57,23 +81,29 @@ export class DragZone extends Component {
   handleDragStart = (evt) => {
     const bag = this.props.onDragStart && this.props.onDragStart(evt)
     if (bag) {
+      draggedZone = this
       evt.stopPropagation()
-      Object.keys(bag).forEach(key => {
-        evt.dataTransfer.setData(key, JSON.stringify(bag[key]))
-      })
+      objectToDataTransfert(bag, evt.dataTransfer)
       FocusDropZone(bag)
     }
   }
   handleDragEnd = (evt) => {
     evt.stopPropagation()
-    this.props.onDragEnd && this.props.onDragEnd(evt)
+    this.dragComplete()
     BlurDropZone()
+  }
+  dragComplete(data: any) {
+    if (draggedZone === this) {
+      this.props.onDragEnd && this.props.onDragEnd(data || {})
+    }
+    draggedZone = null
   }
   render(): React$Element<any> {
     // eslint-disable-next-line no-unused-vars
     const { onDragStart, onDragEnd, ...otherProps } = this.props
     return (
       <div
+        style={ this.props.style }
         draggable
         onMouseDown={ stopPropagation }
         onDragStart={ this.handleDragStart }
@@ -140,19 +170,12 @@ export class DropZone extends Component {
       evt.stopPropagation()
       evt.preventDefault()
       UnselectDropSuggested(this)
-      const bag = {}
       const x = evt.clientX - evt.currentTarget.offsetLeft
       const y = evt.clientY - evt.currentTarget.offsetTop
-      evt.dataTransfer.types.forEach((key) => {
-        try {
-          bag[key] = JSON.parse(evt.dataTransfer.getData(key))
-        }
-        catch (e) {
-          console.error(e)
-        }
-      })
+      const bag = dataTransfertToObject(evt.dataTransfer)
       try {
-        this.props.onDrop && this.props.onDrop(bag, x, y)
+        const acknowledgment = this.props.onDrop && this.props.onDrop(bag, x, y)
+        draggedZone && draggedZone.dragComplete(acknowledgment)
       }
       catch (e) {
         console.error(e)
@@ -207,9 +230,7 @@ export class DragDropZone extends DropZone {
     const bag = this.props.onDragStart && this.props.onDragStart(evt)
     if (bag) {
       evt.stopPropagation()
-      Object.keys(bag).forEach(key => {
-        evt.dataTransfer.setData(key, JSON.stringify(bag[key]))
-      })
+      objectToDataTransfert(bag, evt.dataTransfer)
       FocusDropZone(bag)
     }
   }
