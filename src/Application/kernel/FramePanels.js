@@ -207,7 +207,7 @@ class SidePanelContainer extends Component {
     }
     let className = CSS_panel_container_side
     if (current) {
-      className += " overflow-" + current.getWindowOverflow()
+      className += " overflow-" + current.windowOverflow()
     }
     return (<div
       ref={"container"}
@@ -240,7 +240,7 @@ class CenterPanelContainer extends Component {
   render() {
     const current = this.props.current
     if (current) {
-      const className = CSS_panel_container_center + " overflow-" + current.getWindowOverflow()
+      const className = CSS_panel_container_center + " overflow-" + current.windowOverflow()
       return (<div className={className}>
         {current.render()}
       </div>)

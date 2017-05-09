@@ -10,6 +10,12 @@ type PropsType = {
   success?: boolean,
   info?: boolean,
   children?: any,
+  onClick?: Function,
+}
+
+const handleClick = (props: PropsType) => (e: SyntheticEvent) => {
+  const { onClick } = props
+  onClick && onClick(e)
 }
 
 export default function WindowHeader(props: PropsType) {
@@ -25,7 +31,7 @@ export default function WindowHeader(props: PropsType) {
 
   return (<div>
     <div className={ "flexbox-row padding btn" + suffix }>
-      <div className={ "flex-1 padding-left" }>{title}</div>
+      <div className={ "flex-1 padding-left" } onClick={ handleClick(props) }>{title}</div>
     </div>
     <div className="margin" >
       {children}

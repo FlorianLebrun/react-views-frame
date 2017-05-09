@@ -46,7 +46,7 @@ export default class TreeNode extends Component<void, PropsType, void> {
     else {
       let headerEvent
       if (open) {
-        childrenElement = (content instanceof Function) ? content(parameters) : content
+        childrenElement = (content instanceof Function) ? content(parameters, this.handleOpen) : content
         if (childrenElement instanceof Promise) {
           iconElement = (<span className="flex-no fa fa-spinner fa-pulse no-padding margin-right icon-sm" />)
           childrenElement.then(this.handleUpdate)

@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component } from "react"
 
-import { PanelResizer } from "../kernel/FramePanels"
+import { PanelResizer } from "../layout/FramePanels"
 
 /** ******************************
 *********************************
@@ -13,6 +13,7 @@ import { PanelResizer } from "../kernel/FramePanels"
 export type ItemSplitType = {
   content: React$Element<any>,
   size: number,
+  overflow: string,
 }
 
 type PropsType = {
@@ -69,7 +70,7 @@ export default class WindowSplit extends Component<void, PropsType, StateType> {
       contents.push(<div
         key={ contents.length }
         ref={ index }
-        style={{ overflow: "hidden", height: sizes[index] + "%" }}
+        style={{ overflow: item.overflow || "auto", height: sizes[index] + "%" }}
                     >
         {item.content}
       </div>)
@@ -86,17 +87,13 @@ export default class WindowSplit extends Component<void, PropsType, StateType> {
     contents.push(<div
       key={ contents.length }
       ref={ index }
-      style={{ overflow: "hidden", height: sizes[index] + "%" }}
+      style={{ overflow: item.overflow || "auto", height: sizes[index] + "%" }}
                   >
       {item.content}
     </div>)
 
-    return (<div className="WND_side_panel WND_side_panel_H" style={ styles.expense }>
+    return (<div className="WND_side_panel WND_side_panel_H width-100 height-100">
       {contents}
     </div>)
   }
-}
-
-const styles = {
-  expense: { width: "100%", height: "100%" },
 }

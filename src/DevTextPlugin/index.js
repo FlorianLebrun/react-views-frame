@@ -16,7 +16,7 @@ export class ToolboxX extends Application.WindowInstance {
 }
 
 export class WebPageWindow extends Application.WindowInstance {
-  getWindowOverflow(): string {
+  windowOverflow(): string {
     return "hidden"
   }
   render() {

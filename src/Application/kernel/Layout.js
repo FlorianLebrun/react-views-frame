@@ -96,7 +96,7 @@ export class WindowInstance {
     this.icon = options.icon || this.icon
     this.dockId = options.dockId || this.dockId
   }
-  getWindowOverflow(): string {
+  windowOverflow(): string {
     return "auto"
   }
   openWindow(windowClassID: WindowClassID, options: WindowOptionsType) {

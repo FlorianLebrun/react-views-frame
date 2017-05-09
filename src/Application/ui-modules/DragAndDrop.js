@@ -39,12 +39,12 @@ function UnregisterDropZone(zone: DropZone) {
 
 function FocusDropZone(data: any) {
   dropHighlight = true
-  dropRegistry.forEach(x => x.isDroppable(data) && x.light())
+  dropRegistry.forEach(x => x.activate(data))
 }
 
 function BlurDropZone() {
   dropHighlight = false
-  dropRegistry.forEach(x => x.light())
+  dropRegistry.forEach(x => x.deactivate())
 }
 
 type DragPropsType = {
@@ -133,36 +133,55 @@ export class DropZone extends Component {
     UnregisterDropZone(this)
   }
 
-  zoneId: number
+  zoneId: number = undefined
+  active: boolean = false
 
-  isDroppable = (data: any) => {
-    return !this.props.isDroppable || this.props.isDroppable(data)
-  }
-  light() {
-    const dom = this.refs.zone
-    if (dropHighlight && this.props.highlightClassName) {
-      dom.className = this.props.className + " " + this.props.highlightClassName
+  activate(data) {
+    const props = this.props
+    if (!props.isDroppable || props.isDroppable(data)) {
+      this.active = true
     }
     else {
+      this.active = false
+    }
+    const dom = this.refs.zone
+    if (this.active && props.highlightClassName) {
+      dom.className = props.className + " " + props.highlightClassName
+    }
+    else {
+      dom.className = props.className
+    }
+  }
+  deactivate() {
+    if (this.active) {
+      const dom = this.refs.zone
       dom.className = this.props.className
+      this.active = false
     }
   }
   select() {
+    const props = this.props
     const dom = this.refs.zone
-    if (dropHighlight && this.props.highlightClassName) {
-      dom.className = this.props.className + " " + this.props.highlightClassName + " " + this.props.selectedClassName
+    if (this.active && props.selectedClassName) {
+      if (props.highlightClassName) {
+        dom.className = props.className + " " + props.highlightClassName + " " + props.selectedClassName
+      }
+      else {
+        dom.className = props.className + " " + props.selectedClassName
+      }
     }
     else {
-      dom.className = this.props.className + " " + this.props.selectedClassName
+      dom.className = props.className
     }
   }
   unselect() {
+    const props = this.props
     const dom = this.refs.zone
-    if (dropHighlight && this.props.highlightClassName) {
-      dom.className = this.props.className + " " + this.props.highlightClassName
+    if (this.active && props.highlightClassName) {
+      dom.className = props.className + " " + props.highlightClassName
     }
     else {
-      dom.className = this.props.className
+      dom.className = props.className
     }
   }
   handleDrop = (evt) => {
