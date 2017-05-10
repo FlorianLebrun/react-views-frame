@@ -76,12 +76,12 @@ export class ApplicationKernel {
   }
   openSubWindow(windowClass: WindowClass, parent: WindowInstance, options: WindowOptionsType) {
     if (windowClass && parent) {
-      return new (windowClass.component)("#" + (this.uidGenerator++), windowClass, parent, parent.plugin, options || {})
+      return windowClass.create("#" + (this.uidGenerator++), parent, parent.plugin, options || {})
     }
   }
   openPluginWindow(windowClass: WindowClass, plugin: PluginInstance, options: WindowOptionsType) {
     if (windowClass && plugin) {
-      return new (windowClass.component)("#" + (this.uidGenerator++), windowClass, null, plugin, options || {})
+      return windowClass.create("#" + (this.uidGenerator++), null, plugin, options || {})
     }
   }
   getWindow(windowId: WindowID) {
@@ -107,7 +107,7 @@ export function removeWindow(windowId: WindowID) {
   delete kernel.windows[windowId]
 }
 
-export function getWindowHandle(windowId: WindowID): WindowInstance {
+export function getWindowInstance(windowId: WindowID): WindowInstance {
   return kernel.getWindow.apply(kernel, arguments)
 }
 

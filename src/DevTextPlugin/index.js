@@ -1,13 +1,15 @@
 import React, { Component } from "react"
 import Application from '../Application'
 
-export class ToolboxX extends Application.WindowInstance {
+export class ToolboxX extends Component {
+  state = { counter: 0 }
   handleClick = () => {
-    Application.addNotification({ level: "error", message: "hello" })
+    this.setState({ counter: this.state.counter + 1 })
+    //Application.addNotification({ level: "error", message: "hello" })
   }
   render() {
     return (<div style={{ backgroundColor: "red", width: 300, height: 300 }}>
-      {"Do something"}<br />
+      {"Counter: "}{this.state.counter}<br />
       <button onClick={this.handleClick}>
         {"Notify"}
       </button>
@@ -15,13 +17,13 @@ export class ToolboxX extends Application.WindowInstance {
   }
 }
 
-export class WebPageWindow extends Application.WindowInstance {
+export class WebPageWindow extends Component {
   windowOverflow(): string {
     return "hidden"
   }
   render() {
     return (<iframe
-      src={this.parameters.url}
+      src={"http://www.qwant.com/"}
       style={{ width: "100%", height: "100%" }}
     />)
   }
@@ -32,6 +34,7 @@ export class DevTextPlugin extends Application.PluginInstance {
 
   pluginDidMount() {
     console.log("DevTextPlugin")
+    this.openWindow("toolbox1")
     this.openWindow("web-page", {
       dockId: "center",
       parameters: {

@@ -242,7 +242,7 @@ class CenterPanelContainer extends Component {
     if (current) {
       const className = CSS_panel_container_center + " overflow-" + current.windowOverflow()
       return (<div className={className}>
-        {current.render()}
+      <UIFrame.WindowContainer current={current} />
       </div>)
     }
     else return this.renderBackScreen()

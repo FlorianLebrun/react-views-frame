@@ -2,6 +2,7 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/prop-types */
 import React, { Component } from "react"
+import ReactDOM from "react-dom"
 import { Application } from "../application"
 
 export type WindowID = string
@@ -25,6 +26,28 @@ export class WindowClass {
     console.assert(Application.isInheritedOf(this.component, WindowInstance),
       "Window '", this.name, "' shall be based on WindowInstance")
   }
+  create(windowId: WindowID, parent: WindowInstance,
+    plugin: WindowInstance, options: WindowOptionsType
+  ) {
+    const node = document.createElement("div")
+    const wnd = ReactDOM.render((<WindowInstance
+      windowId={windowId} windowClass={this}
+      node={node} parent={parent} plugin={plugin} options={options}
+    />), node)
+
+    wnd.id = windowId
+    wnd.windowClass = this
+    wnd.parent = parent
+    wnd.plugin = plugin
+    wnd.component = this.component
+    wnd.keepAlive = this.keepAlive
+    wnd.kernel.windows[windowId] = wnd
+
+    wnd.title = options.title || this.defaultTitle
+    wnd.icon = options.icon || this.defaultIcon
+    wnd.parameters = this.defaultParameters || options.parameters || {}
+    wnd.kernel.dockWindow(wnd, options.dockId || this.defaultDockId)
+  }
 }
 
 export class PluginClass {
@@ -46,7 +69,7 @@ export class PluginClass {
 }
 
 
-export class WindowInstance {
+export class WindowInstance extends Component {
   // Definition
   id: WindowID
   windowClass: WindowClass
@@ -55,6 +78,7 @@ export class WindowInstance {
   component: WindowInstance
   container: WindowContainer
   keepAlive: boolean
+  node: HTMLElement
 
   // Options
   dockId: DockID
@@ -62,26 +86,10 @@ export class WindowInstance {
   icon: string
   parameters: { [string]: any }
 
-  constructor(windowId: WindowID, windowClass: WindowClass,
-    parent: WindowInstance, plugin: WindowInstance, options: WindowOptionsType
-  ) {
-    this.id = windowId
-    this.windowClass = windowClass
-    this.parent = parent
-    this.plugin = plugin
-    this.component = windowClass.component
-    this.keepAlive = windowClass.keepAlive
-    this.kernel.windows[windowId] = this
-
-    this.title = options.title || windowClass.defaultTitle
-    this.icon = options.icon || windowClass.defaultIcon
-    this.parameters = windowClass.defaultParameters || options.parameters || {}
-    this.kernel.dockWindow(this, options.dockId || windowClass.defaultDockId)
-  }
   log(severity) {
     const message = {
       severity: severity,
-      from: this.props && this.props.handle && this.props.handle.title,
+      from: this.props && this.props.window && this.props.window.title,
       content: arguments[1],
     }
     if (arguments.length > 1) {
@@ -110,10 +118,11 @@ export class WindowInstance {
   }
   handleChange = (parameters) => {
     this.parameters = { ...this.parameters, ...parameters }
-    this.container && this.container.updateHandle()
+    this.container && this.container.updateWindow()
   }
   render() {
-    return null
+    const windowClass = this.props.windowClass
+    return (<windowClass.component />)
   }
 }
 
@@ -141,54 +150,56 @@ export type PropsType = {
 }
 
 export type StateType = {
-  handle: WindowInstance,
+  window: WindowInstance,
   props: Object,
 }
 
 export class WindowContainer extends Component {
   props: PropsType
-  state: StateType
+  state: StateType = {}
 
-  componentWillMount() {
-    this.mountHandle(this.props.current)
+  componentDidMount() {
+    this.mountWindow(this.props.current)
   }
   componentWillReceiveProps(nextProps) {
     if (this.props.current !== nextProps.current) {
-      this.unmountHandle()
-      this.mountHandle(nextProps.current)
+      this.unmountWindow()
+      this.mountWindow(nextProps.current)
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return this.state.handle !== nextState.handle ||
+    return this.state.window !== nextState.window ||
       this.state.props !== nextState.props
   }
   componentWillUnmount() {
-    this.unmountHandle()
+    this.unmountWindow()
   }
 
-  updateHandle() {
-    const { handle, props } = this.state
-    if (handle && handle.props !== props) {
-      this.setState({ handle: handle, props: handle.props })
+  updateWindow() {
+    const { window, props } = this.state
+    if (window && window.props !== props) {
+      this.setState({ window: window, props: window.props })
     }
   }
-  mountHandle(handle) {
-    if (handle) {
-      handle.container = this
-      this.setState({ handle: handle, props: handle.props })
+  mountWindow(window) {
+    if (window) {
+      this.refs.host.appendChild(window.props.node)
+      window.container = this
+      this.setState({ window: window, props: window.props })
     }
     else {
-      this.setState({ handle: null, props: null })
+      this.setState({ window: null, props: null })
     }
   }
-  unmountHandle() {
-    const { handle } = this.state
-    if (handle && handle.container === this) {
-      handle.container = null
+  unmountWindow() {
+    const { window } = this.state
+    if (window && window.container === this) {
+      this.refs.host.removeChild(window.props.node)
+      window.container = null
     }
   }
   render() {
-    const { handle } = this.state
-    return handle ? handle.render() : null
+    const { window } = this.state
+    return (<div ref="host" />)
   }
 }

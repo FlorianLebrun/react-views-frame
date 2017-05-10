@@ -5,7 +5,7 @@ import React, { Component } from "react"
 
 import { PanelProps, SidePanelTop, SidePanelLeft, SidePanelRight, SidePanelBottom, CenterPanelTop } from "./FramePanels"
 
-import { getWindowHandle } from "."
+import { getWindowInstance } from "."
 
 type StateType = {
   panels: { [string]: PanelProps },
@@ -29,11 +29,11 @@ export class Frame extends Component {
       const panel: PanelProps = {
         ...panelDesc,
         id: dockId,
-        current: getWindowHandle(panelDesc.current),
+        current: getWindowInstance(panelDesc.current),
         items: [],
       }
       panelDesc.items && panelDesc.items.forEach(wid => {
-        const wnd = getWindowHandle(wid)
+        const wnd = getWindowInstance(wid)
         if (wnd) {
           wnd.dockId = dockId
           panel.items.push(wnd)
@@ -46,7 +46,7 @@ export class Frame extends Component {
   }
   showWindow(windowId: WindowID) {
     const panels = this.state.panels
-    const wnd = getWindowHandle(windowId)
+    const wnd = getWindowInstance(windowId)
     if (!wnd) return null
 
     const origin = panels[wnd.dockId]
@@ -61,7 +61,7 @@ export class Frame extends Component {
   }
   hideWindow(windowId: WindowID) {
     const panels = this.state.panels
-    const wnd = getWindowHandle(windowId)
+    const wnd = getWindowInstance(windowId)
     if (!wnd) return null
 
     const origin = panels[wnd.dockId]
@@ -76,7 +76,7 @@ export class Frame extends Component {
   }
   dettachWindow(windowId: WindowID) {
     const panels = this.state.panels
-    const wnd = getWindowHandle(windowId)
+    const wnd = getWindowInstance(windowId)
     if (!wnd) return null
 
     let origin = panels[wnd.dockId]
@@ -95,7 +95,7 @@ export class Frame extends Component {
   }
   attachWindow(windowId: WindowID, dockId: DockID, foreground: boolean) {
     const panels = this.state.panels
-    const wnd = getWindowHandle(windowId)
+    const wnd = getWindowInstance(windowId)
     if (!wnd) return null
 
     let origin = panels[wnd.dockId]
