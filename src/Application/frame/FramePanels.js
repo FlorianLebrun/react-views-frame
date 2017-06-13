@@ -6,10 +6,9 @@ import { DropZone, DragZone } from "../ui-modules/DragAndDrop"
 import { HtmlGrabReaction, stopEvent } from "../ui-modules/event.utils"
 
 import { Application } from "../application"
+
 import { ButtonPopup } from "./FramePopup"
 import FrameMenu from "./FrameMenu"
-
-import * as UIFrame from "."
 
 export type PanelProps = {
   id: DockID,
@@ -118,8 +117,8 @@ class PanelBar extends Component {
   }
   handleDropWindow = (data) => {
     if (data["window"]) {
-      const wnd = Application.kernel.getWindow(data.window.id)
-      wnd && Application.kernel.dockWindow(wnd, this.props.panel.id, true)
+      const wnd = Application.layout.getWindowInstance(data.window.id)
+      wnd && Application.layout.dockWindow(wnd, this.props.panel.id, true)
     }
   }
   renderMenu(close) {
@@ -176,9 +175,6 @@ export class PanelResizer extends Component {
 *********************************
 *********************************/
 
-const CSS_panel_container_side = "WND_panel_container WND_panel_container_side"
-const CSS_panel_container_center = "WND_panel_container WND_panel_container_center"
-
 type SidePanelContainerPropsType = {
   current: WindowInstance,
   vertical: boolean,
@@ -197,25 +193,29 @@ class SidePanelContainer extends Component {
   }
   getSize() {
     const container = this.refs.container
-    return this.props.vertical ? container.clientWidth : container.clientHeight
+    if (container) {
+      return this.props.vertical ? container.width() : container.height()
+    }
   }
   render() {
     const { current, vertical, size } = this.props
     const style = {
+      ...current && current.style,
       width: vertical ? (size + "%") : "auto",
       height: vertical ? "auto" : (size + "%"),
     }
-    let className = CSS_panel_container_side
+
     if (current) {
-      className += " overflow-" + current.windowOverflow()
+      return (<Application.WindowContainer
+        ref="container"
+        className="WND_panel_container_side"
+        style={style}
+        current={current}
+      />)
     }
-    return (<div
-      ref={"container"}
-      className={className}
-      style={style}
-    >
-      <UIFrame.WindowContainer current={current} />
-    </div>)
+    else {
+      return null
+    }
   }
 }
 
@@ -232,20 +232,22 @@ class CenterPanelContainer extends Component {
     return curProps.current !== nextProps.current
   }
   renderBackScreen() {
-    const kernel = this.props.frame.kernel
-    return (<div className={CSS_panel_container_center}>
-      {kernel.splashComponent && <kernel.splashComponent />}
+    const layout = Application.layout
+    return (<div className="WND_panel_container_center overflow-auto">
+      {layout.splashComponent && <layout.splashComponent />}
     </div>)
   }
   render() {
     const current = this.props.current
     if (current) {
-      const className = CSS_panel_container_center + " overflow-" + current.windowOverflow()
-      return (<div className={className}>
-      <UIFrame.WindowContainer current={current} />
-      </div>)
+      return (<Application.WindowContainer
+        current={current}
+        className="WND_panel_container_center"
+      />)
     }
-    else return this.renderBackScreen()
+    else {
+      return this.renderBackScreen()
+    }
   }
 }
 
@@ -274,10 +276,12 @@ class SidePanel extends Component {
   }
   handleResize = (delta) => {
     const csize = this.refs.container.getSize()
-    let size = this.props.panel.size
-    size += Math.max(size, 1) * delta / Math.max(csize, 1)
-    size = Math.min(Math.max(size, 0), 100)
-    this.props.frame.notifyPanelResize(this.props.panel, size)
+    if (csize !== undefined) {
+      let size = this.props.panel.size
+      size += Math.max(size, 1) * delta / Math.max(csize, 1)
+      size = Math.min(Math.max(size, 0), 100)
+      this.props.frame.notifyPanelResize(this.props.panel, size)
+    }
   }
 }
 
@@ -350,23 +354,7 @@ export class CenterPanelTop extends SidePanelTop {
     const { panel, frame } = this.props
     return (<div className={CSS_side_panel_horizontal}>
       <PanelBar panel={panel} frame={frame} />
-      <CenterPanelContainer ref={"container"} current={panel.current} frame={frame} />
-    </div>)
-  }
-}
-
-export class SplitPanelVertical extends SidePanel {
-  transformDelta(e) {
-    return e.deltaY
-  }
-  render() {
-    const { panel, frame } = this.props
-    const size = panel.current ? panel.size : 0
-    return (<div className={CSS_side_panel_horizontal}>
-      <PanelBar panel={panel} frame={frame} />
-      <SidePanelContainer ref={"container"} current={panel.current} size={size} />
-      <PanelResizer onResize={this.handleResize} transformDelta={this.transformDelta} />
-      <div className="flex-height-100">{this.props.children}</div>
+      <CenterPanelContainer ref={"container"} current={panel.current} />
     </div>)
   }
 }

@@ -6,7 +6,6 @@ import React, { Component } from "react"
 import { stopPropagation } from "./event.utils"
 
 let draggedZone: DragZone = null
-let dropHighlight: boolean = false
 let dropSuggested: DropZone = null
 const dropRegistry: Array<DropZone | number> = []
 
@@ -38,12 +37,10 @@ function UnregisterDropZone(zone: DropZone) {
 }
 
 function FocusDropZone(data: any) {
-  dropHighlight = true
   dropRegistry.forEach(x => x.activate(data))
 }
 
 function BlurDropZone() {
-  dropHighlight = false
   dropRegistry.forEach(x => x.deactivate())
 }
 
@@ -55,10 +52,12 @@ type DragPropsType = {
 
 function objectToDataTransfert(obj: Object, dataTransfer: Object) {
   Object.keys(obj).forEach(key => {
-    dataTransfer.setData(key, JSON.stringify(obj[key]))
+    if (key !== "dragImage") {
+      dataTransfer.setData(key, JSON.stringify(obj[key]))
+    }
   })
-  if (!obj["text/plain"]) {
-    dataTransfer.setData("text/plain", JSON.stringify(obj))
+  if (obj.dragImage) {
+    dataTransfer.setDragImage(obj.dragImage.element, obj.dragImage.left || 0, obj.dragImage.top || 0)
   }
 }
 
@@ -69,7 +68,7 @@ function dataTransfertToObject(dataTransfer: Object): Object {
       obj[key] = JSON.parse(dataTransfer.getData(key))
     }
     catch (e) {
-      console.error(e)
+      // Nothing
     }
   })
   return obj
@@ -189,8 +188,9 @@ export class DropZone extends Component {
       evt.stopPropagation()
       evt.preventDefault()
       UnselectDropSuggested(this)
-      const x = evt.clientX - evt.currentTarget.offsetLeft
-      const y = evt.clientY - evt.currentTarget.offsetTop
+      const rect = evt.currentTarget.getBoundingClientRect()
+      const x = evt.clientX - rect.left
+      const y = evt.clientY - rect.top
       const bag = dataTransfertToObject(evt.dataTransfer)
       try {
         const acknowledgment = this.props.onDrop && this.props.onDrop(bag, x, y)

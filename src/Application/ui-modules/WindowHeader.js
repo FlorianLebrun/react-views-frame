@@ -11,6 +11,7 @@ type PropsType = {
   info?: boolean,
   children?: any,
   onClick?: Function,
+  addon?: any,
 }
 
 const handleClick = (props: PropsType) => (e: SyntheticEvent) => {
@@ -19,7 +20,7 @@ const handleClick = (props: PropsType) => (e: SyntheticEvent) => {
 }
 
 export default function WindowHeader(props: PropsType) {
-  const { title, children, primary, danger, warning, success, info } = props
+  const { title, children, primary, danger, warning, success, info, addon } = props
 
   const suffix
     = primary && "-primary"
@@ -30,8 +31,11 @@ export default function WindowHeader(props: PropsType) {
     || "-default"
 
   return (<div>
-    <div className={ "flexbox-row padding btn" + suffix }>
+    <div className={ "flex-row padding btn" + suffix }>
       <div className={ "flex-1 padding-left" } onClick={ handleClick(props) }>{title}</div>
+      { addon &&
+        <div className={ "flex-0 padding-right" }>{addon}</div>
+      }
     </div>
     <div className="margin" >
       {children}

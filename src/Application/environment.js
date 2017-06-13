@@ -71,34 +71,34 @@ class EnvVar {
       if (!this.filters) this.filters = []
       this.filters.push(callback)
     }
-    else throw new Error("EnvVar::addValueFilter expects a not null function")
+    else throw "EnvVar::addValueFilter expects a not null function"
   }
   addValueListener(callback: Function) {
     if (callback instanceof Function) {
       if (!this.valueListeners) this.valueListeners = []
       this.valueListeners.push(callback)
     }
-    else throw new Error("EnvVar::addValueListener expects a not null function")
+    else throw "EnvVar::addValueListener expects a not null function"
   }
   addStreamListener(callback: Function) {
     if (callback instanceof Function) {
       if (!this.streamListeners) this.streamListeners = []
       this.streamListeners.push(new StreamListener(callback))
     }
-    else throw new Error("EnvVar::addStreamListener expects a not null function")
+    else throw "EnvVar::addStreamListener expects a not null function"
   }
   removeListener(callback: Function) {
     if (callback instanceof Function) {
       if (this.valueListeners) {
         const i = this.valueListeners.indexOf(callback)
-        if (i !== -1) this.valueListeners.splice(i, 1)
+        if (i != -1) this.valueListeners.splice(i, 1)
       }
       if (this.streamListeners) {
         const i = this.streamListeners.findIndex(l => l.callback === callback)
-        if (i !== -1) this.streamListeners.splice(i, 1)
+        if (i != -1) this.streamListeners.splice(i, 1)
       }
     }
-    else throw new Error("EnvVar::removeListener expects a not null function")
+    else throw "EnvVar::removeListener expects a not null function"
   }
   dispatch() {
     const pendingStatus = this.pendingStatus

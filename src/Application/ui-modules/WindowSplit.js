@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component } from "react"
 
-import { PanelResizer } from "../layout/FramePanels"
+import { PanelResizer } from "../frame/FramePanels"
 
 /** ******************************
 *********************************
@@ -31,9 +31,7 @@ export default class WindowSplit extends Component<void, PropsType, StateType> {
 
   componentWillMount() {
     const { items } = this.props
-    this.setState({
-      sizes: items.map(() => 100 / items.length),
-    })
+    this.setSizes(items.map((item) => item.size || 100))
   }
   transformDelta(e) {
     return e.deltaY
@@ -48,10 +46,15 @@ export default class WindowSplit extends Component<void, PropsType, StateType> {
     sizes[index] += delta
     sizes[index + 1] -= delta
 
+    this.setSizes(sizes)
+  }
+  setSizes(sizes) {
     // Normalize sizes
     const len = sizes.reduce((prev, sz) => prev + sz, 0)
     const factor = 100 / len
     sizes.forEach((sz, i) => sizes[i] *= factor)
+
+    // Update state
     this.setState({ sizes })
   }
   render() {

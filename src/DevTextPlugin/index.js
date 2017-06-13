@@ -1,7 +1,7 @@
-import React, { Component } from "react"
+import React from "react"
 import Application from '../Application'
 
-export class ToolboxX extends Component {
+export class ToolboxX extends Application.WindowComponent {
   state = { counter: 0 }
   handleClick = () => {
     this.setState({ counter: this.state.counter + 1 })
@@ -17,10 +17,7 @@ export class ToolboxX extends Component {
   }
 }
 
-export class WebPageWindow extends Component {
-  windowOverflow(): string {
-    return "hidden"
-  }
+export class WebPageWindow extends Application.WindowComponent {
   render() {
     return (<iframe
       src={"http://www.qwant.com/"}
@@ -60,6 +57,7 @@ Application.installPlugin({
       defaultTitle: "Web Page",
       defaultIcon: "globe",
       defaultDockId: "center",
+      overflow: "hidden",
       component: WebPageWindow,
     },
   },

@@ -14,6 +14,7 @@
 
 .cursor-pointer {cursor:pointer}
 .cursor-draggable {cursor:move}
+.cursor-alias {cursor:alias}
 
 .user-select-none {user-select:none;}
 
@@ -25,3 +26,12 @@
 .overflow-scroll-x {overflow:hidden;overflow-x:scroll;overflow-y:hidden;}
 .overflow-scroll-y {overflow:hidden;overflow-y:scroll;overflow-x:hidden;}
 
+.right-seperator {
+  border-right: 1px solid #ccc;
+}
+.left-seperator {
+  border-left: 1px solid #ccc;
+}
+select.no-border {
+  border: 0;
+}

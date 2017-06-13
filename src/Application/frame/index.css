@@ -158,14 +158,12 @@
 *********************************
 *********************************/
 
-.WND_panel_container {
-  overflow: auto;
-  background-color: #fff;
-  /*#567;*/
-}
-
 .WND_panel_container_side {
   flex: 0 0 auto;
+  min-height: 0px;
+  min-width: 0px;
+  width: 100%;
+  height: 100%;
 }
 
 .WND_panel_container_center {

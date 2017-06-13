@@ -30,9 +30,9 @@ export default class SplashBackground extends Component {
 }
 
 
-Application.configureKernel({
+Application.configureLayout({
   splashComponent: SplashBackground,
-  layout: {
+  displayLayout: {
     "#": {
       type: "#",
       child: "left",

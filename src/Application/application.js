@@ -1,4 +1,3 @@
-import * as Utils from "./utils"
 
 export class ApplicationInstance {
 
@@ -7,6 +6,14 @@ export class ApplicationInstance {
       if (!onlyFunction || (features[key] instanceof Function)) {
         this[key] = features[key]
       }
+    })
+  }
+  injectAsProperty(clazz) {
+    Object.defineProperty(clazz.prototype, "application", {
+      value: Application,
+      writable: false,
+      enumerable: false,
+      configurable: false,
     })
   }
 }
@@ -21,7 +28,5 @@ export function extendApplication(features: { [string]: any }) {
     })
   })
 }
-
-extendApplication(Utils)
 
 export const Application = new ApplicationInstance()
