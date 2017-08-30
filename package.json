@@ -1,6 +1,6 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "react-application-frame",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "font-awesome": "^4.7.0",
