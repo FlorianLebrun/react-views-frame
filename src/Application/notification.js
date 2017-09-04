@@ -22,7 +22,10 @@ const notificationSystem: NotificationSystem = ReactDOM.render(
 
 export function addNotification(notification: NotificationType) {
   if (typeof notification !== "object") {
-    notificationSystem.addNotification({ level: "info", message: notification })
+    notificationSystem.addNotification({ 
+      level: arguments[0],
+      message: Array.prototype.slice.call(arguments, 1).join(), 
+    })
   }
   else {
     notificationSystem.addNotification(notification)

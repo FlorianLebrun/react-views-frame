@@ -1,0 +1,206 @@
+/********************************
+*********************************
+*** Technical Classes
+*********************************
+*********************************/
+
+.WND_center_horizontal {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.WND_center_vertical {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+/********************************
+*********************************
+*** Side Panel Classes
+*********************************
+*********************************/
+
+.WND_side_panel {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.WND_side_panel_V {
+  flex-direction: row;
+}
+
+.WND_side_panel_H {
+  flex-direction: column;
+}
+
+
+/********************************
+*********************************
+*** Panel Resizer Classes
+*********************************
+*********************************/
+
+.WND_panel_resizer {
+  flex: 0 0 auto;
+  background-color: #123;
+}
+
+.WND_panel_resizer_V {
+  width: 5px;
+  cursor: w-resize;
+}
+
+.WND_panel_resizer_H {
+  height: 5px;
+  cursor: n-resize;
+}
+
+
+/********************************
+*********************************
+*** Panel Bar Classes
+*********************************
+*********************************/
+
+
+/* Bar (flex) */
+
+.WND_panel_bar {
+  flex: 0 0 auto;
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: #012;
+}
+
+.WND_panel_bar_H {
+  flex-direction: row;
+  height: 30px;
+}
+
+.WND_panel_bar_V {
+  flex-direction: column;
+  width: 30px;
+}
+
+
+/* Bar button */
+
+.WND_panel_button_H {
+  min-width: 30px;
+  max-width: 120px;
+  margin-right: 1px;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.WND_panel_button_V {
+  min-height: 30px;
+  max-height: 120px;
+  margin-bottom: 1px;
+  align-items: center;
+  justify-content: center;
+}
+
+.WND_panel_button {
+  flex: 1 1 auto;
+  display: flex;
+  overflow: hidden;
+  background-color: #123;
+  color: #abc;
+  cursor: pointer;
+}
+
+.WND_panel_button-current {
+  background-color: #def;
+  color: #234;
+}
+
+.WND_panel_button:hover {
+  background-color: #def;
+  color: #567;
+}
+
+
+/* Menu unwinder button */
+
+.WND_panel_menu_btn {
+  padding-left: 3px;
+  padding-right: 3px;
+  cursor: pointer;
+  color: #789;
+  background-color: #123;
+  border: 1px solid #789;
+}
+
+.WND_panel_menu_btn_H {
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.WND_panel_menu_btn_V {
+  text-align: center;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.WND_panel_menu_btn:hover {
+  border: 1px solid #def;
+  color: #def;
+}
+
+
+/********************************
+*********************************
+*** Panel Container Classes
+*********************************
+*********************************/
+
+.WND_panel_container_side {
+  flex: 0 0 auto;
+  min-height: 0px;
+  min-width: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.WND_panel_container_center {
+  flex: 1 1 auto;
+  min-height: 0px;
+  min-width: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+div::-webkit-scrollbar {
+  width: 10px;
+  background-color: #bcd;
+}
+
+div::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+div::-webkit-scrollbar-track {
+  border: 1px #789 solid;
+  border-radius: 10px;
+  -webkit-box-shadow: 0 0 6px #cde inset;
+}
+
+div::-webkit-scrollbar-thumb {
+  background-color: #567;
+  border: 1px solid #012;
+  border-radius: 16px;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+  background-color: #678;
+  border: 1px solid #234;
+}
+
+div::-webkit-scrollbar-thumb:active {
+  background-color: #456;
+  border: 1px solid #234;
+}

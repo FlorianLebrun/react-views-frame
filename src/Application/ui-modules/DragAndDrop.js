@@ -32,7 +32,8 @@ function RegisterDropZone(zone: DropZone) {
 function UnregisterDropZone(zone: DropZone) {
   const lzone = dropRegistry[dropRegistry.length - 1]
   lzone.zoneId = zone.zoneId
-  dropRegistry[zone.zoneId] = lzone
+  zone.zoneId = undefined
+  dropRegistry[lzone.zoneId] = lzone
   dropRegistry.pop()
 }
 

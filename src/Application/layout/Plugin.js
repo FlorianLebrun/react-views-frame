@@ -113,6 +113,7 @@ export class PluginInstance {
   }
   updateNextState = () => {
     if (this.nextState) {
+      const updatedWindows = []
       Object.keys(this.nextState).forEach(key => {
         const value = this.nextState[key]
         const links = this.pluginClass.links[key]
@@ -123,27 +124,24 @@ export class PluginInstance {
             const wnd = windows[wndId]
             const wlink = links.find(lk => lk.window === wnd.windowClass)
             if (wlink) {
-              wnd.updateOptions({
-                parameters: {
-                  [wlink.param]: value,
-                },
-              })
+              wnd.parameters[wlink.param] = value
+              if (updatedWindows.indexOf(wnd) < 0) updatedWindows.push(wnd)
             }
           })
         }
       })
+      updatedWindows.forEach(wnd => wnd.render())
       this.nextState = null
     }
   }
   setState(state: Object) {
-    if (this.nextState) {
-      Object.keys(state).forEach(key => {
-        this.nextState[key] = state[key]
-      })
-    }
-    else {
-      this.nextState = state
-      setTimeout(this.updateNextState, 0)
-    }
+    const oldState = this.nextState
+    const newState = oldState || {}
+    Object.keys(state).forEach(key => {
+      newState[key] = state[key]
+      this[key] = state[key]
+    })
+    this.nextState = newState
+    if (!oldState) setTimeout(this.updateNextState, 0)
   }
 }

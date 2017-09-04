@@ -1,6 +1,6 @@
 
 export function injectConstantsInto(clazz, constants) {
-  if (!Array.isArray(clazz)) clazz = [clazz]
+  if (!Array.isArray(clazz)) clazz = [ clazz ]
   Object.keys(constants).forEach((key) => {
     clazz.forEach(cls => {
       Object.defineProperty(cls.prototype, key, {

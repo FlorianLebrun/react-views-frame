@@ -1,7 +1,7 @@
 {
   "name": "react-application-frame",
   "version": "0.0.0",
-  "private": true,
+  "main":"dist/lib/index.js",
   "dependencies": {
     "font-awesome": "^4.7.0",
     "react": "^15.5.4",
@@ -9,11 +9,19 @@
     "react-notification-system": "^0.2.14"
   },
   "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-eslint": "^7.2.3",
+    "babel-register": "^6.11.6",
+    "babel-register-cli": "^4.0.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.11.0",
     "react-scripts": "0.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "babel src/Application -d dist/lib --source-maps inline --presets flow,react,es2015,stage-2",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }

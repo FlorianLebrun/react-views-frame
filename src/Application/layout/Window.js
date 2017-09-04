@@ -38,7 +38,7 @@ export class WindowClass {
       "Window '", this.name, "' shall be based on WindowComponent")
   }
   addLink(link: Object) {
-    if (!this.links) this.links = [link]
+    if (!this.links) this.links = [ link ]
     else this.links.push(link)
   }
   createDefaultParameters(instance: WindowInstance): Object {
@@ -167,7 +167,7 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   }
   render() {
     const { className, style } = this.props
-    return (<div ref="root" className={className} style={style} />)
+    return (<div ref="root" className={ className } style={ style } />)
   }
 }
 

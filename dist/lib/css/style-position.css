@@ -1,0 +1,146 @@
+.no-padding { padding: 0 !important;}
+.padding {padding: 5px !important;}
+.padding-xs {padding: 3px !important;}
+.padding-sm {padding: 4px !important;}
+.padding-md {padding: 6px !important;}
+.padding-lg {padding: 10px !important;}
+.padding-left {padding-left: 5px !important;}
+.padding-left-xs {padding-left: 3px !important;}
+.padding-left-sm {padding-left: 4px !important;}
+.padding-left-md {padding-left: 6px !important;}
+.padding-left-lg {padding-left: 10px !important;}
+.padding-right {padding-right: 5px !important;}
+.padding-right-xs {padding-right: 3px !important;}
+.padding-right-sm {padding-right: 4px !important;}
+.padding-right-md {padding-right: 6px !important;}
+.padding-right-lg {padding-right: 10px !important;}
+.padding-top {padding-top: 5px !important;}
+.padding-top-xs {padding-top: 3px !important;}
+.padding-top-sm {padding-top: 4px !important;}
+.padding-top-md {padding-top: 6px !important;}
+.padding-top-lg {padding-top: 10px !important;}
+.padding-bottom {padding-bottom: 5px !important;}
+.padding-bottom-xs {padding-bottom: 3px !important;}
+.padding-bottom-sm {padding-bottom: 4px !important;}
+.padding-bottom-md {padding-bottom: 6px !important;}
+.padding-bottom-lg {padding-bottom: 10px !important;}
+.padding-bottom {padding-bottom: 5px !important;}
+.padding-bottom-xs {padding-bottom: 3px !important;}
+.padding-bottom-sm {padding-bottom: 4px !important;}
+.padding-bottom-md {padding-bottom: 6px !important;}
+.padding-bottom-lg {padding-bottom: 10px !important;}
+
+
+.no-margin { margin: 0 !important;}
+.margin {margin: 5px !important;}
+.margin-xs {margin: 3px !important;}
+.margin-sm {margin: 4px !important;}
+.margin-md {margin: 6px !important;}
+.margin-lg {margin: 10px !important;}
+.margin-left {margin-left: 5px !important;}
+.margin-left-xs {margin-left: 3px !important;}
+.margin-left-sm {margin-left: 4px !important;}
+.margin-left-md {margin-left: 6px !important;}
+.margin-left-lg {margin-left: 10px !important;}
+.margin-right {margin-right: 5px !important;}
+.margin-right-xs {margin-right: 3px !important;}
+.margin-right-sm {margin-right: 4px !important;}
+.margin-right-md {margin-right: 6px !important;}
+.margin-right-lg {margin-right: 10px !important;}
+.margin-top {margin-top: 5px !important;}
+.margin-top-xs {margin-top: 3px !important;}
+.margin-top-sm {margin-top: 4px !important;}
+.margin-top-md {margin-top: 6px !important;}
+.margin-top-lg {margin-top: 10px !important;}
+.margin-bottom {margin-bottom: 5px !important;}
+.margin-bottom-xs {margin-bottom: 3px !important;}
+.margin-bottom-sm {margin-bottom: 4px !important;}
+.margin-bottom-md {margin-bottom: 6px !important;}
+.margin-bottom-lg {margin-bottom: 10px !important;}
+.margin-bottom {margin-bottom: 5px !important;}
+.margin-bottom-xs {margin-bottom: 3px !important;}
+.margin-bottom-sm {margin-bottom: 4px !important;}
+.margin-bottom-md {margin-bottom: 6px !important;}
+.margin-bottom-lg {margin-bottom: 10px !important;}
+
+.line {min-height: 30px;height: 30px;}
+.line-xs {min-height: 21px;height: 21px;}
+.line-sm {min-height: 25px;height: 25px;}
+.line-md {min-height: 30px;height: 30px;}
+.line-lg {min-height: 35px;height: 35px;}
+
+.width-100 {width:100%; max-width: 100%;}
+.height-100 {height:100%; max-height: 100%;}
+
+.min-width {min-width: 100px;}
+.min-width-xs {min-width: 50px;}
+.min-width-sm {min-width: 80px;}
+.min-width-md {min-width: 100px;}
+.min-width-lg {min-width: 200px;}
+.min-width-xl {min-width: 300px;}
+
+.max-width {max-width: 100px;}
+.max-width-xs {max-width: 50px;}
+.max-width-sm {max-width: 80px;}
+.max-width-md {max-width: 100px;}
+.max-width-lg {max-width: 200px;}
+.max-width-xl {max-width: 300px;}
+
+.flex-row {display: flex; flex-direction: row; white-space:nowrap;}
+.flex-row.top,
+.flex-row.align-top    {align-items: flex-start;}
+.flex-row.bottom,
+.flex-row.align-bottom {align-items: flex-end;}
+.flex-row.center,
+.flex-row.align-center {align-items: center;}
+.flex-col {display: flex; flex-direction: column; white-space:nowrap;}
+.flex-col.left,
+.flex-col.align-left   {align-items: flex-start;}
+.flex-col.right,
+.flex-col.align-right  {align-items: flex-end;}
+.flex-col.center,
+.flex-col.align-center {align-items: center;}
+.flex-row.wrap,
+.flex-col.wrap         {flex-wrap: wrap;}
+.flex-row.wrap-reverse,
+.flex-col.wrap-reverse {flex-wrap: wrap-reverse;}
+
+.flex-no {flex:0;}
+.flex-1 {flex:1;}
+.flex-2 {flex:2;}
+.flex-3 {flex:3;}
+.flex-4 {flex:4;}
+.flex-5 {flex:5;}
+.flex-6 {flex:6;}
+.flex-7 {flex:7;}
+.flex-8 {flex:8;}
+.flex-9 {flex:9;}
+.flex-10 {flex:10;}
+.flex-11 {flex:11;}
+.flex-12 {flex:12;}
+
+.flex-height-100 {flex:1 1 auto;min-height:0px;height:100%;}
+.flex-width-100 {flex:1 1 auto;min-width:0px;width:100%;}
+
+.flex-start {align-items:flex-start}
+.flex-end {align-items:flex-end}
+.center {align-items:center}
+.baseline {align-items:baseline}
+.stretch {align-items:stretch}
+
+.self-flex-start {align-self:flex-start}
+.self-flex-end {align-self:flex-end}
+.self-center {align-self:center}
+.self-baseline {align-self:baseline}
+.self-stretch {align-self:stretch}
+
+.transform-rotate-90 {-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";-webkit-transform: rotate(90deg);-ms-transform: rotate(90deg);transform: rotate(90deg);}
+.transform-rotate-180 {-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";-webkit-transform: rotate(180deg);-ms-transform: rotate(180deg);transform: rotate(180deg);}
+.transform-rotate-270 {-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";-webkit-transform: rotate(270deg);-ms-transform: rotate(270deg);transform: rotate(270deg);}
+.transform-flip-horizontal {-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";-webkit-transform: scale(-1, 1);-ms-transform: scale(-1, 1);transform: scale(-1, 1);}
+.transform-flip-vertical {-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";-webkit-transform: scale(1, -1);-ms-transform: scale(1, -1);transform: scale(1, -1);}
+
+.inline-block {display: inline-block;}
+
+.position-relative {position: relative;}
+.position-absolute {position: absolute;}
