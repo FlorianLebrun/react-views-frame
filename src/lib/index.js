@@ -5,7 +5,7 @@ import * as Storage from "./storage"
 import * as Notification from "./notification"
 import * as Layout from "./layout"
 import { Application, extendApplication } from "./application"
-import "./css"
+import "../css"
 
 extendApplication(Environment)
 extendApplication(Storage)

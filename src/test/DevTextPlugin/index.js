@@ -1,5 +1,5 @@
 import React from "react"
-import Application from '../Application'
+import Application from '../../lib'
 
 export class ToolboxX extends Application.WindowComponent {
   state = { counter: 0 }

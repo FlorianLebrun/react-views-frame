@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "babel src/Application -d dist/lib --source-maps inline --presets flow,react,es2015,stage-2",
+    "build": "babel src/lib -d dist/lib --source-maps inline --presets flow,react,es2015,stage-2",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
