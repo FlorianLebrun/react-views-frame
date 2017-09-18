@@ -8,23 +8,27 @@ type ParameterLink = {
 export class PluginClass {
   name: string
   instance: PluginInstance
+  parameters: Object
   component: Function<PluginInstance> // constructor of PluginInstance
   windows: { [WindowClassID]: WindowClass } = {}
   links: { [string]: Array<ParameterLink> } = {}
   export: Object
   import: Object
+  context: PluginContext
 
-  constructor(desc: Object) {
+  constructor(desc: Object, parameters: Object, context: PluginContext) {
     desc && Object.keys(desc).forEach(key => this[key] = desc[key])
+    this.context = context
+    this.parameters = parameters
     this.component = this.component || PluginInstance
-    Object.keys(desc.windows).forEach(name => {
+    desc.windows && Object.keys(desc.windows).forEach(name => {
       this.windows[name] = new WindowClass(name, desc.windows[name], this)
     })
   }
   createInstance(): PluginInstance {
     return new (this.component)(this)
   }
-  mountInstance(instance: PluginInstance, context: ApplicationLayout) {
+  mountInstance(instance: PluginInstance, context: PluginContext) {
     this.instance = instance
 
     // Process import
@@ -55,7 +59,7 @@ export class PluginClass {
       })
     })
 
-    instance.pluginWillMount()
+    instance.pluginWillMount(this.parameters)
   }
   addParameterLink(window: Object, param: string) {
     const link = this.resolveValueReference(window.parameters[param], param)
@@ -96,14 +100,16 @@ export class PluginClass {
 
 export class PluginInstance {
   pluginClass: PluginClass
+  application: Object
 
   // Life Cycle management functions
-  pluginWillMount() { }
+  pluginWillMount(parameters: Object) { } // eslint-disable-line
   pluginDidMount() { }
   pluginWillUnmount() { }
 
   constructor(pluginClass: PluginClass) {
     this.pluginClass = pluginClass
+    this.application = pluginClass.context.application
   }
   openWindow(windowName: string, options) {
     this.layout.openPluginWindow(this.pluginClass.windows[windowName], this, options)

@@ -1,9 +1,35 @@
-import { WindowInstance, WindowComponent, WindowContainer, WindowID } from "./Window"
-import { PluginInstance, PluginClass } from "./Plugin"
-import { applicationLayout } from "./Layout"
 
-PluginInstance.prototype.layout = applicationLayout
-WindowInstance.prototype.layout = applicationLayout
+import { WindowInstance, WindowComponent, WindowContainer, WindowID } from "./Window"
+import { PluginInstance } from "./Plugin"
+import { PluginContext } from "./Context"
+
+export default function(app) {
+  const layout = new PluginContext(app)
+  app.installFeatures({
+    layout,
+    WindowComponent,
+    WindowContainer,
+    PluginInstance,
+    configureLayout: function(description: Object): PluginClass {
+      layout.splashComponent = description.splashComponent
+      layout.displayLayout = description.displayLayout
+      return this
+    },
+    installPlugin: function (description: Object): PluginClass { // eslint-disable-line
+      return layout.installPlugin.apply(layout, arguments)
+    },
+    dettachWindow: function(windowId: WindowID) {
+      layout.frame && layout.frame.dettachWindow(windowId)
+    },
+    removeWindow: function(windowId: WindowID) {
+      this.dettachWindow(windowId)
+      delete layout.windows[windowId]
+    },
+    getWindowHandle: function (windowId: WindowID): WindowInstance { // eslint-disable-line
+      return layout.getWindowInstance.apply(layout, arguments)
+    },
+  })
+}
 
 export {
   WindowInstance,
@@ -11,28 +37,5 @@ export {
   WindowContainer,
   WindowID,
   PluginInstance,
-  applicationLayout,
-}
-
-export function configureLayout(description: Object): PluginClass {
-  applicationLayout.splashComponent = description.splashComponent
-  applicationLayout.displayLayout = description.displayLayout
-  return this
-}
-
-export function installPlugin(description: Object): PluginClass { // eslint-disable-line
-  return applicationLayout.installPlugin.apply(applicationLayout, arguments)
-}
-
-export function dettachWindow(windowId: WindowID) {
-  applicationLayout.frame && applicationLayout.frame.dettachWindow(windowId)
-}
-
-export function removeWindow(windowId: WindowID) {
-  dettachWindow(windowId)
-  delete applicationLayout.windows[windowId]
-}
-
-export function getWindowHandle(windowId: WindowID): WindowInstance { // eslint-disable-line
-  return applicationLayout.getWindowInstance.apply(applicationLayout, arguments)
+  PluginContext,
 }

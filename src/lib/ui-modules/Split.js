@@ -25,7 +25,7 @@ type StateType = {
   sizes?: Array<number>,
 }
 
-export default class WindowSplit extends Component<void, PropsType, StateType> {
+export default class Split extends Component<void, PropsType, StateType> {
   props: PropsType
   state: any = {}
 
@@ -95,7 +95,7 @@ export default class WindowSplit extends Component<void, PropsType, StateType> {
       {item.content}
     </div>)
 
-    return (<div className="WND_side_panel H width-100 height-100">
+    return (<div className="WND_side_panel WND_side_panel_H width-100 height-100">
       {contents}
     </div>)
   }

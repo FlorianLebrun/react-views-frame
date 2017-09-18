@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
-import Application from '../lib'
+import Application from './app'
 import './DevTextPlugin'
 
 export default class SplashBackground extends Component {

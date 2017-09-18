@@ -2,11 +2,11 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-string-refs */
+/* eslint-disable react/sort-comp */
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
 
 import { isInheritedOf } from "../utils"
-import { Application } from "../application"
 
 export type WindowID = string
 export type WindowClassID = string
@@ -174,15 +174,14 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
 export class WindowComponent<DefaultProps, Props, State>
   extends Component<DefaultProps, Props, State>
 {
+  instance: WindowInstance
+  plugin: PluginInstance
+
   constructor(props) {
     super(props)
     this.instance = props.instance
     this.plugin = props.instance.plugin
   }
-
-  instance: WindowInstance
-  plugin: PluginInstance
-
   isWindow() {
     return true
   }
@@ -197,7 +196,7 @@ export class WindowComponent<DefaultProps, Props, State>
     }
     if (severity === "error") console.error(...message.content)
     else console.log(...message.content)
-    Application.setEnv("console.debug", message)
+    this.plugin.application.setEnv("console.debug", message)
   }
   // eslint-disable-next-line no-unused-vars
   openWindow(windowClassID: WindowClassID, options: WindowOptions) {

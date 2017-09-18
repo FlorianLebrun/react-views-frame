@@ -1,18 +1,30 @@
-/* eslint-disable import/no-namespace */
-import * as Frame from "./frame"
-import * as Environment from "./environment"
-import * as Storage from "./storage"
-import * as Notification from "./notification"
-import * as Layout from "./layout"
+import installApplicationLayout from "./layout"
+import { renderDisplayFrame } from "./frame"
 import { Application, extendApplication } from "./application"
 import "../css"
 
-extendApplication(Environment)
-extendApplication(Storage)
-extendApplication(Notification)
+import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
+import Split from "./ui-modules/Split"
 
-Application.installFeatures(Layout, true)
-Application.layout = Layout.applicationLayout
-Application.renderDisplayFrame = Frame.renderDisplayFrame
+import Popup from "./addons/popup"
+import Fetch from "./addons/fetch"
+import Notification from "./addons/notification"
 
+installApplicationLayout(Application)
+Application.renderDisplayFrame = renderDisplayFrame
+
+export const UI = {
+  DragZone,
+  DropZone,
+  DragDropZone,
+  Split,
+}
+
+export const Addons = {
+  Popup,
+  Fetch,
+  Notification,
+}
+
+export { extendApplication }
 export default Application

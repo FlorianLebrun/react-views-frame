@@ -1,11 +1,11 @@
 import React from "react"
-import Application from '../../lib'
+import Application from '../app'
 
 export class ToolboxX extends Application.WindowComponent {
   state = { counter: 0 }
   handleClick = () => {
+    Application.addNotification("error", "hello")
     this.setState({ counter: this.state.counter + 1 })
-    //Application.addNotification({ level: "error", message: "hello" })
   }
   render() {
     return (<div style={{ backgroundColor: "red", width: 300, height: 300 }}>

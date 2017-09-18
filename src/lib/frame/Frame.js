@@ -142,7 +142,7 @@ export class Frame extends Component<void, PropsType, StateType> {
     }
     switch (panel.type) {
     case "#":
-      return (<div className="width-100 height-100"> {props.children} </div>)
+      return (<div style={{ height: "100%", width: "100%" }}> {props.children} </div>)
     case "side-left":
       return React.createElement(SidePanelLeft, props)
     case "side-top":
