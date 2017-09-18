@@ -1,6 +1,6 @@
 {
   "name": "react-application-frame",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main":"dist/lib/index.js",
   "dependencies": {
     "font-awesome": "^4.7.0",
