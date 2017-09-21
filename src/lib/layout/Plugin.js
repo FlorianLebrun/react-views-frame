@@ -111,11 +111,14 @@ export class PluginInstance {
     this.pluginClass = pluginClass
     this.application = pluginClass.context.application
   }
-  openWindow(windowName: string, options) {
+  openWindow(windowName: string, options: Object) {
     this.layout.openPluginWindow(this.pluginClass.windows[windowName], this, options)
   }
+  closeWindow(windowName: string) {
+    this.layout.closePluginWindows(this.pluginClass.windows[windowName], this)
+  }
   closeAllWindow() {
-    console.log("closeAllWindow NOT IMPLEMENTED")
+    this.layout.closePluginWindows(null, this)
   }
   updateNextState = () => {
     if (this.nextState) {

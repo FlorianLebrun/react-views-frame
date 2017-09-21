@@ -32,10 +32,10 @@ export default {
         }
         ReactDOM.render((
           <div>
-            <div style={styles.backdrop} className="backdrop web-modal-dialog" />
-            <div style={styles.vWrapper} onClick={outsideReject && handleReject} className="v-wrapper">
-              <div style={styles.hWrapper} className="h-wrapper">
-                <div className="modal-dialog" onClick={handleStopPropagation}>
+            <div style={ styles.backdrop } className="backdrop web-modal-dialog" />
+            <div style={ styles.vWrapper } onClick={ outsideReject && handleReject } className="v-wrapper">
+              <div style={ styles.hWrapper } className="h-wrapper">
+                <div className="modal-dialog" onClick={ handleStopPropagation }>
                   <div className="modal-content">
                     <div className="modal-body">
                       {renderer(handleResolve, handleReject)}

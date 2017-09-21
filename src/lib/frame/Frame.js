@@ -34,11 +34,11 @@ export class Frame extends Component<void, PropsType, StateType> {
       const panel: PanelProps = {
         ...panelDesc,
         id: dockId,
-        current: Application.getWindowHandle(panelDesc.current),
+        current: Application.layout.getWindowInstance(panelDesc.current),
         items: [],
       }
       panelDesc.items && panelDesc.items.forEach(wid => {
-        const wnd = Application.getWindowHandle(wid)
+        const wnd = Application.layout.getWindowInstance(wid)
         if (wnd) {
           wnd.dockId = dockId
           panel.items.push(wnd)
@@ -51,7 +51,7 @@ export class Frame extends Component<void, PropsType, StateType> {
   }
   showWindow(windowId: WindowID) {
     const panels = this.state.panels
-    const wnd = Application.getWindowHandle(windowId)
+    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     const origin = panels[wnd.dockId]
@@ -66,7 +66,7 @@ export class Frame extends Component<void, PropsType, StateType> {
   }
   hideWindow(windowId: WindowID) {
     const panels = this.state.panels
-    const wnd = Application.getWindowHandle(windowId)
+    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     const origin = panels[wnd.dockId]
@@ -81,7 +81,7 @@ export class Frame extends Component<void, PropsType, StateType> {
   }
   dettachWindow(windowId: WindowID) {
     const panels = this.state.panels
-    const wnd = Application.getWindowHandle(windowId)
+    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     let origin = panels[wnd.dockId]
@@ -100,26 +100,30 @@ export class Frame extends Component<void, PropsType, StateType> {
   }
   attachWindow(windowId: WindowID, dockId: DockID, foreground: boolean) {
     const panels = this.state.panels
-    const wnd = Application.getWindowHandle(windowId)
+    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
-    let origin = panels[wnd.dockId]
-    if (origin) {
-      origin = {
-        ...origin,
-        items: origin.items.filter(x => x !== wnd),
+    // Detach from origin panel
+    if (wnd.dockId !== dockId) {
+      let origin = panels[wnd.dockId]
+      if (origin && origin.items.indexOf(wnd) >= 0) {
+        origin = {
+          ...origin,
+          items: origin.items.filter(x => x !== wnd),
+        }
+        if (origin.current === wnd) origin.current = origin.items[0]
+        panels[wnd.dockId] = origin
       }
-      if (origin.current === wnd) origin.current = origin.items[0]
-      panels[wnd.dockId] = origin
     }
 
+    // Attach to target panel
     let panel = panels[dockId]
     if (panel) {
-      panel = {
-        ...panel,
-        current: foreground ? (wnd || panel.current) : (panel.current || wnd),
-        items: [ ...panel.items, wnd ],
+      panel = { ...panel }
+      if (panel.items.indexOf(wnd) < 0) {
+        panel.items = [ ...panel.items, wnd ]
       }
+      panel.current = foreground ? (wnd || panel.current) : (panel.current || wnd)
       panels[dockId] = panel
     }
 

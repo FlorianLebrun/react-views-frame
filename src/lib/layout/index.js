@@ -10,24 +10,8 @@ export default function(app) {
     WindowComponent,
     WindowContainer,
     PluginInstance,
-    configureLayout: function(description: Object): PluginClass {
-      layout.splashComponent = description.splashComponent
-      layout.displayLayout = description.displayLayout
-      return this
-    },
-    installPlugin: function (description: Object): PluginClass { // eslint-disable-line
-      return layout.installPlugin.apply(layout, arguments)
-    },
-    dettachWindow: function(windowId: WindowID) {
-      layout.frame && layout.frame.dettachWindow(windowId)
-    },
-    removeWindow: function(windowId: WindowID) {
-      this.dettachWindow(windowId)
-      delete layout.windows[windowId]
-    },
-    getWindowHandle: function (windowId: WindowID): WindowInstance { // eslint-disable-line
-      return layout.getWindowInstance.apply(layout, arguments)
-    },
+    configureLayout: layout.configureLayout.bind(layout),
+    installPlugin: layout.installPlugin.bind(layout),
   })
 }
 

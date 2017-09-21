@@ -19,30 +19,31 @@ export default {
         throw new Error("no endpoint for " + url)
       }
 
-      options = {
-        method: options && options.method || "GET",
-        headers: {
-          "Accept": "application/json",
-          ...options && options.headers,
-        },
+      const request = {
+        method: "GET",
+        headers: { "Accept": "application/json" },
       }
 
-      if (options.body instanceof Object) {
-        options.headers["Content-Type"] = "application/json"
-        options.body = JSON.stringify(options.body)
-      }
-      else if (options.body) {
-        const contentType = options.headers["Content-Type"]
-        if (!contentType) options.headers["Content-Type"] = "text/plain"
+      if (options) {
+        if (options.body instanceof Object) {
+          request.headers["Content-Type"] = "application/json"
+          request.body = JSON.stringify(options.body)
+        }
+        else if (options.body) {
+          const contentType = options.headers["Content-Type"]
+          if (!contentType) request.headers["Content-Type"] = "text/plain"
+        }
+        if (options.method) request.method = options.method
+        if (options.headers) Object.assign(request.headers, options.headers)
       }
 
       const response = (res) => {
         return new Promise((resolve, reject) => {
 
-          const respondSuccess = function (json) {
+          const respondSuccess = function(json) {
             resolve({ status: res.status, headers: res.headers, json })
           }
-          const respondError = function (error) {
+          const respondError = function(error) {
             reject({ status: res.status, headers: res.headers, error })
           }
 
@@ -62,7 +63,7 @@ export default {
             this.loginPromise.then(() => {
               this.loginPromise = null
               hasLoginRecovery = false
-              const data = { ...options }
+              const data = { ...request }
               resolve(fetch(endpoint.prepare(url, data), data).then(response, response))
             }, (error) => {
               this.loginPromise = null
@@ -79,7 +80,7 @@ export default {
         })
       }
 
-      const data = { ...options }
+      const data = { ...request }
       return fetch(endpoint.prepare(url, data), data).then(response, response)
     }
   },

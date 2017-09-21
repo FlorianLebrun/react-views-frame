@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
-import Application from './app'
-import './DevTextPlugin'
+import Application from "./app"
+import "./DevTextPlugin"
 
 export default class SplashBackground extends Component {
   style = {
@@ -21,14 +21,13 @@ export default class SplashBackground extends Component {
     },
   }
   render() {
-    return (<div style={this.style.body}>
-      <h1 style={this.style.title}>
+    return (<div style={ this.style.body }>
+      <h1 style={ this.style.title }>
         {"{ react-application-frame }"}
       </h1>
     </div>)
   }
 }
-
 
 Application.configureLayout({
   splashComponent: SplashBackground,
@@ -56,7 +55,7 @@ Application.configureLayout({
       type: "center-top",
       menu: true,
     },
-  }
+  },
 })
 
 ReactDOM.render(Application.renderDisplayFrame(), document.getElementById("root"))

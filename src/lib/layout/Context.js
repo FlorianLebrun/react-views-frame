@@ -57,7 +57,11 @@ export class PluginContext {
       plugin.pluginWillUnmount()
     })
   }
-  installPlugin(description: Object, parameters:Object): PluginClass {
+  configureLayout(description: Object) {
+    this.splashComponent = description.splashComponent
+    this.displayLayout = description.displayLayout
+  }
+  installPlugin(description: Object, parameters: Object): PluginClass {
     const pluginClass = new PluginClass(description, parameters, this)
     this.pluginClasses[description.name] = pluginClass
     if (this.windowLoaded) {
@@ -69,11 +73,20 @@ export class PluginContext {
     return pluginClass
   }
   dockWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
-    this.frame.attachWindow(wnd.id, dockId, foreground)
+    this.frame && this.frame.attachWindow(wnd.id, dockId, foreground)
+  }
+  dettachWindow(windowId: WindowID) {
+    this.frame && this.frame.dettachWindow(windowId)
+  }
+  removeWindow(windowId: WindowID) {
+    const wnd = this.windows[windowId]
+    this.dettachWindow(windowId)
+    delete this.windows[windowId]
+    wnd.close()
   }
   openSubWindow(windowClass: WindowClass, parent: WindowInstance, options: WindowOptions) {
     if (windowClass && parent) {
-      let wnd = (options && options.openNew) ? null : this.getWindowInstanceFromClass(windowClass)
+      let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)
       if (!wnd) {
         wnd = new WindowInstance("#" + (this.uidGenerator++), windowClass, parent, parent.plugin, options || {})
       }
@@ -84,8 +97,8 @@ export class PluginContext {
     }
   }
   openPluginWindow(windowClass: WindowClass, plugin: PluginInstance, options: WindowOptions) {
-    if (windowClass && parent) {
-      let wnd = (options && options.openNew) ? null : this.getWindowInstanceFromClass(windowClass)
+    if (windowClass) {
+      let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)
       if (!wnd) {
         wnd = new WindowInstance("#" + (this.uidGenerator++), windowClass, null, plugin, options || {})
       }
@@ -95,13 +108,49 @@ export class PluginContext {
       this.dockWindow(wnd, wnd.dockId, true)
     }
   }
+  closePluginWindows(windowClass: WindowClass, plugin: PluginInstance) {
+    let windows
+    if (windowClass) windows = this.findAllWindowsByClass(windowClass)
+    else windows = this.findAllWindowsByPlugin(plugin)
+    windows.forEach(wnd => this.removeWindow(wnd.id))
+  }
   getWindowInstance(windowId: WindowID) {
     return this.windows[windowId]
   }
-  getWindowInstanceFromClass(windowClass: WindowClass) {
-    const windowId = Object.keys(this.windows).find(key => {
-      return (this.windows[key].windowClass === windowClass) ? this.windows[key] : null
-    })
-    return windowId && this.windows[windowId]
+  findOneWindowByClass(windowClass: WindowClass): WindowInstance {
+    let windowId
+    for (windowId in this.windows) {
+      if (this.windows[windowId].windowClass === windowClass) {
+        return this.windows[windowId]
+      }
+    }
+    return null
+  }
+  findAllWindowsByPlugin(plugin: PluginInstance): Array<WindowInstance> {
+    const windows = []
+    if (plugin) {
+      let windowId
+      for (windowId in this.windows) {
+        if (this.windows[windowId].plugin === plugin) {
+          windows.push(this.windows[windowId])
+        }
+      }
+    }
+    return windows
+  }
+  findAllWindowsByClass(windowClass: WindowClass): Array<WindowInstance> {
+    if (windowClass) {
+      let windowId
+      const windows = []
+      for (windowId in this.windows) {
+        if (this.windows[windowId].windowClass === windowClass) {
+          windows.push(this.windows[windowId])
+        }
+      }
+      return windows
+    }
+    else {
+      return this.windows.values()
+    }
   }
 }

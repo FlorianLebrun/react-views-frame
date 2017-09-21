@@ -76,7 +76,7 @@ class PanelButton extends Component {
     if (e.button === 1) {
       stopEvent(e)
       const item = this.props.item
-      Application.removeWindow(item.id)
+      Application.layout.removeWindow(item.id)
     }
   }
   render() {
