@@ -106,7 +106,6 @@ export class WindowInstance {
     this.layout.showSubWindow(this.windows[windowID], this, options)
   }
   close() {
-    if (this.container) throw new Error("a window shall be dettached before closing")
     ReactDOM.unmountComponentAtNode(this.node)
   }
   handleChange = (parameters) => {

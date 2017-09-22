@@ -1,6 +1,6 @@
 {
   "name": "react-application-frame",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main":"dist/lib/index.js",
   "peerDependencies": {
     "font-awesome": "^4.7.0",
