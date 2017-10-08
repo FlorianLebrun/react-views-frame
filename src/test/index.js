@@ -7,22 +7,22 @@ export default class SplashBackground extends Component {
   style = {
     body: {
       display: "flex",
+      backgroundColor:"#012",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       height: "100%",
     },
     title: {
-      color: "#012",
+      color: "transparent",
       fontFamily: "Consolas",
-      textShadow: "5px 5px 5px #abc",
-      borderTop: "2px solid #012",
+      textShadow: "5px 5px 5px #123",
       padding: 20,
     },
   }
   render() {
-    return (<div style={ this.style.body }>
-      <h1 style={ this.style.title }>
+    return (<div style={this.style.body}>
+      <h1 style={this.style.title}>
         {"{ react-application-frame }"}
       </h1>
     </div>)

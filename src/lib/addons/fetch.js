@@ -19,31 +19,32 @@ export default {
         throw new Error("no endpoint for " + url)
       }
 
-      const request = Object.assign({ headers:{} }, options)
-      if (options) {
-        if (options.body instanceof Object) {
+      const request = Object.assign({}, options)
+      request.headers = {
+        "Accept": "application/json",
+        ...request.headers,
+      }
+      if (request.body) {
+        request.method = request.method || "POST"
+        if (request.body instanceof Object) {
           request.headers["Content-Type"] = "application/json"
-          request.body = JSON.stringify(options.body)
+          request.body = JSON.stringify(request.body)
         }
-        else if (options.body) {
-          const contentType = options.headers["Content-Type"]
-          if (!contentType) request.headers["Content-Type"] = "text/plain"
+        else if (!request.headers["Content-Type"]) {
+          request.headers["Content-Type"] = "text/plain"
         }
-        request.method = options.method || "GET"
-        request.headers = Object.assign({ "Accept": "application/json" }, options.headers)
       }
       else {
-        request.method = "GET"
-        request.headers = { "Accept": "application/json" }
+        request.method = request.method || "GET"
       }
 
       const response = (res) => {
         return new Promise((resolve, reject) => {
 
-          const respondSuccess = function(json) {
+          const respondSuccess = function (json) {
             resolve({ status: res.status, headers: res.headers, json })
           }
-          const respondError = function(error) {
+          const respondError = function (error) {
             reject({ status: res.status, headers: res.headers, error })
           }
 

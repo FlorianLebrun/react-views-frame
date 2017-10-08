@@ -1,7 +1,7 @@
-import "font-awesome/css/font-awesome.min.css"
+require("font-awesome/css/font-awesome.min.css");
 
-import "./style-display.css"
-import "./style-position.css"
-import "./style-bootstrap.css"
+require("./style-display.css");
+require("./style-position.css");
+require("./style-bootstrap.css");
 
-import "./frame.css"
+require("./frame.css");
