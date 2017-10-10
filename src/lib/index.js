@@ -1,17 +1,15 @@
-import installApplicationLayout from "./layout"
-import { renderDisplayFrame } from "./frame"
-import { Application, extendApplication } from "./application"
 import "../css"
 
+import installApplicationLayout from "./layout"
+import { Application, extendApplication } from "./application"
 import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
 import Split from "./ui-modules/Split"
-
 import Popup from "./addons/popup"
 import Fetch from "./addons/fetch"
 import Notification from "./addons/notification"
+import WindowsFrame from "./addons/windows-frame"
 
 installApplicationLayout(Application)
-Application.renderDisplayFrame = renderDisplayFrame
 
 export const UI = {
   DragZone,
@@ -24,6 +22,7 @@ export const Addons = {
   Popup,
   Fetch,
   Notification,
+  WindowsFrame,
 }
 
 export { extendApplication }

@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component } from "react"
 
-import { PanelResizer } from "../frame/FramePanels"
+import { PanelResizer } from "../addons/windows-frame/FramePanels"
 
 /** ******************************
 *********************************

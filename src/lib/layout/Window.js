@@ -57,7 +57,7 @@ export class WindowInstance {
   id: WindowID
   windowClass: WindowClass
   parent: WindowInstance
-  plugin: PluginInstance
+  plugin: PluginComponent
   component: WindowComponent
   container: WindowContainer
   node: HtmlElement
@@ -175,7 +175,7 @@ export class WindowComponent<DefaultProps, Props, State>
   extends Component<DefaultProps, Props, State>
 {
   instance: WindowInstance
-  plugin: PluginInstance
+  plugin: PluginComponent
 
   constructor(props) {
     super(props)

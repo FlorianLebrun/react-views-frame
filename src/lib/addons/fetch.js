@@ -1,8 +1,8 @@
-import { PluginInstance } from "../layout"
+import { PluginComponent } from "../layout"
 
 export default {
   name: "fetch-addon",
-  component: class extends PluginInstance {
+  component: class extends PluginComponent {
     endpoints: Array = null
     loginPromise: Promise = null
     enableLoginRecovery: boolean = true
@@ -41,12 +41,15 @@ export default {
       const response = (res) => {
         return new Promise((resolve, reject) => {
 
-          const respondSuccess = function (json) {
+          const respondSuccess = function(json) {
             resolve({ status: res.status, headers: res.headers, json })
           }
-          const respondError = function (error) {
+          const respondError = function(error) {
             reject({ status: res.status, headers: res.headers, error })
           }
+
+          const contentType = res.headers && res.headers.get("content-type")
+          const isJson = contentType && contentType.toLowerCase().indexOf("application/json") !== -1
 
           if (res.status >= 200 && res.status < 300) {
             if (endpoint.feedback) {
@@ -55,8 +58,11 @@ export default {
             if (res.status === 204) {
               return respondSuccess({})
             }
-            else {
+            else if (isJson && res.json instanceof Function) {
               return res.json().then(respondSuccess, respondError)
+            }
+            else {
+              return res.blob().then(respondSuccess, respondError)
             }
           }
           else if (res.status === 401 && hasLoginRecovery && endpoint.login) {
@@ -75,7 +81,7 @@ export default {
               respondError(error)
             })
           }
-          else if (res.json && res.json instanceof Function) {
+          else if (isJson && res.json instanceof Function) {
             return res.json().then(respondError, () => {
               this.enableLoginRecovery = false
               respondError(res.error)

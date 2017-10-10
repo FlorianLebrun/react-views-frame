@@ -3,7 +3,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component } from "react"
 
-import { Application } from "../application"
+import { Application } from "../../application"
 
 import { PanelProps, SidePanelTop, SidePanelLeft, SidePanelRight, SidePanelBottom, CenterPanelTop } from "./FramePanels"
 

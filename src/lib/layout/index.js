@@ -1,7 +1,9 @@
 
 import { WindowInstance, WindowComponent, WindowContainer, WindowID } from "./Window"
-import { PluginInstance } from "./Plugin"
+import { PluginComponent } from "./Plugin"
 import { PluginContext } from "./Context"
+
+const PluginInstance = PluginComponent
 
 export default function(app) {
   const layout = new PluginContext(app)
@@ -21,5 +23,6 @@ export {
   WindowContainer,
   WindowID,
   PluginInstance,
+  PluginComponent,
   PluginContext,
 }

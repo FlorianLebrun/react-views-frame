@@ -3,9 +3,9 @@
 /* eslint-disable react/no-string-refs */
 import React, { Component } from "react"
 
-import { DropZone, DragZone } from "../ui-modules/DragAndDrop"
-import { HtmlGrabReaction, stopEvent } from "../ui-modules/event.utils"
-import { Application } from "../application"
+import { DropZone, DragZone } from "../../ui-modules/DragAndDrop"
+import { HtmlGrabReaction, stopEvent } from "../../ui-modules/event.utils"
+import { Application } from "../../application"
 
 import { ButtonPopup } from "./FramePopup"
 import FrameMenu from "./FrameMenu"

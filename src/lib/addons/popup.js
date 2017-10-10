@@ -1,11 +1,11 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-import { PluginInstance } from "../layout"
+import { PluginComponent } from "../layout"
 
 export default {
   name: "popup-addon",
-  component: class extends PluginInstance {
+  component: class extends PluginComponent {
     modalStack = []
     pluginWillMount() {
       this.application.popup = this.popup.bind(this)

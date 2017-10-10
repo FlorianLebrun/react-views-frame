@@ -1,10 +1,10 @@
 /* eslint-disable react/no-multi-comp */
-import { PluginInstance, PluginClass } from "./Plugin"
+import { PluginComponent, PluginClass } from "./Plugin"
 import { WindowInstance, WindowClass, WindowID } from "./Window"
 
 export class PluginContext {
   pluginClasses: { [string]: PluginClass } = {}
-  plugins: { [string]: PluginInstance } = {}
+  plugins: { [string]: PluginComponent } = {}
   windows: { [string]: WindowInstance } = {}
   docks: { [string]: Array<WindowInstance> } = {}
   frame: Frame = null
@@ -16,39 +16,27 @@ export class PluginContext {
 
   constructor(application) {
     this.application = application
-    PluginInstance.prototype.layout = this
+    PluginComponent.prototype.layout = this
+    PluginComponent.prototype.application = application
     WindowInstance.prototype.layout = this
-    PluginInstance.prototype.application = application
     WindowInstance.prototype.application = application
     window.addEventListener("beforeunload", this.unmountPlugins)
   }
   registerFrame(frame: Frame) {
-    const prevFrame = this.frame
-    if (!frame && prevFrame) {
-      this.unmountPlugins()
-    }
     this.frame = frame
-    if (frame && !prevFrame) {
-      this.mountPlugins()
-    }
   }
   mountPlugins = () => {
     this.windowLoaded = true
     const pluginNames = Object.keys(this.pluginClasses)
 
-    // Instancing plugins
-    pluginNames.forEach(name => {
-      this.plugins[name] = this.pluginClasses[name].createInstance()
-    })
-
     // Connect plugins
     pluginNames.forEach(name => {
-      this.pluginClasses[name].mountInstance(this.plugins[name], this)
+      this.pluginClasses[name].willMount()
     })
 
     // Finalize plugins mount
     pluginNames.forEach(name => {
-      this.plugins[name].pluginDidMount()
+      this.pluginClasses[name].didMount()
     })
   }
   unmountPlugins = () => {
@@ -61,15 +49,17 @@ export class PluginContext {
     this.splashComponent = description.splashComponent
     this.displayLayout = description.displayLayout
   }
-  installPlugin(description: Object, parameters: Object): PluginClass {
-    const pluginClass = new PluginClass(description, parameters, this)
-    this.pluginClasses[description.name] = pluginClass
-    if (this.windowLoaded) {
-      const plugin = pluginClass.createInstance()
-      this.plugins[pluginClass.name] = plugin
-      plugin.pluginWillMount(parameters)
-      plugin.pluginDidMount()
+  mapPlugin(name) {
+    let pluginClass = this.pluginClasses[name]
+    if (!pluginClass) {
+      pluginClass = new PluginClass(name, this)
+      this.pluginClasses[name] = pluginClass
     }
+    return pluginClass
+  }
+  installPlugin(description: Object, parameters: Object): PluginClass {
+    const pluginClass = this.mapPlugin(description.name)
+    pluginClass.setup(description, parameters)
     return pluginClass
   }
   dockWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
@@ -96,7 +86,7 @@ export class PluginContext {
       this.dockWindow(wnd, wnd.dockId, true)
     }
   }
-  openPluginWindow(windowClass: WindowClass, plugin: PluginInstance, options: WindowOptions) {
+  openPluginWindow(windowClass: WindowClass, plugin: PluginComponent, options: WindowOptions) {
     if (windowClass) {
       let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)
       if (!wnd) {
@@ -108,7 +98,7 @@ export class PluginContext {
       this.dockWindow(wnd, wnd.dockId, true)
     }
   }
-  closePluginWindows(windowClass: WindowClass, plugin: PluginInstance) {
+  closePluginWindows(windowClass: WindowClass, plugin: PluginComponent) {
     let windows
     if (windowClass) windows = this.findAllWindowsByClass(windowClass)
     else windows = this.findAllWindowsByPlugin(plugin)
@@ -126,7 +116,7 @@ export class PluginContext {
     }
     return null
   }
-  findAllWindowsByPlugin(plugin: PluginInstance): Array<WindowInstance> {
+  findAllWindowsByPlugin(plugin: PluginComponent): Array<WindowInstance> {
     const windows = []
     if (plugin) {
       let windowId

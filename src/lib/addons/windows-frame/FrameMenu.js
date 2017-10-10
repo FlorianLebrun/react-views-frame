@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 
-import { Application } from "../application"
+import { Application } from "../../application"
 
 export default class FrameMenu extends Component<void, void, void> {
   props: any

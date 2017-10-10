@@ -2,7 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 import NotificationSystem from "react-notification-system"
 
-import { PluginInstance } from "../layout"
+import { PluginComponent } from "../layout"
 
 type NotificationType = {
   uid: number,
@@ -15,7 +15,7 @@ type NotificationType = {
 
 export default {
   name: "notification-addon",
-  component: class extends PluginInstance {
+  component: class extends PluginComponent {
     notificationNode: HTMLElement = null
     notificationSystem: NotificationSystem = null
     modalStack = []

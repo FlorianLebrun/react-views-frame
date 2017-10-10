@@ -20,3 +20,7 @@ export function isInheritedOf(What, Of) {
   }
   return false
 }
+
+export function isClass(value) {
+  return typeof value === "function" && value.prototype.constructor === value
+}

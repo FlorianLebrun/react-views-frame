@@ -5,49 +5,116 @@ type ParameterLink = {
   param: string,
 }
 
+const PluginStatus = {
+  Mapped: { desc: "mapped but not installed" },
+  Installed: { desc: "instancied and will mount" },
+  Mounted: { desc: "instancied and will mount" },
+}
+
 export class PluginClass {
   name: string
-  instance: PluginInstance
+  status: Object
+  instance: PluginComponent
+  component: Function
   parameters: Object
-  component: Function<PluginInstance> // constructor of PluginInstance
   windows: { [WindowClassID]: WindowClass } = {}
   links: { [string]: Array<ParameterLink> } = {}
   export: Object
   import: Object
   context: PluginContext
+  users: Array<PluginClass>
+  dependencies: Array<PluginClass>
 
-  constructor(desc: Object, parameters: Object, context: PluginContext) {
-    desc && Object.keys(desc).forEach(key => this[key] = desc[key])
+  constructor(name: string, context: PluginContext) {
+    this.name = name
+    this.status = PluginStatus.Mapped
     this.context = context
+  }
+  setup(desc: Object, parameters: Object) {
     this.parameters = parameters
-    this.component = this.component || PluginInstance
-    desc.windows && Object.keys(desc.windows).forEach(name => {
-      this.windows[name] = new WindowClass(name, desc.windows[name], this)
-    })
+    this.component = desc.component || PluginComponent
+
+    // Setup dependencies
+    if (desc.dependencies) {
+      desc.dependencies.forEach(name => {
+        return this.addDependency(name)
+      })
+    }
+
+    // Setup windows
+    if (desc.windows) {
+      Object.keys(desc.windows).forEach(name => {
+        this.windows[name] = new WindowClass(name, desc.windows[name], this)
+      })
+      this.addDependency("windows-frame")
+    }
+
+    // Mount an instance
+    this.willMount()
+
+    // Prompt for did mount procedure
+    this.promptMount()
   }
-  createInstance(): PluginInstance {
-    return new (this.component)(this)
+  addUser(user: PluginClass) {
+    if (!this.users) this.users = []
+    this.users.push(user)
+    return this
   }
-  mountInstance(instance: PluginInstance, context: PluginContext) {
-    this.instance = instance
+  addDependency(name: string) {
+    const pluginClass = this.context.mapPlugin(name)
+    if (!this.dependencies) this.dependencies = []
+
+    const deps = this.dependencies
+    for (let i = 0; i < deps.length; i++) {
+      if (deps[i] === pluginClass) return
+    }
+    deps.push(pluginClass)
+    return pluginClass.addUser(this)
+  }
+  promptMount() {
+    if (this.status === PluginStatus.Installed) {
+      const deps = this.dependencies
+      if (deps) {
+        for (let i = 0; i < deps.length; i++) {
+          if (!deps[i].instance) return
+        }
+      }
+      this.didMount()
+    }
+  }
+  willMount() {
+    this.status = PluginStatus.Installed
+
+    // Create instance
+    this.instance = new (this.component)(this)
+    this.context.plugins[this.name] = this.instance
+
+    // Call will mount
+    this.instance.pluginWillMount(this.parameters)
+
+    // Notify all user plugins
+    this.users && this.users.forEach(x => x.promptMount(this))
+  }
+  didMount() {
+    this.status = PluginStatus.Mounted
 
     // Process import
     this.import && Object.keys(this.import).forEach(name => {
       const ref = this.import[name]
-      const plugin = context.plugins[name]
+      const plugin = this.context.plugins[name]
       const pluginExport = plugin.pluginClass.export
       if (pluginExport) {
         if (ref === true) {
           pluginExport.forEach(key => {
-            instance[key] = plugin[key]
+            this.instance[key] = plugin[key]
           })
         }
         else if (typeof ref === "string") {
-          instance[ref] = plugin
+          this.instance[ref] = plugin
         }
       }
       else if (typeof ref === "string") {
-        instance[ref] = plugin
+        this.instance[ref] = plugin
       }
     })
 
@@ -59,7 +126,7 @@ export class PluginClass {
       })
     })
 
-    instance.pluginWillMount(this.parameters)
+    this.instance.pluginDidMount()
   }
   addParameterLink(window: Object, param: string) {
     const link = this.resolveValueReference(window.parameters[param], param)
@@ -98,7 +165,7 @@ export class PluginClass {
   }
 }
 
-export class PluginInstance {
+export class PluginComponent {
   pluginClass: PluginClass
   application: Object
 
