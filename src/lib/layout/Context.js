@@ -24,7 +24,7 @@ export class PluginContext {
   }
   registerFrame(frame: Frame) {
     this.frame = frame
-    Object.keys(this.windows).forEach(key=>{
+    frame && Object.keys(this.windows).forEach(key=>{
       const wnd = this.windows[key]
       frame.attachWindow(wnd.id, wnd.dockId)
     })
