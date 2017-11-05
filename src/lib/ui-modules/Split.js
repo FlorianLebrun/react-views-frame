@@ -1,5 +1,4 @@
 /* eslint-disable react/no-string-refs */
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component } from "react"
 
 import { PanelResizer } from "../addons/windows-frame/FramePanels"
@@ -21,82 +20,129 @@ type PropsType = {
   style?: Object | Array<any>,
 }
 
-type StateType = {
-  sizes?: Array<number>,
-}
-
-export default class Split extends Component<void, PropsType, StateType> {
+export default class Split extends Component<void, PropsType, void> {
   props: PropsType
-  state: any = {}
 
   componentWillMount() {
     const { items } = this.props
-    this.setSizes(items.map((item) => item.size || 100))
+    this.sizes = items.map((item) => item.size || 0)
+    this.modes = items.map((item) => item.size !== undefined ? 1 : 0)
+    this.styles = items.map((item) => ({ overflow: item.overflow || "auto" }))
+    this.applySizes()
   }
+
+  sizes: Array<number>
+  modes: Array<number>
+  styles: Array<Object>
+
   transformDelta(e) {
     return e.deltaY
   }
   handleResize = (index) => (delta) => {
-    const sizes = this.state.sizes.slice()
-    const csize = this.refs[index].clientHeight
+    const { sizes, modes } = this
+    if (modes[index] > 0) {
+      const csize = this.refs[index].clientHeight
 
-    // Update sizes
-    const size = sizes[index]
-    delta = Math.max(size, 1) * delta / Math.max(csize, 1)
-    sizes[index] += delta
-    sizes[index + 1] -= delta
+      // Update sizes
+      const size = sizes[index]
+      delta = Math.max(size, 1) * delta / Math.max(csize, 1)
+      sizes[index] += delta
+      sizes[index + 1] -= delta
 
-    this.setSizes(sizes)
+      this.applySizes()
+    }
   }
-  setSizes(sizes) {
-    // Normalize sizes
-    const len = sizes.reduce((prev, sz) => prev + sz, 0)
-    const factor = 100 / len
-    sizes.forEach((sz, i) => sizes[i] *= factor)
+  handleCollapse = (index) => () => {
+    const { modes } = this
+    modes[index] = -modes[index]
+    this.applySizes()
+  }
+  applySizes() {
+    const { sizes, modes, styles } = this
 
-    // Update state
-    this.setState({ sizes })
+    // Accumulate sizes
+    let len = 0
+    for (let i = 0; i < sizes.length; i++) {
+      if (sizes[i] > 0) len += sizes[i]
+    }
+
+    // Normalize sizes
+    const factor = len ? 100 / len : 1
+    for (let i = 0; i < sizes.length; i++) {
+      const mode = modes[i]
+      sizes[i] *= factor
+      if (mode > 0) {
+        styles[i] = { ...styles[i], height: sizes[i] + "%" }
+      }
+      else if (mode < 0) {
+        styles[i] = { ...styles[i], height: 0 }
+      }
+      else {
+        styles[i] = { height: "auto" }
+      }
+    }
+
+    // Update
+    this.forceUpdate()
   }
   render() {
     const { items } = this.props
-    const { sizes } = this.state
     const contents = []
-    let index = 0
 
     if (!items || !Array.isArray(items)) {
       console.error("Empty Collapsible Window is useless.")
       return null
     }
 
-    while (index < items.length - 1) {
-      const item = items[index]
+    const lastIndex = items.length - 1
+    for (let i = 0; i <= lastIndex; i++) {
+      const item = items[i]
+
+      // Render header
+      if (item.header) {
+        contents.push(<div
+          key={ contents.length }
+          style={ styles.header }
+          onClick={ this.handleCollapse(i) }
+                      >
+          {this.modes[i] > 0
+            ? <span className="fa fa-fw fa-caret-right padding-xs" />
+            : <span className="fa fa-fw fa-caret-down padding-xs" />
+          }
+          {item.header}
+        </div>)
+      }
+
+      // Render content
       contents.push(<div
         key={ contents.length }
-        ref={ index }
-        style={{ overflow: item.overflow || "auto", height: sizes[index] + "%" }}
+        ref={ i }
+        style={ this.styles[i] }
                     >
         {item.content}
       </div>)
-      contents.push(<PanelResizer
-        key={ contents.length }
-        onResize={ this.handleResize(index) }
-        transformDelta={ this.transformDelta }
-                    />)
-      index++
+
+      // Render resizer
+      if (i < lastIndex) {
+        contents.push(<PanelResizer
+          key={ contents.length }
+          onResize={ this.handleResize(i) }
+          transformDelta={ this.transformDelta }
+                      />)
+      }
     }
-
-    const item = items[index]
-
-    contents.push(<div
-      key={ contents.length }
-      ref={ index }
-      style={{ overflow: item.overflow || "auto", height: sizes[index] + "%" }}
-                  >
-      {item.content}
-    </div>)
 
     return (<div className="WND_side_panel WND_side_panel_H width-100 height-100">
       {contents}
     </div>)
   }
+}
+
+const styles = {
+  header: {
+    cursor: "pointer",
+    backgroundColor: "#234",
+    borderBottom: "solid 1px #012",
+    color: "#89a",
+  },
 }
