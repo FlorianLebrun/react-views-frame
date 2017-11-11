@@ -1,6 +1,4 @@
 /* eslint-disable guard-for-in */
-/* eslint-disable import/no-namespace */
-/* eslint-disable react-native/no-inline-styles */
 import React, { Component } from "react"
 
 import { Application } from "../../application"
@@ -146,7 +144,7 @@ export class Frame extends Component<void, PropsType, StateType> {
     }
     switch (panel.type) {
     case "#":
-      return (<div style={{ height: "100%", width: "100%" }}> {props.children} </div>)
+      return (<div style={ styles.root }> {props.children} </div>)
     case "side-left":
       return React.createElement(SidePanelLeft, props)
     case "side-top":
@@ -164,4 +162,8 @@ export class Frame extends Component<void, PropsType, StateType> {
   render() {
     return this.renderPanel("#")
   }
+}
+
+const styles = {
+  root: { height: "100%", width: "100%" },
 }

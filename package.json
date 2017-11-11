@@ -1,7 +1,7 @@
 {
   "name": "react-application-frame",
-  "version": "0.0.16",
-  "main":"dist/lib/index.js",
+  "version": "0.0.17",
+  "main": "dist/lib/index.js",
   "dependencies": {
     "font-awesome": "^4.7.0",
     "react-notification-system": "^0.2.14"
@@ -27,12 +27,12 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/FlorianLebrun/react-application-frame.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FlorianLebrun/react-application-frame.git"
   },
-  "license" :{
-	"type": "MIT",
-	"url": "https://www.opensource.org/licenses/mit-license.php"
+  "license": {
+    "type": "MIT",
+    "url": "https://www.opensource.org/licenses/mit-license.php"
   }
 }

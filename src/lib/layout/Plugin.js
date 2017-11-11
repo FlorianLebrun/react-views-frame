@@ -168,6 +168,8 @@ export class PluginClass {
 export class PluginComponent {
   pluginClass: PluginClass
   application: Object
+  storage: Object
+  nextState: Object
 
   // Life Cycle management functions
   pluginWillMount(parameters: Object) { } // eslint-disable-line
@@ -177,6 +179,27 @@ export class PluginComponent {
   constructor(pluginClass: PluginClass) {
     this.pluginClass = pluginClass
     this.application = pluginClass.context.application
+    this.restorePluginStorage()
+  }
+  restorePluginStorage() {
+    try {
+      const data = localStorage.getItem(this.pluginClass.name)
+      this.storage = data ? JSON.parse(data) : {}
+    }
+    catch (e) {
+      this.storage = {}
+      localStorage.removeItem(this.pluginClass.name)
+      console.error("plugin storage cannot be load", e)
+    }
+  }
+  savePluginStorage(storage: Object) {
+    try {
+      const data = JSON.stringify(storage)
+      localStorage.setItem(this.pluginClass.name, data)
+    }
+    catch (e) {
+      console.error("plugin storage cannot be save", e)
+    }
   }
   openWindow(windowName: string, options: Object) {
     this.layout.openPluginWindow(this.pluginClass.windows[windowName], this, options)
@@ -194,6 +217,9 @@ export class PluginComponent {
         const value = this.nextState[key]
         const links = this.pluginClass.links[key]
         this[key] = value
+        if (key === "storage") {
+          this.savePluginStorage(value)
+        }
         if (links) {
           const windows = this.layout.windows
           Object.keys(windows).forEach(wndId => {

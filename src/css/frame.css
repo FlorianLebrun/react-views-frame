@@ -1,19 +1,3 @@
-/********************************
-*********************************
-*** Technical Classes
-*********************************
-*********************************/
-
-.WND_center_horizontal {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.WND_center_vertical {
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
 
 /********************************
 *********************************
@@ -138,12 +122,16 @@
 .WND_panel_menu_btn_H {
   margin-left: 6px;
   margin-right: 6px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .WND_panel_menu_btn_V {
   text-align: center;
   margin-top: 6px;
   margin-bottom: 6px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .WND_panel_menu_btn:hover {
@@ -162,6 +150,8 @@
   flex: 0 0 auto;
   min-height: 0px;
   min-width: 0px;
+  max-width: 100%;
+  max-height: 100%;
   width: 100%;
   height: 100%;
 }
@@ -170,8 +160,14 @@
   flex: 1 1 auto;
   min-height: 0px;
   min-width: 0px;
+  max-width: 100%;
+  max-height: 100%;
   width: 100%;
   height: 100%;
+}
+
+.WND_panel_container_splash {
+  overflow: hidden;
 }
 
 div::-webkit-scrollbar {
