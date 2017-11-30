@@ -194,7 +194,7 @@ export class DropZone extends Component {
       const y = evt.clientY - rect.top
       const bag = dataTransfertToObject(evt.dataTransfer)
       try {
-        const acknowledgment = this.props.onDrop && this.props.onDrop(bag, x, y)
+        const acknowledgment = this.props.onDrop && this.props.onDrop(bag, x, y, evt)
         draggedZone && draggedZone.dragComplete(acknowledgment)
       }
       catch (e) {
@@ -265,7 +265,7 @@ export class DragDropZone extends DropZone {
       onDrop, onDropMatch, onDropHightlight, selectedClassName,
       // eslint-disable-next-line no-unused-vars
       highlightClassName, isDroppable, onDragStart, onDragEnd,
-      ...otherProps,
+      ...otherProps
     } = this.props
     return (
       <div
