@@ -4,6 +4,9 @@ import installApplicationLayout from "./layout"
 import { Application, extendApplication } from "./application"
 import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
 import Split from "./ui-modules/Split"
+import Listener from "./ui-modules/Listener"
+import Listenable from "./modules/listenable"
+import Storable from "./modules/storable"
 import Popup from "./addons/popup"
 import Fetch from "./addons/fetch"
 import Notification from "./addons/notification"
@@ -16,6 +19,7 @@ export const UI = {
   DropZone,
   DragDropZone,
   Split,
+  Listener,
 }
 
 export const Addons = {
@@ -23,6 +27,11 @@ export const Addons = {
   Fetch,
   Notification,
   WindowsFrame,
+}
+
+export const Modules = {
+  Storable,
+  Listenable,
 }
 
 export { extendApplication }

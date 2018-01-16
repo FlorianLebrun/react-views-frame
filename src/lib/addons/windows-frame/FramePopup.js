@@ -1,10 +1,7 @@
-/* eslint-disable react/no-multi-comp */
-/* eslint-disable react/no-string-refs */
-/* eslint-disable react/no-find-dom-node */
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
 
-let popupRoot: FramePopupDock = null
+let popupRoot = null
 
 type PropsType = {
   render?: Function,
@@ -16,6 +13,7 @@ type PropsType = {
 
 export class ButtonPopup extends Component<void, PropsType, void> {
   props: PropsType
+
   handleClick = () => {
     openPopup(this.props.render, this)
     this.props.onClick && this.props.onClick()
@@ -54,13 +52,13 @@ class FramePopupDock extends Component<void, void, DockStateType> {
       const position = this.state.position
       const popupHeight = popup.clientHeight
       const popupWidth = popup.clientWidth
-      if (position.left + popupWidth > screen.width) {
+      if (position.left + popupWidth > window.screen.width) {
         popup.style.left = position.right - popupWidth + "px"
       }
       else {
         popup.style.left = position.left + "px"
       }
-      if (position.bottom + popupHeight > screen.height) {
+      if (position.bottom + popupHeight > window.screen.height) {
         popup.style.top = position.top - popupHeight + "px"
       }
       else {

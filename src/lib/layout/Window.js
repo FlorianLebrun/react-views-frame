@@ -38,7 +38,7 @@ export class WindowClass {
       "Window '", this.name, "' shall be based on WindowComponent")
   }
   addLink(link: Object) {
-    if (!this.links) this.links = [ link ]
+    if (!this.links) this.links = [link]
     else this.links.push(link)
   }
   createDefaultParameters(instance: WindowInstance): Object {
@@ -77,7 +77,7 @@ export class WindowInstance {
     this.plugin = plugin
     this.component = windowClass.component
     this.node = document.createElement("div")
-    this.node.className = "position-relative width-100 height-100 overflow-"+windowClass.overflow
+    this.node.className = "position-relative width-100 height-100 overflow-" + windowClass.overflow
     this.layout.windows[windowId] = this
     this.title = windowClass.defaultTitle
     this.icon = windowClass.defaultIcon
@@ -98,12 +98,6 @@ export class WindowInstance {
       }
     }
     this.render()
-  }
-  openWindow(windowClassID: WindowClassID, options: WindowOptions) {
-    this.layout.openSubWindow(this.windowClass.windows[windowClassID], this, options)
-  }
-  showWindow(windowID: WindowID, options: WindowOptions): WindowID {
-    this.layout.showSubWindow(this.windows[windowID], this, options)
   }
   close() {
     ReactDOM.unmountComponentAtNode(this.node)
@@ -142,12 +136,6 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   componentWillUnmount() {
     this.unmountWindow()
   }
-  width() {
-    return this.refs.root && this.refs.root.clientWidth
-  }
-  height() {
-    return this.refs.root && this.refs.root.clientHeight
-  }
   mountWindow(window) {
     if (window) {
       this.refs.root.appendChild(window.node)
@@ -165,9 +153,15 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
       window.container = null
     }
   }
+  width() {
+    return this.refs.root && this.refs.root.clientWidth
+  }
+  height() {
+    return this.refs.root && this.refs.root.clientHeight
+  }
   render() {
     const { className, style } = this.props
-    return (<div ref="root" className={ className } style={ style } />)
+    return (<div ref="root" className={className} style={style} />)
   }
 }
 
@@ -198,14 +192,21 @@ export class WindowComponent<DefaultProps, Props, State>
     else console.log(...message.content)
     this.plugin.application.setEnv("console.debug", message)
   }
-  // eslint-disable-next-line no-unused-vars
   openWindow(windowClassID: WindowClassID, options: WindowOptions) {
-    const window = this.props.window
-    window.openWindow.apply(window, arguments)
+    const { layout } = this.instance
+    layout.openSubWindow(this.windowClass.windows[windowClassID], this, options)
   }
-  // eslint-disable-next-line no-unused-vars
-  closeWindow(windowId: WindowID) {
-    const window = this.props.window
-    window.closeWindow.apply(window, arguments)
+  showWindow(windowID: WindowID, options: WindowOptions): WindowID {
+    const { layout } = this.instance
+    layout.showSubWindow(this.windows[windowID], this, options)
+  }
+  closeWindow(windowClassID: WindowClassID) {
+    const { layout } = this.instance
+    if (windowClassID) {
+      layout.closeSubWindow(this.windowClass.windows[windowClassID], this)
+    }
+    else {
+      layout.removeWindow(this.instance.id)
+    }
   }
 }
