@@ -1,12 +1,13 @@
 /* eslint-disable react/no-multi-comp */
 import { PluginComponent, PluginClass } from "./Plugin"
-import { WindowInstance, WindowClass, WindowID } from "./Window"
+import { WindowInstance, WindowClass, WindowContainer, WindowID } from "./Window"
 
 export class PluginContext {
   pluginClasses: { [string]: PluginClass } = {}
   plugins: { [string]: PluginComponent } = {}
   windows: { [string]: WindowInstance } = {}
   docks: { [string]: Array<WindowInstance> } = {}
+  focused: WindowInstance = null
   frame: Frame = null
   application: Object = null
 
@@ -20,13 +21,15 @@ export class PluginContext {
     PluginComponent.prototype.application = application
     WindowInstance.prototype.layout = this
     WindowInstance.prototype.application = application
+    WindowContainer.prototype.layout = this
+    WindowContainer.prototype.application = application
     window.addEventListener("beforeunload", this.unmountPlugins)
   }
   registerFrame(frame: Frame) {
     this.frame = frame
     frame && Object.keys(this.windows).forEach(key=>{
       const wnd = this.windows[key]
-      frame.attachWindow(wnd.id, wnd.dockId)
+      frame.attachWindow(wnd, wnd.dockId)
     })
   }
   mountPlugins = () => {
@@ -67,16 +70,26 @@ export class PluginContext {
     return pluginClass
   }
   dockWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
-    this.frame && this.frame.attachWindow(wnd.id, dockId, foreground)
+    this.frame && this.frame.attachWindow(wnd, dockId, foreground)
   }
   dettachWindow(windowId: WindowID) {
-    this.frame && this.frame.dettachWindow(windowId)
+    const wnd = this.windows[windowId]
+    this.frame && this.frame.dettachWindow(wnd)
   }
   removeWindow(windowId: WindowID) {
     const wnd = this.windows[windowId]
-    this.dettachWindow(windowId)
+    this.dettachWindow(wnd)
     delete this.windows[windowId]
     wnd.close()
+  }
+  focusOnWindow(focused: WindowInstance) {
+    const prev_focused = this.focused
+    if(prev_focused !== focused) {
+      this.focused = focused
+      prev_focused && prev_focused.notifyBlur()
+      this.frame && this.frame.notifyFocusChange(this.focused, prev_focused)
+      this.focused && this.focused.notifyFocus()
+    }
   }
   openSubWindow(windowClass: WindowClass, parent: WindowInstance, options: WindowOptions) {
     if (windowClass && parent) {

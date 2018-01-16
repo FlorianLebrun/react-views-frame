@@ -45,11 +45,9 @@ export class Frame extends Component<void, PropsType, StateType> {
       panels[dockId] = panel
     }
     this.setState({ panels })
-    this.forceUpdate()
   }
-  showWindow(windowId: WindowID) {
+  showWindow(wnd: WindowInstance) {
     const panels = this.state.panels
-    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     const origin = panels[wnd.dockId]
@@ -59,12 +57,10 @@ export class Frame extends Component<void, PropsType, StateType> {
         current: wnd,
       }
       this.setState({ panels })
-      this.forceUpdate()
     }
   }
-  hideWindow(windowId: WindowID) {
+  hideWindow(wnd: WindowInstance) {
     const panels = this.state.panels
-    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     const origin = panels[wnd.dockId]
@@ -74,12 +70,10 @@ export class Frame extends Component<void, PropsType, StateType> {
         current: null,
       }
       this.setState({ panels })
-      this.forceUpdate()
     }
   }
-  dettachWindow(windowId: WindowID) {
+  dettachWindow(wnd: WindowInstance) {
     const panels = this.state.panels
-    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     let origin = panels[wnd.dockId]
@@ -91,14 +85,12 @@ export class Frame extends Component<void, PropsType, StateType> {
       if (origin.current === wnd) origin.current = origin.items[0]
       panels[wnd.dockId] = origin
       this.setState({ panels })
-      this.forceUpdate()
     }
 
     wnd.dockId = null
   }
-  attachWindow(windowId: WindowID, dockId: DockID, foreground: boolean) {
+  attachWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
     const panels = this.state.panels
-    const wnd = Application.layout.getWindowInstance(windowId)
     if (!wnd) return null
 
     // Detach from origin panel
@@ -127,12 +119,35 @@ export class Frame extends Component<void, PropsType, StateType> {
 
     wnd.dockId = dockId
     this.setState({ panels })
-    this.forceUpdate()
   }
   notifyPanelResize(panel: PanelProps, size: number) {
     const panels = this.state.panels
     panels[panel.id] = { ...panel, size }
     this.setState({ panels })
+  }
+  notifyFocusChange(focused: WindowInstance, prev_focused: WindowInstance) {
+    const panels = this.state.panels
+    
+    if(prev_focused) {
+      const origin = panels[prev_focused.dockId]
+      if (origin) {
+        panels[prev_focused.dockId] = {
+          ...origin,
+          focused:false,
+        }
+      }
+    }
+    if(focused) {
+      const origin = panels[focused.dockId]
+      if (origin) {
+        panels[focused.dockId] = {
+          ...origin,
+          focused:true,
+        }
+      }
+    }
+    this.setState({ panels })
+    this.forceUpdate()
   }
   renderPanel(id: string) {
     const panel = this.state.panels[id]

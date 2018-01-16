@@ -47,7 +47,7 @@ export class WindowClass {
       params[lk.param] = lk.pluginClass.instance[lk.path]
     })
     params.instance = instance
-    params.onChange = instance.handleChange
+    params.onChange = instance.notifyChange
     return params
   }
 }
@@ -102,7 +102,11 @@ export class WindowInstance {
   close() {
     ReactDOM.unmountComponentAtNode(this.node)
   }
-  handleChange = (parameters) => {
+  notifyFocus() {
+  }
+  notifyBlur() {
+  }
+  notifyChange = (parameters) => {
     this.updateOptions({ parameters })
   }
   render() {
@@ -116,13 +120,9 @@ export type PropsType = {
   style: any,
 }
 
-export type StateType = {
-  window: WindowInstance,
-}
-
 export class WindowContainer extends Component<void, PropsType, StateType> {
   props: PropsType
-  state: StateType = { window: null }
+  window: WindowInstance
 
   componentDidMount() {
     this.mountWindow(this.props.current)
@@ -137,20 +137,16 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
     this.unmountWindow()
   }
   mountWindow(window) {
+    this.window = window
     if (window) {
       this.refs.root.appendChild(window.node)
       window.container = this
-      this.setState({ window: window })
-    }
-    else {
-      this.setState({ window: null })
     }
   }
   unmountWindow() {
-    const { window } = this.state
-    if (window && window.container === this) {
-      this.refs.root.removeChild(window.node)
-      window.container = null
+    if (this.window && this.window.container === this) {
+      this.refs.root.removeChild(this.window.node)
+      this.window.container = null
     }
   }
   width() {
@@ -159,9 +155,18 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   height() {
     return this.refs.root && this.refs.root.clientHeight
   }
+  handleFocus = () => {
+    this.layout.focusOnWindow(this.window)
+  }
   render() {
     const { className, style } = this.props
-    return (<div ref="root" className={className} style={style} />)
+    return (<div
+      ref="root"
+      tabIndex={1}
+      className={className}
+      style={style}
+      onFocus={this.handleFocus}
+    />)
   }
 }
 
@@ -195,10 +200,6 @@ export class WindowComponent<DefaultProps, Props, State>
   openWindow(windowClassID: WindowClassID, options: WindowOptions) {
     const { layout } = this.instance
     layout.openSubWindow(this.windowClass.windows[windowClassID], this, options)
-  }
-  showWindow(windowID: WindowID, options: WindowOptions): WindowID {
-    const { layout } = this.instance
-    layout.showSubWindow(this.windows[windowID], this, options)
   }
   closeWindow(windowClassID: WindowClassID) {
     const { layout } = this.instance
