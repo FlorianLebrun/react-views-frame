@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import { PluginComponent, PluginClass } from "./Plugin"
-import { WindowInstance, WindowClass, WindowContainer, WindowID } from "./Window"
+import { WindowInstance, WindowClass, WindowContainer } from "./Window"
 
 export class PluginContext {
   pluginClasses: { [string]: PluginClass } = {}
@@ -72,14 +72,12 @@ export class PluginContext {
   dockWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
     this.frame && this.frame.attachWindow(wnd, dockId, foreground)
   }
-  dettachWindow(windowId: WindowID) {
-    const wnd = this.windows[windowId]
+  dettachWindow(wnd: WindowInstance) {
     this.frame && this.frame.dettachWindow(wnd)
   }
-  removeWindow(windowId: WindowID) {
-    const wnd = this.windows[windowId]
+  removeWindow(wnd: WindowInstance) {
     this.dettachWindow(wnd)
-    delete this.windows[windowId]
+    delete this.windows[wnd.id]
     wnd.close()
   }
   focusOnWindow(focused: WindowInstance) {
@@ -95,7 +93,7 @@ export class PluginContext {
     if (windowClass && parent) {
       let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)
       if (!wnd) {
-        wnd = new WindowInstance("#" + (this.uidGenerator++), windowClass, parent, parent.plugin, options || {})
+        wnd = new WindowInstance("#" + (this.uidGenerator++), windowClass, parent, parent.plugin, options)
       }
       else {
         options && wnd.updateOptions(options)
@@ -107,7 +105,7 @@ export class PluginContext {
     if (windowClass) {
       let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)
       if (!wnd) {
-        wnd = new WindowInstance("#" + (this.uidGenerator++), windowClass, null, plugin, options || {})
+        wnd = new WindowInstance("#" + (this.uidGenerator++), windowClass, null, plugin, options)
       }
       else {
         options && wnd.updateOptions(options)
@@ -119,7 +117,7 @@ export class PluginContext {
     let windows
     if (windowClass) windows = this.findAllWindowsByClass(windowClass)
     else windows = this.findAllWindowsByPlugin(plugin)
-    windows.forEach(wnd => this.removeWindow(wnd.id))
+    windows.forEach(wnd => this.removeWindow(wnd))
   }
   getWindowInstance(windowId: WindowID) {
     return this.windows[windowId]

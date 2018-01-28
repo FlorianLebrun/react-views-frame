@@ -17,7 +17,7 @@ export class PluginClass {
   instance: PluginComponent
   component: Function
   parameters: Object
-  windows: { [WindowClassID]: WindowClass } = {}
+  windows: { [string]: WindowClass } = {}
   links: { [string]: Array<ParameterLink> } = {}
   export: Object
   import: Object

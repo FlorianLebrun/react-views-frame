@@ -8,9 +8,6 @@ import ReactDOM from "react-dom"
 
 import { isInheritedOf } from "../utils"
 
-export type WindowID = string
-export type WindowClassID = string
-
 export type WindowOptions = {
   title: string,
   dockId: DockID,
@@ -26,7 +23,7 @@ export class WindowClass {
   defaultDockId: DockID
   defaultParameters: Object
 
-  windows: { [WindowClassID]: WindowClass } = {}
+  windows: { [string]: WindowClass } = {}
   links: Array<ParameterLink>
 
   constructor(name: string, desc: Object, pluginClass: PluginClass) {
@@ -54,7 +51,7 @@ export class WindowClass {
 
 export class WindowInstance {
   // Definition
-  id: WindowID
+  id: string
   windowClass: WindowClass
   parent: WindowInstance
   plugin: PluginComponent
@@ -68,7 +65,7 @@ export class WindowInstance {
   icon: string
   parameters: { [string]: any }
 
-  constructor(windowId: WindowID, windowClass: WindowClass,
+  constructor(windowId: string, windowClass: WindowClass,
     parent: WindowInstance, plugin: WindowInstance, options: WindowOptions
   ) {
     this.id = windowId
@@ -197,17 +194,17 @@ export class WindowComponent<DefaultProps, Props, State>
     else console.log(...message.content)
     this.plugin.application.setEnv("console.debug", message)
   }
-  openWindow(windowClassID: WindowClassID, options: WindowOptions) {
+  openWindow(windowClassID: string, options: WindowOptions) {
     const { layout } = this.instance
     layout.openSubWindow(this.windowClass.windows[windowClassID], this, options)
   }
-  closeWindow(windowClassID: WindowClassID) {
+  closeWindow(windowClassID: string) {
     const { layout } = this.instance
     if (windowClassID) {
       layout.closeSubWindow(this.windowClass.windows[windowClassID], this)
     }
     else {
-      layout.removeWindow(this.instance.id)
+      layout.removeWindow(this.instance)
     }
   }
 }

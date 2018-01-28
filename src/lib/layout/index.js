@@ -1,5 +1,5 @@
 
-import { WindowInstance, WindowComponent, WindowContainer, WindowID } from "./Window"
+import { WindowInstance, WindowComponent, WindowContainer } from "./Window"
 import { PluginComponent } from "./Plugin"
 import { PluginContext } from "./Context"
 
@@ -21,7 +21,6 @@ export {
   WindowInstance,
   WindowComponent,
   WindowContainer,
-  WindowID,
   PluginInstance,
   PluginComponent,
   PluginContext,
