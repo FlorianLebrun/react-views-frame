@@ -1,7 +1,7 @@
 
 export default class Listenable {
   $status: string = "changed"
-  $nextState: Object
+  $prevState: Object
   $listeners: Array<Array<Function | string>>
 
   listenState(callback: Function, keys: Array) {
@@ -28,14 +28,14 @@ export default class Listenable {
   }
   dispatchState = () => {
     let k, i
-    const count = this.$listeners?this.$listeners.length:0
+    const count = this.$listeners ? this.$listeners.length : 0
     for (i = 0; i < count; i++) {
       const listener = this.$listeners[i]
       if (listener.length > 1) {
         for (k = 1; k < listener.length; k++) {
-          if (this.$nextState.hasOwnProperty(listener[k])) {
+          if (this.$prevState.hasOwnProperty(listener[k])) {
             try {
-              listener[0](this)
+              listener[0](this, this.$prevState)
             }
             catch (e) {
               console.error(e)
@@ -46,25 +46,29 @@ export default class Listenable {
       }
       else {
         try {
-          listener[0](this)
+          listener[0](this, this.$prevState)
         }
         catch (e) {
           console.error(e)
         }
       }
     }
-    this.$nextState = 0
+    this.$prevState = 0
   }
   setState(value) {
     this.$status = "changed"
-    if (this.$nextState) {
-      this.$nextState = Object.assign(this.$nextState, value)
+    for (let key in value) {
+      if (this[key] !== value[key]) {
+        if (!this.$prevState) {
+          this.$prevState = {}
+          setTimeout(this.dispatchState, 0)
+        }
+        if (!this.$prevState.hasOwnProperty(key)) {
+          this.$prevState[key] = this[key]
+        }
+        this[key] = value[key]
+      }
     }
-    else {
-      this.$nextState = Object.assign({}, value)
-      setTimeout(this.dispatchState, 0)
-    }
-    Object.assign(this, value)
   }
   terminate() {
     this.$status = "released"

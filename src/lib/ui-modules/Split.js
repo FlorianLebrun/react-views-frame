@@ -9,34 +9,101 @@ import { PanelResizer } from "../addons/windows-frame/FramePanels"
 *********************************
 *********************************/
 
-export type ItemSplitType = {
+type SplitItemType = {
   content: React$Element<any>,
   size: number,
   overflow: string,
 }
 
 type PropsType = {
-  items?: Array<ItemSplitType>,
+  items?: Array<SplitItemType>,
   style?: Object | Array<any>,
 }
+
+const defaultArray = []
 
 export default class Split extends Component<void, PropsType, void> {
   props: PropsType
 
-  componentWillMount() {
-    const { items } = this.props
-    this.sizes = items.map((item) => item.size || 0)
-    this.modes = items.map((item) => item.size !== undefined ? 1 : 0)
-    this.styles = items.map((item) => ({ overflow: item.overflow || "auto" }))
-    this.applySizes()
-  }
-
-  sizes: Array<number>
-  modes: Array<number>
+  items: Array<SplitItemType>
+  sizes: Array<number> = []
+  modes: Array<number> = []
   styles: Array<Object>
 
+  componentWillMount() {
+    this.updateProps(this.props)
+  }
+  componentWillReceiveProps(nextProps) {
+    this.updateProps(nextProps)
+  }
   transformDelta(e) {
     return e.deltaY
+  }
+  updateProps(props) {
+    let hasChanged
+    const prevItems = this.items || defaultArray
+    const nextItems = props.items || defaultArray
+    this.items = nextItems
+
+    // Check items count
+    hasChanged = (nextItems.length !== prevItems.length)
+
+    // Update sizes and modes
+    for (let i = 0; i < nextItems.length; i++) {
+      const item = nextItems[i]
+      const prevItem = prevItems[i]
+      if (!prevItem || item.size !== prevItem.size) {
+        hasChanged = true
+        if (item.size === undefined) {
+          this.sizes[i] = 0
+          this.modes[i] = 0
+        }
+        else {
+          this.sizes[i] = item.size
+          if (this.modes[i] === undefined)
+            this.modes[i] = 1
+        }
+      }
+    }
+
+    // Update styles and normalize sizes
+    hasChanged && this.applySizes()
+  }
+  applySizes() {
+    const { items, sizes, modes } = this
+    this.styles = []
+    this.sizes = []
+
+    // Accumulate sizes
+    let len = 0
+    for (let i = 0; i < items.length; i++) {
+      const sz = this.sizes[i] = sizes[i] || items[i].size
+      if (sz > 0) len += sz
+    }
+
+    // Normalize sizes
+    const factor = len ? 100 / len : 1
+    for (let i = 0; i < items.length; i++) {
+      const style = this.styles[i] = { ...styles.content }
+      const mode = modes[i], item = items[i]
+      this.sizes[i] *= factor
+      if (mode > 0) {
+        style.overflow = item.overflow || "auto"
+        style.flex = sizes[i]
+      }
+      else if (mode < 0) {
+        style.overflow = item.overflow || "auto"
+        style.flex = 0
+        style.height = 0
+      }
+      else {
+        style.flex = (i < items.length - 1) ? 0 : 1
+        style.height = "auto"
+      }
+    }
+
+    // Update
+    this.forceUpdate()
   }
   handleResize = (index) => (delta) => {
     const { sizes, modes } = this
@@ -57,34 +124,6 @@ export default class Split extends Component<void, PropsType, void> {
     modes[index] = -modes[index]
     this.applySizes()
   }
-  applySizes() {
-    const { sizes, modes, styles } = this
-
-    // Accumulate sizes
-    let len = 0
-    for (let i = 0; i < sizes.length; i++) {
-      if (sizes[i] > 0) len += sizes[i]
-    }
-
-    // Normalize sizes
-    const factor = len ? 100 / len : 1
-    for (let i = 0; i < sizes.length; i++) {
-      const mode = modes[i]
-      sizes[i] *= factor
-      if (mode > 0) {
-        styles[i] = { ...styles[i], height: sizes[i] + "%" }
-      }
-      else if (mode < 0) {
-        styles[i] = { ...styles[i], height: 0 }
-      }
-      else {
-        styles[i] = { height: "auto" }
-      }
-    }
-
-    // Update
-    this.forceUpdate()
-  }
   render() {
     const { items } = this.props
     const contents = []
@@ -100,49 +139,67 @@ export default class Split extends Component<void, PropsType, void> {
 
       // Render header
       if (item.header) {
-        contents.push(<div
-          key={ contents.length }
-          style={ styles.header }
-          onClick={ this.handleCollapse(i) }
-                      >
-          {this.modes[i] > 0
+        contents.push(<span
+          key={contents.length}
+          style={styles.header}
+          onClick={this.handleCollapse(i)}
+        >
+          {this.modes[i] <= 0
             ? <span className="fa fa-fw fa-caret-right padding-xs" />
             : <span className="fa fa-fw fa-caret-down padding-xs" />
           }
           {item.header}
-        </div>)
+        </span>)
       }
 
       // Render content
       contents.push(<div
-        key={ contents.length }
-        ref={ i }
-        style={ this.styles[i] }
-                    >
+        key={contents.length}
+        ref={i}
+        style={this.styles[i]}
+      >
         {item.content}
       </div>)
 
       // Render resizer
       if (i < lastIndex) {
         contents.push(<PanelResizer
-          key={ contents.length }
-          onResize={ this.handleResize(i) }
-          transformDelta={ this.transformDelta }
-                      />)
+          key={contents.length}
+          onResize={this.handleResize(i)}
+          transformDelta={this.transformDelta}
+        />)
       }
     }
 
-    return (<div className="WND_side_panel WND_side_panel_H width-100 height-100">
+    return (<div style={styles.panel}>
       {contents}
     </div>)
   }
 }
 
+
 const styles = {
   header: {
+    display: "flex",
+    flexDirection: "row",
+    whiteSpace: "nowrap",
     cursor: "pointer",
     backgroundColor: "#234",
     borderBottom: "solid 1px #012",
     color: "#89a",
+    overflow: "hidden",
   },
+  content: {
+    backgroundColor: "#fff",
+  },
+  panel: {
+    display: "flex",
+    height: "100%",
+    maxHeight: "100%",
+    minHeight: "100%",
+    maxWidth: "100%",
+    minWidth: "100%",
+    flexDirection: "column",
+    backgroundColor: "#234",
+  }
 }
