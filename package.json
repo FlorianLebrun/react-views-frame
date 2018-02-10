@@ -1,14 +1,14 @@
 {
   "name": "react-application-frame",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "main": "dist/lib/index.js",
   "dependencies": {
     "font-awesome": "^4.7.0",
     "react-notification-system": "^0.2.14"
   },
   "peerDependencies": {
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1"
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",

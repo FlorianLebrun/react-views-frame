@@ -1,3 +1,4 @@
+import React from "react"
 import { Component } from "react"
 
 export default class Listener extends Component<void, Object, void> {
@@ -28,6 +29,11 @@ export default class Listener extends Component<void, Object, void> {
     const { children } = this.props
     if (children instanceof Function) {
       return children(this.props)
+    }
+    else if (Array.isArray(children)) {
+      return (<React.Fragment>
+        {children}
+      </React.Fragment>)
     }
     else {
       return children

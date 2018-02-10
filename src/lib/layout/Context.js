@@ -30,6 +30,7 @@ export class PluginContext {
     frame && Object.keys(this.windows).forEach(key=>{
       const wnd = this.windows[key]
       frame.attachWindow(wnd, wnd.dockId)
+      wnd.render()
     })
   }
   mountPlugins = () => {

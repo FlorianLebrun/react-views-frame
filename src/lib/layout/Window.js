@@ -107,7 +107,8 @@ export class WindowInstance {
     this.updateOptions({ parameters })
   }
   render() {
-    ReactDOM.render(React.createElement(this.component, this.parameters), this.node)
+    const { frame } = this.layout
+    frame && ReactDOM.unstable_renderSubtreeIntoContainer(frame, React.createElement(this.component, this.parameters), this.node)
   }
 }
 
