@@ -1,8 +1,7 @@
 import React from "react"
-
 import { PluginComponent } from "../../layout"
-
 import { Frame } from "./Frame"
+import "./frame.css"
 
 export default {
   name: "windows-frame",

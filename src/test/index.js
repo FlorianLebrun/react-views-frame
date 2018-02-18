@@ -38,6 +38,18 @@ export class DevTextPlugin extends Application.PluginInstance {
   pluginDidMount() {
     this.openWindow("toolbox-x")
     this.openWindow("toolbox-y")
+    Application.setWindowMenu([
+      {
+        "icon": "save",
+        "title": "Save current state",
+        "action": "save",
+      },
+      {
+        "icon": "cog",
+        "title": "Show menu",
+        "action": "menu",
+      },
+    ])
   }
 }
 

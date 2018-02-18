@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import Application, { extendApplication, createApplication, Addons, UI, Modules } from "./lib"
-import "./test"
+//import "./test"
 import "codemirror/lib/codemirror.css"
 
 Application.installPlugin(Addons.Notification)

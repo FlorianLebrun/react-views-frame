@@ -1,5 +1,3 @@
-import "../css"
-
 import installApplicationLayout from "./layout"
 import { Application, extendApplication } from "./application"
 import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
@@ -15,6 +13,7 @@ import Notification from "./addons/notification"
 import WindowsFrame from "./addons/windows-frame"
 import createApplication from "./sandbox/createApplication"
 import { SandBox } from "./sandbox/SandBox"
+import "./css"
 
 installApplicationLayout(Application)
 

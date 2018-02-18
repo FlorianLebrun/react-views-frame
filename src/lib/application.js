@@ -45,6 +45,13 @@ export class ApplicationInstance {
       window.title = name
     }
   }
+  setWindowMenu(menu) {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(JSON.stringify({
+        menu,
+      }), '*')
+    }
+  }
 }
 
 window.addEventListener("message", (e) => {
