@@ -1,6 +1,5 @@
 
 export class ApplicationInstance {
-
   installFeatures(features: { [string]: any }, onlyFunction: boolean) {
     Object.keys(features).forEach(key => {
       if (!onlyFunction || (features[key] instanceof Function)) {
@@ -16,7 +15,42 @@ export class ApplicationInstance {
       configurable: false,
     })
   }
+  redirect(url: string) {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(JSON.stringify({
+        redirect: url,
+      }), '*')
+    }
+    else {
+      window.location = url
+    }
+  }
+  openWindow(url: string) {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(JSON.stringify({
+        open: url,
+      }), '*')
+    }
+    else {
+      window.open(url)
+    }
+  }
+  setWindowTitle(name: string, icon: string) {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(JSON.stringify({
+        title: { name, icon }
+      }), '*')
+    }
+    else {
+      window.title = name
+    }
+  }
 }
+
+window.addEventListener("message", (e) => {
+  //alert("child receive", JSON.stringify(e))
+  console.log("child receive", e)
+})
 
 export function extendApplication(features: { [string]: any }) {
   Object.keys(features).forEach(key => {

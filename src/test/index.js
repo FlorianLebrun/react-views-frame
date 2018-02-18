@@ -1,7 +1,23 @@
 import React from "react"
 import Application from '../lib'
 
+
 export class ToolboxX extends Application.WindowComponent {
+  handleClick = () => {
+    //Application.redirect("https://www.qwant.com/?q=js+postMessage&client=opensearch")
+    Application.openWindow("https://www.qwant.com/?q=js+postMessage&client=opensearch")
+  }
+  render() {
+    return (<div>
+      <button onClick={this.handleClick}>
+        {"Message"}
+      </button>
+    </div>)
+  }
+}
+
+
+export class ToolboxY extends Application.WindowComponent {
   state = { counter: 0 }
   handleClick = () => {
     Application.addNotification("error", "hello")
@@ -16,20 +32,12 @@ export class ToolboxX extends Application.WindowComponent {
     </div>)
   }
 }
-
-
 export class DevTextPlugin extends Application.PluginInstance {
   console: DevConsolePlugin
 
   pluginDidMount() {
-    console.log("DevTextPlugin")
-    this.openWindow("toolbox1")
-    this.openWindow("web-page", {
-      dockId: "center",
-      parameters: {
-        url: "http://www.qwant.com/",
-      }
-    })
+    this.openWindow("toolbox-x")
+    this.openWindow("toolbox-y")
   }
 }
 
@@ -39,18 +47,18 @@ Application.installPlugin({
   component: DevTextPlugin,
   importPlugins: { console: "dev-console" },
   windows: {
-    "toolbox1": {
+    "toolbox-x": {
       defaultTitle: "Tool Box 1 - Tool Box 1",
       defaultIcon: "bug",
       defaultDockId: "left",
       component: ToolboxX,
     },
-    "web-page": {
+    "toolbox-y": {
       defaultTitle: "Web Page - Web Page",
       defaultIcon: "globe",
       defaultDockId: "center",
       overflow: "hidden",
-      component: ToolboxX,
+      component: ToolboxY,
     },
   },
 })
