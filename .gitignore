@@ -9,5 +9,7 @@ npm-debug.log*
 # react-intl messages
 intl/messages.json
 
+dist
+build
 .output
 package-lock.json

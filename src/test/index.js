@@ -1,61 +1,56 @@
-import React, { Component } from "react"
-import ReactDOM from "react-dom"
-import Application from "./app"
-import "./DevTextPlugin"
+import React from "react"
+import Application from '../lib'
 
-export default class SplashBackground extends Component {
-  style = {
-    body: {
-      display: "flex",
-      backgroundColor:"#012",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100%",
-    },
-    title: {
-      color: "transparent",
-      fontFamily: "Consolas",
-      textShadow: "5px 5px 5px #123",
-      padding: 20,
-    },
+export class ToolboxX extends Application.WindowComponent {
+  state = { counter: 0 }
+  handleClick = () => {
+    Application.addNotification("error", "hello")
+    this.setState({ counter: this.state.counter + 1 })
   }
   render() {
-    return (<div style={this.style.body}>
-      <h1 style={this.style.title}>
-        {"{ react-application-frame }"}
-      </h1>
+    return (<div style={{ backgroundColor: "red", width: 300, height: 300 }}>
+      {"Counter: "}{this.state.counter}<br />
+      <button onClick={this.handleClick}>
+        {"Notify"}
+      </button>
     </div>)
   }
 }
 
-Application.configureLayout({
-  splashComponent: SplashBackground,
-  displayLayout: {
-    "#": {
-      type: "#",
-      child: "left",
+
+export class DevTextPlugin extends Application.PluginInstance {
+  console: DevConsolePlugin
+
+  pluginDidMount() {
+    console.log("DevTextPlugin")
+    this.openWindow("toolbox1")
+    this.openWindow("web-page", {
+      dockId: "center",
+      parameters: {
+        url: "http://www.qwant.com/",
+      }
+    })
+  }
+}
+
+Application.installPlugin({
+  name: "ewam",
+  title: "Gold IDE",
+  component: DevTextPlugin,
+  importPlugins: { console: "dev-console" },
+  windows: {
+    "toolbox1": {
+      defaultTitle: "Tool Box 1 - Tool Box 1",
+      defaultIcon: "bug",
+      defaultDockId: "left",
+      component: ToolboxX,
     },
-    "left": {
-      type: "side-left",
-      child: "bottom",
-      size: 30,
-    },
-    "bottom": {
-      type: "side-bottom",
-      child: "right",
-      size: 30,
-    },
-    "right": {
-      type: "side-right",
-      child: "center",
-      size: 30,
-    },
-    "center": {
-      type: "center-top",
-      menu: true,
+    "web-page": {
+      defaultTitle: "Web Page - Web Page",
+      defaultIcon: "globe",
+      defaultDockId: "center",
+      overflow: "hidden",
+      component: ToolboxX,
     },
   },
 })
-
-ReactDOM.render(Application.renderDisplayFrame(), document.getElementById("root"))

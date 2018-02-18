@@ -51,22 +51,23 @@
 
 /* Bar (flex) */
 
-.WND_panel_bar {
+.WND_panel_bar {  
+  font-size: 14px;
+  font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
   flex: 0 0 auto;
   display: flex;
   white-space: nowrap;
-  overflow: hidden;
   background-color: #012;
 }
 
 .WND_panel_bar_H {
   flex-direction: row;
-  height: 30px;
+  height: 26px;
 }
 
 .WND_panel_bar_V {
   flex-direction: column;
-  width: 30px;
+  width: 26px;
 }
 
 
@@ -80,18 +81,24 @@
   padding-left: 10px;
 }
 
+.WND_panel_button_H > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .WND_panel_button_V {
   min-height: 30px;
   max-height: 120px;
   margin-bottom: 1px;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .WND_panel_button {
-  flex: 1 1 auto;
+  flex: 1;
   display: flex;
-  overflow: hidden;
+  white-space: nowrap;
   background-color: #123;
   color: #abc;
   cursor: pointer;

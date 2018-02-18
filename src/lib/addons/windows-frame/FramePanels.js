@@ -90,6 +90,7 @@ class PanelButton extends Component {
     return (
       <DragZone
         className={className}
+        title={item.title}
         onDragStart={this.handleDragWindow}
         onDragOver={this.handleDragOver}
         onClick={this.handleClick}
