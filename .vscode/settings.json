@@ -10,11 +10,6 @@
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
-    "**/.hg": true,
-    "*.log": true,
-    "*.lock": true,
-    "**/.DS_Store": true,
-    "**/.webpack-cache": true,
-    "**/dist": true
+    "**/.hg": true
   }
 }
