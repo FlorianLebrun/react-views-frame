@@ -1,10 +1,10 @@
 /* eslint-disable react/no-multi-comp */
-import { PluginComponent, PluginClass } from "./Plugin"
+import { PluginInstance, PluginClass } from "./Plugin"
 import { WindowInstance, WindowClass, WindowContainer } from "./Window"
 
 export class PluginContext {
   pluginClasses: { [string]: PluginClass } = {}
-  plugins: { [string]: PluginComponent } = {}
+  plugins: { [string]: PluginInstance } = {}
   windows: { [string]: WindowInstance } = {}
   docks: { [string]: Array<WindowInstance> } = {}
   focused: WindowInstance = null
@@ -17,8 +17,8 @@ export class PluginContext {
 
   constructor(application) {
     this.application = application
-    PluginComponent.prototype.layout = this
-    PluginComponent.prototype.application = application
+    PluginInstance.prototype.layout = this
+    PluginInstance.prototype.application = application
     WindowInstance.prototype.layout = this
     WindowInstance.prototype.application = application
     WindowContainer.prototype.layout = this
@@ -27,7 +27,7 @@ export class PluginContext {
   }
   registerFrame(frame: Frame) {
     this.frame = frame
-    frame && Object.keys(this.windows).forEach(key=>{
+    frame && Object.keys(this.windows).forEach(key => {
       const wnd = this.windows[key]
       frame.attachWindow(wnd, wnd.dockId)
       wnd.render()
@@ -68,6 +68,17 @@ export class PluginContext {
   installPlugin(description: Object, parameters: Object): PluginClass {
     const pluginClass = this.mapPlugin(description.name)
     pluginClass.setup(description, parameters)
+    pluginClass.mount()
+    return pluginClass
+  }
+  declarePlugin(description: Object, parameters: Object): PluginClass {
+    const pluginClass = this.mapPlugin(description.name)
+    pluginClass.setup(description, parameters)
+    return pluginClass
+  }
+  mountPlugin(name: Object): PluginClass {
+    const pluginClass = this.pluginClasses[name]
+    pluginClass && pluginClass.mount()
     return pluginClass
   }
   dockWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
@@ -83,7 +94,7 @@ export class PluginContext {
   }
   focusOnWindow(focused: WindowInstance) {
     const prev_focused = this.focused
-    if(prev_focused !== focused) {
+    if (prev_focused !== focused) {
       this.focused = focused
       prev_focused && prev_focused.notifyBlur()
       this.frame && this.frame.notifyFocusChange(this.focused, prev_focused)
@@ -102,7 +113,7 @@ export class PluginContext {
       this.dockWindow(wnd, wnd.dockId, true)
     }
   }
-  openPluginWindow(windowClass: WindowClass, plugin: PluginComponent, options: WindowOptions) {
+  openPluginWindow(windowClass: WindowClass, plugin: PluginInstance, options: WindowOptions) {
     if (windowClass) {
       let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)
       if (!wnd) {
@@ -114,7 +125,7 @@ export class PluginContext {
       this.dockWindow(wnd, wnd.dockId, true)
     }
   }
-  closePluginWindows(windowClass: WindowClass, plugin: PluginComponent) {
+  closePluginWindows(windowClass: WindowClass, plugin: PluginInstance) {
     let windows
     if (windowClass) windows = this.findAllWindowsByClass(windowClass)
     else windows = this.findAllWindowsByPlugin(plugin)
@@ -132,7 +143,7 @@ export class PluginContext {
     }
     return null
   }
-  findAllWindowsByPlugin(plugin: PluginComponent): Array<WindowInstance> {
+  findAllWindowsByPlugin(plugin: PluginInstance): Array<WindowInstance> {
     const windows = []
     if (plugin) {
       let windowId

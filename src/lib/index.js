@@ -1,19 +1,23 @@
 import installApplicationLayout from "./layout"
 import { Application, extendApplication } from "./application"
+import "./css"
+
 import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
 import Split from "./ui-modules/Split"
 import Listener from "./ui-modules/Listener"
-import Waitable from "./modules/waitable"
-import Listenable from "./modules/listenable"
-import Storable from "./modules/storable"
-import CallChain, { CallSite } from "./modules/callchain"
+
+import Envs from "./addons/envs"
 import Popup from "./addons/popup"
 import Fetch from "./addons/fetch"
 import Notification from "./addons/notification"
 import WindowsFrame from "./addons/windows-frame"
+
+import Waitable from "./modules/waitable"
+import Listenable from "./modules/listenable"
+import Storable from "./modules/storable"
+import CallChain, { CallSite } from "./modules/callchain"
 import createApplication from "./sandbox/createApplication"
 import { SandBox } from "./sandbox/SandBox"
-import "./css"
 
 installApplicationLayout(Application)
 
@@ -26,6 +30,7 @@ export const UI = {
 }
 
 export const Addons = {
+  Envs,
   Popup,
   Fetch,
   Notification,

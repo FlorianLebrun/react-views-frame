@@ -1,9 +1,7 @@
 
 import { WindowInstance, WindowComponent, WindowContainer } from "./Window"
-import { PluginComponent } from "./Plugin"
+import { PluginInstance } from "./Plugin"
 import { PluginContext } from "./Context"
-
-const PluginInstance = PluginComponent
 
 export default function(app) {
   const layout = new PluginContext(app)
@@ -14,6 +12,8 @@ export default function(app) {
     PluginInstance,
     configureLayout: layout.configureLayout.bind(layout),
     installPlugin: layout.installPlugin.bind(layout),
+    declarePlugin: layout.declarePlugin.bind(layout),
+    mountPlugin: layout.mountPlugin.bind(layout),
   })
 }
 
@@ -22,6 +22,5 @@ export {
   WindowComponent,
   WindowContainer,
   PluginInstance,
-  PluginComponent,
   PluginContext,
 }

@@ -8,10 +8,12 @@ const defaultImports = {
   "icon": require("./Icon.js"),
 }
 
-export class Module {
+export class Export {
+  __esModule = true
+}
+
+export class Module extends Export {
   ".sandbox": SandBox = null
-  ".nref": string = 1
-  ".dependencies": Array<string> = undefined
   "$": Array<Export> = null
 }
 
@@ -19,10 +21,12 @@ export class SandBox {
   name: string
   modules: { [string]: Object } = {}
   connector: Connector
+  devMode: boolean
 
   constructor(name: string) {
     if (typeof name !== "string") throw new Error()
     this.name = name
+    this.devMode = true
     this.connector = new Connector()
     this.imports(defaultImports)
   }
@@ -37,17 +41,17 @@ export class SandBox {
   imports(cimports: Object) {
     for (const guid in cimports) {
       let cimport = cimports[guid]
-      const module = this.getModule(guid)
-      if (module.$ === null) {
-        module.$ = true
+      const cmodule = this.getModule(guid)
+      if (cmodule.$ === null) {
+        cmodule.$ = true
         if (!cimport.__esSandboxExport) {
-          Object.assign(module, cimport)
+          Object.assign(cmodule, cimport)
         }
         else {
-          cimport.__esSandboxExport(module, this)
+          cimport.__esSandboxExport(cmodule, this)
         }
-        if (module.default === undefined) {
-          module.default = module
+        if (cmodule.default === undefined) {
+          cmodule.default = cmodule
         }
       }
       else console.error(guid, "is imported more than once.")
@@ -57,55 +61,34 @@ export class SandBox {
     return this.modules
   }
   getModule(guid: string): Module {
-    let module = this.modules[guid]
-    if (!module) {
-      module = new Module()
-      module[".sandbox"] = this
-      this.modules[guid] = module
+    let cmodule = this.modules[guid]
+    if (!cmodule) {
+      cmodule = new Module()
+      cmodule[".sandbox"] = this
+      if (this.devMode) {
+        cmodule[".guid"] = guid
+      }
+      this.modules[guid] = cmodule
     }
-    return module
+    return cmodule
   }
-  getModuleGuid(module: Module): string {
+  getModuleGuid(cmodule: Module): string {
     for (const guid in this.modules) {
-      if (this.modules[guid] === module) return guid
+      if (this.modules[guid] === cmodule) return guid
     }
   }
-  installModule(module: Module): Promise<Module> | undefined {
-    if (!module) throw new Error("module is undefined")
-    if (module.$ === null) {
-      const guid = this.getModuleGuid(module)
-      return module.$ = this.connector.fetchModule(guid)
+  installModule(cmodule: Module): Promise<Module> | undefined {
+    if (!cmodule) throw new Error("module is undefined")
+    if (cmodule.$ === null) {
+      const guid = this.getModuleGuid(cmodule)
+      return cmodule.$ = this.connector.fetchModule(guid)
         .then((data) => {
           installPack(this, data)
-          return module
+          return cmodule
         })
     }
-    else if (module.$ instanceof Promise) {
-      return module.$
-    }
-  }
-  uninstallModule(module: Module) {
-    if (!module) throw new Error("module is undefined")
-    if (module[".nref"] !== undefined) {
-      module[".nref"]--
-      if (!module[".nref"]) {
-        const guid = this.getModuleGuid(module)
-        if (guid) {
-          const deps = module[".dependencies"]
-          if (deps) {
-            for (const key in deps) {
-              this.closeFile(key)
-            }
-          }
-          delete this.modules[guid]
-        }
-        else {
-          throw new Error("module is unknown")
-        }
-      }
-    }
-    else {
-      throw new Error("module is cannot be uninstalled")
+    else if (cmodule.$ instanceof Promise) {
+      return cmodule.$
     }
   }
 }
@@ -121,6 +104,7 @@ function installModule(context: SandBox, data: ModuleObject): Object {
 
   // Create object export register
   const cmodule = context.getModule(data.name)
+  if (data.type) cmodule[".type"] = data.type
   const register = [cmodule]
   for (let i = 1; i < objectsCount; i++) {
     register.push({})
@@ -131,7 +115,7 @@ function installModule(context: SandBox, data: ModuleObject): Object {
     let code = obj.data
 
     // Append source map
-    if (obj.mappings && obj.source) {
+    if (obj.mappings && obj.names && obj.source) {
       code += "\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,"
       code += base64.encode(JSON.stringify({
         version: 3,
@@ -144,12 +128,14 @@ function installModule(context: SandBox, data: ModuleObject): Object {
     }
 
     // Eval & call module constructor
+    const constructor = compileScript(code)
     try {
-      const constructor = compileScript(code)
-      constructor(cmodule, cexports, context.require)
+      if (constructor instanceof Function) {
+        constructor(cmodule, cexports, context.require)
+      }
     }
     catch (e) {
-      console.error(`in ${data.name} (${obj.location}) : `, e, code)
+      console.error(`in ${data.name} (${obj.location}) : `, e, constructor)
     }
     return cexports
   }
@@ -166,14 +152,13 @@ function installModule(context: SandBox, data: ModuleObject): Object {
     head.appendChild(style)
   }
   function installImage(obj: BasicObject, cexports: Object) {
-    cexports.uri = obj.data
-    cexports.default = cexports
+    cexports.default = obj.data
   }
 
   // Install each object
-  for (let i = objectsCount - 1; i >= 0; i--) {
+  for (let i = 0; i < objectsCount; i++) {
     const obj = data.objects[i]
-    const cexports = register[i]
+    const cexports = register[obj.id]
     try {
       switch (obj.type) {
         case "js":
@@ -191,7 +176,8 @@ function installModule(context: SandBox, data: ModuleObject): Object {
     }
     catch (e) {
       cmodule.__error = e.toString()
-      console.error(`in ${data.name} (${obj.location}) : `, e)
+      console.error(`in ${data.name} (${obj.location}) : `, e, obj, obj.data)
+      return cmodule
     }
   }
   return cmodule

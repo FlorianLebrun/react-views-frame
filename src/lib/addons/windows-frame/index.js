@@ -1,11 +1,11 @@
 import React from "react"
-import { PluginComponent } from "../../layout"
+import { PluginInstance } from "../../layout"
 import { Frame } from "./Frame"
 import "./frame.css"
 
 export default {
   name: "windows-frame",
-  component: class extends PluginComponent {
+  component: class extends PluginInstance {
     pluginWillMount() {
       this.application.renderDisplayFrame = function() {
         return (<Frame />)

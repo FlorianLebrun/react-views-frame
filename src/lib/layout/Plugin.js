@@ -1,38 +1,27 @@
 import { WindowClass } from "./Window"
+import Listenable from "../modules/listenable"
 
-type ParameterLink = {
-  window: WindowClass,
-  param: string,
-}
-
-const PluginStatus = {
-  Mapped: { desc: "mapped but not installed" },
-  Installed: { desc: "instancied and will mount" },
-  Mounted: { desc: "instancied and will mount" },
-}
 
 export class PluginClass {
   name: string
-  status: Object
-  instance: PluginComponent
+  instance: PluginInstance
   component: Function
   parameters: Object
-  windows: { [string]: WindowClass } = {}
-  links: { [string]: Array<ParameterLink> } = {}
+  windows: { [string]: WindowClass }
   export: Object
   import: Object
   context: PluginContext
   users: Array<PluginClass>
   dependencies: Array<PluginClass>
+  isMounted: boolean
 
   constructor(name: string, context: PluginContext) {
     this.name = name
-    this.status = PluginStatus.Mapped
     this.context = context
   }
   setup(desc: Object, parameters: Object) {
     this.parameters = parameters
-    this.component = desc.component || PluginComponent
+    this.component = desc.component || PluginInstance
 
     // Setup dependencies
     if (desc.dependencies) {
@@ -44,16 +33,11 @@ export class PluginClass {
     // Setup windows
     if (desc.windows) {
       Object.keys(desc.windows).forEach(name => {
+        if (!this.windows) this.windows = {}
         this.windows[name] = new WindowClass(name, desc.windows[name], this)
       })
       this.addDependency("windows-frame")
     }
-
-    // Mount an instance
-    this.willMount()
-
-    // Prompt for did mount procedure
-    this.promptMount()
   }
   addUser(user: PluginClass) {
     if (!this.users) this.users = []
@@ -71,8 +55,22 @@ export class PluginClass {
     deps.push(pluginClass)
     return pluginClass.addUser(this)
   }
+  mount() {
+    if (!this.instance) {
+      // Create instance
+      this.instance = new (this.component)(this)
+      this.context.plugins[this.name] = this.instance
+
+      // Call will mount
+      this.instance.pluginWillMount(this.parameters)
+
+      // Notify all user plugins
+      this.users && this.users.forEach(x => x.promptMount(this))
+      this.promptMount()
+    }
+  }
   promptMount() {
-    if (this.status === PluginStatus.Installed) {
+    if (this.instance && !this.isMounted) {
       const deps = this.dependencies
       if (deps) {
         for (let i = 0; i < deps.length; i++) {
@@ -82,94 +80,68 @@ export class PluginClass {
       this.didMount()
     }
   }
-  willMount() {
-    this.status = PluginStatus.Installed
-
-    // Create instance
-    this.instance = new (this.component)(this)
-    this.context.plugins[this.name] = this.instance
-
-    // Call will mount
-    this.instance.pluginWillMount(this.parameters)
-
-    // Notify all user plugins
-    this.users && this.users.forEach(x => x.promptMount(this))
-  }
   didMount() {
-    this.status = PluginStatus.Mounted
+    if (this.instance && !this.isMounted) {
 
-    // Process import
-    this.import && Object.keys(this.import).forEach(name => {
-      const ref = this.import[name]
-      const plugin = this.context.plugins[name]
-      const pluginExport = plugin.pluginClass.export
-      if (pluginExport) {
-        if (ref === true) {
-          pluginExport.forEach(key => {
-            this.instance[key] = plugin[key]
-          })
+      // Process import
+      this.import && Object.keys(this.import).forEach(name => {
+        const ref = this.import[name]
+        const plugin = this.context.plugins[name]
+        const pluginExport = plugin[".class"].export
+        if (pluginExport) {
+          if (ref === true) {
+            pluginExport.forEach(key => {
+              this.instance[key] = plugin[key]
+            })
+          }
+          else if (typeof ref === "string") {
+            this.instance[ref] = plugin
+          }
         }
         else if (typeof ref === "string") {
           this.instance[ref] = plugin
         }
-      }
-      else if (typeof ref === "string") {
-        this.instance[ref] = plugin
-      }
-    })
-
-    // Process windows parameters import
-    Object.keys(this.windows).forEach(key => {
-      const window = this.windows[key]
-      window.parameters && Object.keys(window.parameters).forEach(param => {
-        this.addParameterLink(window, param)
       })
-    })
 
-    this.instance.pluginDidMount()
-  }
-  addParameterLink(window: Object, param: string) {
-    const link = this.resolveValueReference(window.parameters[param], param)
-    if (link) {
-      link.param = param
-      link.window = window
-      window.addLink(link)
-      const linkList = this.links[link.path]
-      if (!linkList) this.links[link.path] = [ link ]
-      else linkList.push(link)
-    }
-    else {
-      console.error("Parameter '" + param + "' of window '" + window.name + "' has invalid link:", link.path)
+      // Process windows parameters import
+      this.windows && Object.keys(this.windows).forEach(key => {
+        const window = this.windows[key]
+        window.parameters && Object.keys(window.parameters).forEach(key => {
+          const reference = window.parameters[key]
+          const { pluginName, path } = this.resolveValueReference(reference, key)
+          if (pluginName) window.addLink(pluginName, key, path)
+          else console.error("Parameter '" + key + "' of window '" + window.name + "' has invalid link:", path)
+        })
+      })
+
+      this.instance.pluginDidMount({})
+      this.isMounted = true
     }
   }
   resolveValueReference(reference: string, key: string) {
+    let pluginName, path
     if (reference === true) {
-      return {
-        pluginClass: this,
-        path: key,
-      }
+      pluginName = this.name
+      path = key
     }
     else if (typeof reference === "string") {
       const parts = reference.split("/")
       if (parts.length > 1) {
-        return {
-          pluginClass: parts[0] ? this.context.pluginClasses[parts[0]] : this,
-          path: parts[1],
-        }
+        const pluginClass = parts[0] ? this.context.pluginClasses[parts[0]] : this
+        pluginName = pluginClass && pluginClass.name
+        path = parts[1]
       }
-      else return {
-        pluginClass: this,
-        path: reference,
+      else {
+        pluginName = this.name
+        path = reference
       }
     }
+    return { pluginName, path }
   }
 }
 
-export class PluginComponent {
-  pluginClass: PluginClass
-  application: Object
-  storage: Object
-  nextState: Object
+export class PluginInstance extends Listenable {
+  ".class": PluginClass
 
   // Life Cycle management functions
   pluginWillMount(parameters: Object) { } // eslint-disable-line
@@ -177,73 +149,18 @@ export class PluginComponent {
   pluginWillUnmount() { }
 
   constructor(pluginClass: PluginClass) {
-    this.pluginClass = pluginClass
-    this.application = pluginClass.context.application
-    this.restorePluginStorage()
-  }
-  restorePluginStorage() {
-    try {
-      const data = localStorage.getItem(this.pluginClass.name)
-      this.storage = data ? JSON.parse(data) : {}
+    super()
+    this[".class"] = pluginClass
+    if (pluginClass.windows) {
+      this.openWindow = function (windowName: string, options: Object) {
+        this.layout.openPluginWindow(pluginClass.windows[windowName], this, options)
+      }
+      this.closeWindow = function (windowName: string) {
+        this.layout.closePluginWindows(pluginClass.windows[windowName], this)
+      }
+      this.closeAllWindow = function () {
+        this.layout.closePluginWindows(null, this)
+      }
     }
-    catch (e) {
-      this.storage = {}
-      localStorage.removeItem(this.pluginClass.name)
-      console.error("plugin storage cannot be load", e)
-    }
-  }
-  savePluginStorage(storage: Object) {
-    try {
-      const data = JSON.stringify(storage)
-      localStorage.setItem(this.pluginClass.name, data)
-    }
-    catch (e) {
-      console.error("plugin storage cannot be save", e)
-    }
-  }
-  openWindow(windowName: string, options: Object) {
-    this.layout.openPluginWindow(this.pluginClass.windows[windowName], this, options)
-  }
-  closeWindow(windowName: string) {
-    this.layout.closePluginWindows(this.pluginClass.windows[windowName], this)
-  }
-  closeAllWindow() {
-    this.layout.closePluginWindows(null, this)
-  }
-  updateNextState = () => {
-    if (this.nextState) {
-      const updatedWindows = []
-      Object.keys(this.nextState).forEach(key => {
-        const value = this.nextState[key]
-        const links = this.pluginClass.links[key]
-        this[key] = value
-        if (key === "storage") {
-          this.savePluginStorage(value)
-        }
-        if (links) {
-          const windows = this.layout.windows
-          Object.keys(windows).forEach(wndId => {
-            const wnd = windows[wndId]
-            const wlink = links.find(lk => lk.window === wnd.windowClass)
-            if (wlink) {
-              wnd.parameters[wlink.param] = value
-              if (updatedWindows.indexOf(wnd) < 0) updatedWindows.push(wnd)
-            }
-          })
-        }
-      })
-      updatedWindows.forEach(wnd => wnd.render())
-      this.nextState = null
-    }
-  }
-  setState(state: Object) {
-    const oldState = this.nextState
-    const newState = oldState || {}
-    Object.keys(state).forEach(key => {
-      newState[key] = state[key]
-      this[key] = state[key]
-    })
-    this.nextState = newState
-    if (!oldState) setTimeout(this.updateNextState, 0)
   }
 }
