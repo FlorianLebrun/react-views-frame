@@ -4,14 +4,16 @@ export default class Listenable {
   $$prevState: Object
   $$listeners: Array<Array<Function | string>>
 
-  listenState(callback: Function, keys: Array) {
-    if (callback instanceof Function) {
-      let listener = [callback]
-      keys && listener.concat(keys)
-      if (!this.$$listeners) this.$$listeners = []
-      this.$$listeners.push(listener)
+  listenState(listener: Function | Array) {
+    if (!Array.isArray(listener)) {
+      listener = [listener]
+      if (Array.isArray(arguments[1])) listener = listener.concat(arguments[1])
     }
-    else throw new Error("ViewFile::listenContent expects a not null function")
+    if (!(listener[0] instanceof Function)) {
+      throw new Error("listenState expects a callback function")
+    }
+    if (!this.$$listeners) this.$$listeners = []
+    this.$$listeners.push(listener)
     return this
   }
   unlistenState(callback: Function) {
@@ -26,42 +28,16 @@ export default class Listenable {
     }
     return false
   }
-  dispatchState = () => {
-    let k, i
-    const count = this.$$listeners ? this.$$listeners.length : 0
-    for (i = 0; i < count; i++) {
-      const listener = this.$$listeners[i]
-      if (listener.length > 1) {
-        for (k = 1; k < listener.length; k++) {
-          if (this.$$prevState.hasOwnProperty(listener[k])) {
-            try {
-              listener[0](this, this.$$prevState)
-            }
-            catch (e) {
-              console.error(e)
-            }
-            break
-          }
-        }
-      }
-      else {
-        try {
-          listener[0](this, this.$$prevState)
-        }
-        catch (e) {
-          console.error(e)
-        }
-      }
-    }
-    this.$$prevState = 0
-  }
   setState(value) {
     this.$$status = "changed"
+    if (arguments.length === 2) {
+      value = { [value]: arguments[1] }
+    }
     for (let key in value) {
       if (this[key] !== value[key]) {
         if (!this.$$prevState) {
           this.$$prevState = {}
-          setTimeout(this.dispatchState, 0)
+          setTimeout(dispatchState.bind(this), 0)
         }
         if (!this.$$prevState.hasOwnProperty(key)) {
           this.$$prevState[key] = this[key]
@@ -74,4 +50,34 @@ export default class Listenable {
     this.$$status = "released"
     this.dispatchState()
   }
+}
+
+function dispatchState() {
+  let k, i
+  const count = this.$$listeners ? this.$$listeners.length : 0
+  for (i = 0; i < count; i++) {
+    const listener = this.$$listeners[i]
+    if (listener.length > 1) {
+      for (k = 1; k < listener.length; k++) {
+        if (this.$$prevState.hasOwnProperty(listener[k])) {
+          try {
+            listener[0](this, this.$$prevState)
+          }
+          catch (e) {
+            console.error(e)
+          }
+          break
+        }
+      }
+    }
+    else {
+      try {
+        listener[0](this, this.$$prevState)
+      }
+      catch (e) {
+        console.error(e)
+      }
+    }
+  }
+  this.$$prevState = 0
 }

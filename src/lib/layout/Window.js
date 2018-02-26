@@ -14,6 +14,10 @@ export type WindowOptions = {
   parameters: { [string]: any },
 }
 
+export type ParameterLink = {
+  [string]: string, // key -> path
+}
+
 export class WindowClass {
   name: string
   overflow: string
@@ -23,8 +27,8 @@ export class WindowClass {
   defaultDockId: DockID
   defaultParameters: Object
 
-  windows: { [string]: WindowClass } = {}
-  links: Array<ParameterLink>
+  windows: { [string]: WindowClass }
+  links: { [string]: ParameterLink }
 
   constructor(name: string, desc: Object, pluginClass: PluginClass) {
     desc && Object.keys(desc).forEach(key => this[key] = desc[key])
@@ -34,18 +38,38 @@ export class WindowClass {
     console.assert(isInheritedOf(this.component, WindowComponent),
       "Window '", this.name, "' shall be based on WindowComponent")
   }
-  addLink(link: Object) {
-    if (!this.links) this.links = [link]
-    else this.links.push(link)
+  addLink(pluginName: string, key: string, path: string) {
+    if (!this.links) this.links = {}
+    if (!this.links[pluginName]) this.links[pluginName] = {}
+    this.links[pluginName][key] = path
   }
-  createDefaultParameters(instance: WindowInstance): Object {
-    const params = { ...this.defaultParameters }
-    this.links && this.links.forEach(lk => {
-      params[lk.param] = lk.pluginClass.instance[lk.path]
-    })
-    params.instance = instance
-    params.onChange = instance.notifyChange
-    return params
+  updateParametersFor(instance, pluginName, bind: boolean) {
+    const { plugins } = instance.application.layout
+    const plugInstance = plugins[pluginName]
+    if (plugInstance) {
+      const plugLinks = this.links[pluginName]
+      bind && plugInstance.listenState(instance.updateParams, Object.keys(plugLinks))
+      for (const key in plugLinks) {
+        const path = plugLinks[key]
+        instance.parameters[key] = plugInstance[path]
+      }
+    }
+  }
+  connectParameters(instance: WindowInstance): Object {
+    if (this.links) {
+      for (const pluginName in this.links) {
+        this.updateParametersFor(instance, pluginName, true)
+      }
+    }
+  }
+  disconnectParameters(instance: WindowInstance): Object {
+    if (this.links) {
+      const { plugins } = instance.application.layout
+      for (const pluginName in this.links) {
+        const plugInstance = plugins[pluginName]
+        plugInstance && plugInstance.unlistenState(instance.updateParams)
+      }
+    }
   }
 }
 
@@ -66,7 +90,7 @@ export class WindowInstance {
   parameters: { [string]: any }
 
   constructor(windowId: string, windowClass: WindowClass,
-    parent: WindowInstance, plugin: WindowInstance, options: WindowOptions
+    parent: WindowInstance, plugin: PluginComponent, options: WindowOptions
   ) {
     this.id = windowId
     this.windowClass = windowClass
@@ -79,8 +103,18 @@ export class WindowInstance {
     this.title = windowClass.defaultTitle
     this.icon = windowClass.defaultIcon
     this.dockId = windowClass.defaultDockId
-    this.parameters = windowClass.createDefaultParameters(this)
+    this.parameters = {
+      ...this.defaultParameters,
+      instance: this,
+      onChange: this.notifyChange,
+    }
+    this.windowClass.connectParameters(this)
     this.updateOptions(options)
+  }
+  updateParams = (plugin, prevState) => {
+    this.windowClass.updateParametersFor(this, plugin[".class"].name)
+    console.log("update window", this.windowClass.name)
+    this.render()
   }
   updateOptions(options: WindowOptions) {
     if (options) {
@@ -97,6 +131,7 @@ export class WindowInstance {
     this.render()
   }
   close() {
+    this.windowClass.disconnectParameters(this)
     ReactDOM.unmountComponentAtNode(this.node)
   }
   notifyFocus() {

@@ -14,21 +14,22 @@ export default class FrameMenu extends Component<void, void, void> {
   render() {
     const style = { width: 200 }
     const plugins = Application.layout.plugins
-    return (<div className="text-bold" style={ style }>
+    return (<div className="text-bold" style={style}>
       {Object.keys(plugins).map((name, i) => {
         const plugin = plugins[name]
-        return (<div key={ i }className="padding-top">
-          <span className="font-style-italic">{plugin.pluginClass.title || name}</span>
+        const windows = plugin[".class"].windows
+        return (<div key={i} className="padding-top">
+          <span className="font-style-italic">{plugin[".class"].title || name}</span>
           <div>
-            {Object.keys(plugin.pluginClass.windows).map((name, i) => {
-              const wnd = plugin.pluginClass.windows[name]
+            {windows && Object.keys(windows).map((name, i) => {
+              const wnd = windows[name]
               return (<div
-                key={ i }
+                key={i}
                 className="margin-left-lg hoverbox hoverbox-highlight cursor-pointer"
-                onClick={ this.handleClick(plugin, name) }
-                onMouseDown={ this.handleMouseDown }
-                      >
-                <span className={ "text-shade fa fa-" + wnd.defaultIcon } style={ styles.icon } />
+                onClick={this.handleClick(plugin, name)}
+                onMouseDown={this.handleMouseDown}
+              >
+                <span className={"text-shade fa fa-" + wnd.defaultIcon} style={styles.icon} />
                 {wnd.defaultTitle || name}
               </div>)
             })}

@@ -1,8 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import NotificationSystem from "react-notification-system"
-
-import { PluginComponent } from "../layout"
+import { PluginInstance } from "../layout"
 
 type NotificationType = {
   uid: number,
@@ -15,7 +14,7 @@ type NotificationType = {
 
 export default {
   name: "notification-addon",
-  component: class extends PluginComponent {
+  component: class extends PluginInstance {
     notificationNode: HTMLElement = null
     notificationSystem: NotificationSystem = null
     modalStack = []
@@ -27,10 +26,10 @@ export default {
         React.createElement(NotificationSystem),
         this.notificationNode
       )
-      
-      this.application.addNotification = this.addNotification.bind(this)
+
+      this.application.addNotification = this.addNotification
     }
-    addNotification(notification: NotificationType) {
+    addNotification = (notification: NotificationType) => {
       if (typeof notification !== "object") {
         notification = {
           level: arguments[0],

@@ -1,16 +1,16 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-import { PluginComponent } from "../layout"
+import { PluginInstance } from "../layout"
 
 export default {
   name: "popup-addon",
-  component: class extends PluginComponent {
+  component: class extends PluginInstance {
     modalStack = []
     pluginWillMount() {
-      this.application.popup = this.popup.bind(this)
+      this.application.popup = this.popup
     }
-    popup(renderer: Function, outsideReject): Promise {
+    popup = (renderer: Function, outsideReject): Promise => {
       return new Promise((resolve, reject) => {
         const htmlRoot = document.createElement("div")
         htmlRoot.style.position = "absolute"
@@ -32,10 +32,10 @@ export default {
         }
         ReactDOM.render((
           <div>
-            <div style={ styles.backdrop } className="backdrop web-modal-dialog" />
-            <div style={ styles.vWrapper } onClick={ outsideReject && handleReject } className="v-wrapper">
-              <div style={ styles.hWrapper } className="h-wrapper">
-                <div className="modal-dialog" onClick={ handleStopPropagation }>
+            <div style={styles.backdrop} className="backdrop web-modal-dialog" />
+            <div style={styles.vWrapper} onClick={outsideReject && handleReject} className="v-wrapper">
+              <div style={styles.hWrapper} className="h-wrapper">
+                <div className="modal-dialog" onClick={handleStopPropagation}>
                   <div className="modal-content">
                     <div className="modal-body">
                       {renderer(handleResolve, handleReject)}

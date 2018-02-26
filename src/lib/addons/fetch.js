@@ -1,17 +1,17 @@
-import { PluginComponent } from "../layout"
+import { PluginInstance } from "../layout"
 
 export default {
   name: "fetch-addon",
-  component: class extends PluginComponent {
+  component: class extends PluginInstance {
     endpoints: Array = null
     loginPromise: Promise = null
     enableLoginRecovery: boolean = true
 
     pluginWillMount(parameters: Object) {
-      this.application.fetchAPI = this.fetchAPI.bind(this)
+      this.application.fetchAPI = this.fetchAPI
       this.endpoints = parameters.endpoints
     }
-    fetchAPI(url, options) {
+    fetchAPI = (url, options) => {
       let hasLoginRecovery = this.enableLoginRecovery && (!options || !options.noCredentials)
 
       const endpoint = this.endpoints.find(e => url.match(e.pattern))
@@ -41,10 +41,10 @@ export default {
       const response = (res) => {
         return new Promise((resolve, reject) => {
 
-          const respondSuccess = function(json) {
+          const respondSuccess = function (json) {
             resolve({ status: res.status, headers: res.headers, json })
           }
-          const respondError = function(error) {
+          const respondError = function (error) {
             reject({ status: res.status, headers: res.headers, error })
           }
 
