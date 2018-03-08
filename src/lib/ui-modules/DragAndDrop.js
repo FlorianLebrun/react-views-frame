@@ -72,6 +72,7 @@ function dataTransfertToObject(dataTransfer: Object): Object {
       // Nothing
     }
   })
+  obj.files = dataTransfer.files
   return obj
 }
 

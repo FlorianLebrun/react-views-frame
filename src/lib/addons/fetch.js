@@ -26,7 +26,10 @@ export default {
       }
       if (request.body) {
         request.method = request.method || "POST"
-        if (request.body instanceof Object) {
+        if (request.body instanceof File) {
+          request.headers["Content-Type"] = request.body.type
+        }
+        else if (request.body instanceof Object) {
           request.headers["Content-Type"] = "application/json"
           request.body = JSON.stringify(request.body)
         }
