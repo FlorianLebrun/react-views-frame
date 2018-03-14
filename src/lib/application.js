@@ -81,9 +81,7 @@ window.addEventListener("message", (msg) => {
       return Application.receiveHostMessage(data)
     }
   }
-  catch (e) {
-    console.error(e)
-  }
+  catch (e) {}
 })
 
 export function extendApplication(features: { [string]: any }) {
