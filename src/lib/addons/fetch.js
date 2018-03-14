@@ -8,10 +8,10 @@ export default {
     enableLoginRecovery: boolean = true
 
     pluginWillMount(parameters: Object) {
-      this.application.fetchAPI = this.fetchAPI
+      this.application.fetchAPI = this.fetchAPI.bind(this)
       this.endpoints = parameters.endpoints
     }
-    fetchAPI = (url, options) => {
+    fetchAPI(url, options) {
       let hasLoginRecovery = this.enableLoginRecovery && (!options || !options.noCredentials)
 
       const endpoint = this.endpoints.find(e => url.match(e.pattern))
