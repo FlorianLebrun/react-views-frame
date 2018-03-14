@@ -27,9 +27,9 @@ export default {
         this.notificationNode
       )
 
-      this.application.addNotification = this.addNotification
+      this.application.addNotification = this.addNotification.bind(this)
     }
-    addNotification = (notification: NotificationType) => {
+    addNotification(notification: NotificationType) {
       if (typeof notification !== "object") {
         notification = {
           level: arguments[0],

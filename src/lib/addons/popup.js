@@ -8,9 +8,9 @@ export default {
   component: class extends PluginInstance {
     modalStack = []
     pluginWillMount() {
-      this.application.popup = this.popup
+      this.application.popup = this.popup.bind(this)
     }
-    popup = (renderer: Function, outsideReject): Promise => {
+    popup(renderer: Function, outsideReject): Promise {
       return new Promise((resolve, reject) => {
         const htmlRoot = document.createElement("div")
         htmlRoot.style.position = "absolute"
