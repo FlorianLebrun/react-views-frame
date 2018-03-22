@@ -49,6 +49,14 @@ export class ApplicationInstance {
       window.open(url)
     }
   }
+  reloadWindow() {
+    if (this.isHostedWindow()) {
+      window.location.reload()
+    }
+    else {
+      window.reload()
+    }
+  }
   setWindowTitle(title: string, icon: string) {
     if (this.isHostedWindow()) {
       window.parent.postMessage(JSON.stringify({ infos: { title, icon } }), '*')
@@ -74,6 +82,16 @@ export class ApplicationInstance {
   }
 }
 
+window.addEventListener("keydown", (e) => {
+  if (Application.isHostedWindow()) {
+    if (e.keyCode === 82 && e.ctrlKey) {
+      Application.reloadWindow()
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+})
+
 window.addEventListener("message", (msg) => {
   try {
     const data = JSON.parse(msg.data)
@@ -81,7 +99,7 @@ window.addEventListener("message", (msg) => {
       return Application.receiveHostMessage(data)
     }
   }
-  catch (e) {}
+  catch (e) { }
 })
 
 export function extendApplication(features: { [string]: any }) {
