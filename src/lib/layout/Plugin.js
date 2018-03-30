@@ -22,6 +22,8 @@ export class PluginClass {
   setup(desc: Object, parameters: Object) {
     this.parameters = parameters
     this.component = desc.component || PluginInstance
+    this.export = desc.export
+    this.import = desc.import
 
     // Setup dependencies
     if (desc.dependencies) {
