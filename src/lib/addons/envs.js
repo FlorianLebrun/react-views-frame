@@ -6,31 +6,15 @@ export default {
   component: class extends PluginInstance {
     pluginWillMount() {
       this.application.envs = this
-      this.application.listenEnv = listenEnv.bind(this.application)
-      this.application.filterEnv = filterEnv.bind(this.application)
       this.application.connectEnv = connectEnv.bind(this.application)
 
-      const update_location = updateWindowLocation.bind(this.application)
-      window.addEventListener("hashchange", update_location)
-      update_location()
+      window.addEventListener("hashchange", this.updateLocation)
+      this.updateLocation()
+    }
+    updateLocation = () => {
+      this.setState("location", parseLocation(window.location.hash))
     }
   },
-}
-
-function listenEnv(name: string, callback: Function) {
-  //TODO //TODO
-}
-
-function filterEnv(name: string, callback: Function) {
-  //TODO
-}
-
-function listenEnvStream(name: string, callback: Function) {
-  //TODO
-}
-
-function unlistenEnvStream(name: string, callback: Function) {
-  //TODO
 }
 
 function connectEnv(mapping: Function | Array<string> | { [string]: string }, ConnectedComponent) {
@@ -39,7 +23,7 @@ function connectEnv(mapping: Function | Array<string> | { [string]: string }, Co
   }
 }
 
-function filterWindowLocation(location) {
+function parseLocation(location): Object {
   if (typeof location === "string") {
     const locParts = location.split("?")
     location = {}
@@ -66,9 +50,5 @@ function filterWindowLocation(location) {
     }
     window.location.hash = hash
   }
-  return { "location": location }
-}
-
-function updateWindowLocation() {
-  this.envs.setState(filterWindowLocation(window.location.hash))
+  return location
 }

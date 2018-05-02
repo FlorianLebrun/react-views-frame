@@ -31,9 +31,9 @@ export class WindowClass {
   links: { [string]: ParameterLink }
 
   constructor(name: string, desc: Object, pluginClass: PluginClass) {
-    desc && Object.keys(desc).forEach(key => this[key] = desc[key])
+    for (const key in desc) this[key] = desc[key]
     this.name = name
-    this.overflow = this.overflow || "auto"
+    this.overflow = desc.overflow || "auto"
     this.pluginClass = pluginClass
     console.assert(isInheritedOf(this.component, WindowComponent),
       "Window '", this.name, "' shall be based on WindowComponent")
@@ -55,14 +55,14 @@ export class WindowClass {
       }
     }
   }
-  connectParameters(instance: WindowInstance): Object {
+  connectParameters(instance: WindowInstance) {
     if (this.links) {
       for (const pluginName in this.links) {
         this.updateParametersFor(instance, pluginName, true)
       }
     }
   }
-  disconnectParameters(instance: WindowInstance): Object {
+  disconnectParameters(instance: WindowInstance) {
     if (this.links) {
       const { plugins } = instance.application.layout
       for (const pluginName in this.links) {
@@ -216,19 +216,6 @@ export class WindowComponent<DefaultProps, Props, State>
   }
   isWindow() {
     return true
-  }
-  log(severity) {
-    const message = {
-      severity: severity,
-      from: this.props && this.props.window && this.props.window.title,
-      content: arguments[1],
-    }
-    if (arguments.length > 1) {
-      message.content = Array.prototype.slice.call(arguments, 1)
-    }
-    if (severity === "error") console.error(...message.content)
-    else console.log(...message.content)
-    this.plugin.application.setEnv("console.debug", message)
   }
   openWindow(windowClassID: string, options: WindowOptions) {
     const { layout } = this.instance

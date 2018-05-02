@@ -28,27 +28,43 @@ export default class Listenable {
     }
     return false
   }
-  setState(value) {
-    this.$$status = "changed"
-    if (arguments.length === 2) {
-      value = { [value]: arguments[1] }
-    }
-    for (let key in value) {
-      if (this[key] !== value[key]) {
-        if (!this.$$prevState) {
-          this.$$prevState = {}
-          setTimeout(dispatchState.bind(this), 0)
-        }
-        if (!this.$$prevState.hasOwnProperty(key)) {
-          this.$$prevState[key] = this[key]
-        }
-        this[key] = value[key]
+  setState(value: Object) {
+    if (arguments.length === 0) {
+      if (!this.$$prevState) {
+        this.$$prevState = {}
+        setTimeout(dispatchState.bind(this), 0)
       }
     }
+    else if (arguments.length === 1) {
+      for (let key in value) {
+        if (this[key] !== value[key]) {
+          if (!this.$$prevState) {
+            this.$$prevState = {}
+            setTimeout(dispatchState.bind(this), 0)
+          }
+          if (!this.$$prevState.hasOwnProperty(key)) {
+            this.$$prevState[key] = this[key]
+          }
+          this.$$status = "changed"
+          this[key] = value[key]
+        }
+      }
+    }
+    else if (arguments.length === 2) {
+      const key = value
+      if (!this.$$prevState) {
+        this.$$prevState = {}
+        setTimeout(dispatchState.bind(this), 0)
+      }
+      if (!this.$$prevState.hasOwnProperty(key)) {
+        this.$$prevState[key] = this[key]
+      }
+      this.$$status = "changed"
+      this[key] = arguments[1]
+    }
   }
-  terminate() {
-    this.$$status = "released"
-    this.dispatchState()
+  terminateState() {
+    this.setState({ $$status: "released" })
   }
 }
 

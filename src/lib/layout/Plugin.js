@@ -22,20 +22,34 @@ export class PluginClass {
   setup(desc: Object, parameters: Object) {
     this.parameters = parameters
     this.component = desc.component || PluginInstance
+    this.export = desc.export
 
     // Setup dependencies
     if (desc.dependencies) {
-      desc.dependencies.forEach(name => {
-        return this.addDependency(name)
-      })
+      for (const name of desc.dependencies) {
+        this.addDependency(name)
+      }
+    }
+    if (desc.import) {
+      this.import = desc.import
+      for (const name in desc.import) {
+        this.addDependency(name)
+      }
     }
 
     // Setup windows
     if (desc.windows) {
-      Object.keys(desc.windows).forEach(name => {
+      for (const name in desc.windows) {
         if (!this.windows) this.windows = {}
-        this.windows[name] = new WindowClass(name, desc.windows[name], this)
-      })
+        const window = new WindowClass(name, desc.windows[name], this)
+        for (const key in window.parameters) {
+          const reference = window.parameters[key]
+          const { pluginName, path } = this.resolveValueReference(reference, key)
+          if (pluginName) window.addLink(pluginName, key, path)
+          else console.error("Parameter '" + key + "' of window '" + window.name + "' has invalid link:", path)
+        }
+        this.windows[name] = window
+      }
       this.addDependency("windows-frame")
     }
   }
@@ -57,6 +71,7 @@ export class PluginClass {
   }
   mount() {
     if (!this.instance) {
+
       // Create instance
       this.instance = new (this.component)(this)
       this.context.plugins[this.name] = this.instance
@@ -64,8 +79,21 @@ export class PluginClass {
       // Call will mount
       this.instance.pluginWillMount(this.parameters)
 
+      // Mount all dependencies
+      if (this.dependencies) {
+        for (const dep of this.dependencies) {
+          dep.mount()
+        }
+      }
+
       // Notify all user plugins
-      this.users && this.users.forEach(x => x.promptMount(this))
+      if (this.users) {
+        for (const user of this.users) {
+          user.promptMount(this)
+        }
+      }
+
+      // Try to finalize mounting
       this.promptMount()
     }
   }
@@ -84,15 +112,15 @@ export class PluginClass {
     if (this.instance && !this.isMounted) {
 
       // Process import
-      this.import && Object.keys(this.import).forEach(name => {
+      for (const name in this.import) {
         const ref = this.import[name]
         const plugin = this.context.plugins[name]
         const pluginExport = plugin[".class"].export
         if (pluginExport) {
           if (ref === true) {
-            pluginExport.forEach(key => {
+            for (const key of pluginExport) {
               this.instance[key] = plugin[key]
-            })
+            }
           }
           else if (typeof ref === "string") {
             this.instance[ref] = plugin
@@ -101,18 +129,7 @@ export class PluginClass {
         else if (typeof ref === "string") {
           this.instance[ref] = plugin
         }
-      })
-
-      // Process windows parameters import
-      this.windows && Object.keys(this.windows).forEach(key => {
-        const window = this.windows[key]
-        window.parameters && Object.keys(window.parameters).forEach(key => {
-          const reference = window.parameters[key]
-          const { pluginName, path } = this.resolveValueReference(reference, key)
-          if (pluginName) window.addLink(pluginName, key, path)
-          else console.error("Parameter '" + key + "' of window '" + window.name + "' has invalid link:", path)
-        })
-      })
+      }
 
       this.instance.pluginDidMount({})
       this.isMounted = true
@@ -127,8 +144,7 @@ export class PluginClass {
     else if (typeof reference === "string") {
       const parts = reference.split("/")
       if (parts.length > 1) {
-        const pluginClass = parts[0] ? this.context.pluginClasses[parts[0]] : this
-        pluginName = pluginClass && pluginClass.name
+        pluginName = parts[0] ? parts[0] : this.name
         path = parts[1]
       }
       else {

@@ -1,43 +1,82 @@
 import Listenable from "./listenable"
 
 export default class Storable extends Listenable {
-  uid: string
-  data: Object
+  $$storeUid: string
+  $$storeDirectory: Array
 
   constructor(uid: string) {
     super()
-    this.uid = uid
+    this.$$storeUid = uid
+    const data = this.readStorageData()
+    if (data) this.storableShouldRestore(data)
+    else this.storableShouldInitiate()
   }
-  load(): Object {
+  storableShouldInitiate() {
+
+  }
+  storableShouldRestore(data: Object) {
+
+  }
+  storableShouldSave(): Object {
+
+  }
+  storableWillUnmount() {
+
+  }
+  readStorageData(): Object {
     try {
-      const json = window.localStorage.getItem(this.uid)
-      this.data = json ? JSON.parse(json) : this.defaultData()
+      const bytes = window.localStorage.getItem(this.$$storeUid)
+      if (bytes) return JSON.parse(bytes)
     }
-    catch (e) { this.data = this.defaultData() }
-    this.$status = "stored"
-    this.dispatchData(this.data)
-    return this.data
-  }
-  save(): Object {
-    this.data = this.updateData()
-    const new_json = JSON.stringify(this.data)
-    const prev_json = window.localStorage.getItem(this.uid)
-    if (new_json !== prev_json) {
-      window.localStorage.setItem(this.uid, new_json)
+    catch (e) {
+      window.localStorage.removeItem(this.$$storeUid)
     }
-    this.$status = "stored"
-    return this.data
+    return null
   }
-  delete() {
-    this.terminate()
-    window.localStorage.removeItem(this.uid)
+  writeStorageData(data: Object): boolean {
+    try {
+      const bytes = JSON.stringify(data)
+      window.localStorage.setItem(this.$$storeUid, bytes)
+      return true
+    }
+    catch (e) { }
+    return false
   }
-  defaultData() {
-    return {}
+  setStorageData(value: Object) {
+    const data = this.readStorageData()
+    let hasChange = false
+    if (arguments.length === 1) {
+      for (let key in value) {
+        if (data[key] !== value[key]) {
+          data[key] = value[key]
+          hasChange = true
+        }
+      }
+    }
+    else if (arguments.length === 2) {
+      if (data[value] !== arguments[1]) {
+        data[value] = arguments[1]
+        hasChange = true
+      }
+    }
+    hasChange && this.writeStorageData(data)
   }
-  dispatchData(data: Object) {
+  forceRestore() {
+    const data = this.readStorageData()
+    if (data) this.storableShouldRestore(data)
   }
-  updateData(): Object {
-    return this.data
+  forceSave() {
+    const data = this.storableShouldSave()
+    if (data) this.writeStorageData(data)
+  }
+  terminateState() {
+    super.terminateState()
+    this.storableShouldSave()
+    this.storableWillUnmount()
+  }
+  deleteState() {
+    this.terminateState()
+    this.storableWillUnmount()
+    window.localStorage.removeItem(this.$$storeUid)
   }
 }

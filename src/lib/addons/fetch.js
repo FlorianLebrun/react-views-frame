@@ -44,9 +44,6 @@ export default {
       const response = (res) => {
         return new Promise((resolve, reject) => {
 
-          const respondSuccess = function (json) {
-            resolve({ status: res.status, headers: res.headers, json })
-          }
           const respondError = function (error) {
             reject({ status: res.status, headers: res.headers, error })
           }
@@ -59,18 +56,27 @@ export default {
               endpoint.feedback(res, data)
             }
             if (res.status === 204) {
-              return respondSuccess({})
+              resolve({ status: res.status, headers: res.headers, json: isJson ? {} : undefined })
             }
-            else if (isJson && res.json instanceof Function) {
-              return res.json().then(respondSuccess, respondError)
+            else if (request.useBlob) {
+              return res.blob().then((blob) => {
+                return resolve({ status: res.status, headers: res.headers, blob })
+              }, respondError)
             }
             else {
-              return res.blob().then(respondSuccess, respondError)
+              return res.text().then(function (text) {
+                let json
+                if (isJson) {
+                  try { json = isJson && JSON.parse(text) }
+                  catch (e) { return respondError(e) }
+                }
+                return resolve({ status: res.status, headers: res.headers, text, json })
+              }, respondError)
             }
           }
           else if (res.status === 401 && hasLoginRecovery && endpoint.login) {
             if (!this.loginPromise) {
-              this.loginPromise = endpoint.login(this.application)
+              this.loginPromise = endpoint.login(request, res)
               if (!this.loginPromise) throw new Error()
             }
             this.loginPromise.then(() => {
