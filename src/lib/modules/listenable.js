@@ -16,10 +16,12 @@ export default class Listenable {
     this.$$listeners.push(listener)
     return this
   }
-  unlistenState(callback: Function) {
-    let i
+  unlistenState(callback: Function | Array) {
+    if (Array.isArray(callback)) {
+      callback = callback[0]
+    }
     if (this.$$listeners) {
-      for (i = 0; i < this.$$listeners.length; i++) {
+      for (let i = 0; i < this.$$listeners.length; i++) {
         if (this.$$listeners[i][0] === callback) {
           this.$$listeners.splice(i, 1)
           return true
@@ -62,6 +64,9 @@ export default class Listenable {
       this.$$status = "changed"
       this[key] = arguments[1]
     }
+  }
+  isTerminateState() {
+    return this.$$status === "released"
   }
   terminateState() {
     this.setState({ $$status: "released" })

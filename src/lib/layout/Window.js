@@ -87,6 +87,7 @@ export class WindowInstance {
   dockId: DockID
   title: string
   icon: string
+  events: { [string]: Function }
   parameters: { [string]: any }
 
   constructor(windowId: string, windowClass: WindowClass,
@@ -103,6 +104,7 @@ export class WindowInstance {
     this.title = windowClass.defaultTitle
     this.icon = windowClass.defaultIcon
     this.dockId = windowClass.defaultDockId
+    this.events = {}
     this.parameters = {
       ...this.defaultParameters,
       instance: this,
@@ -134,9 +136,13 @@ export class WindowInstance {
     this.windowClass.disconnectParameters(this)
     ReactDOM.unmountComponentAtNode(this.node)
   }
-  notifyFocus() {
+  notifyFocus(e) {
+    const event = this.events["focus"]
+    return event && event(e)
   }
-  notifyBlur() {
+  notifyBlur(e) {
+    const event = this.events["blur"]
+    return event && event(e)
   }
   notifyChange = (parameters) => {
     this.updateOptions({ parameters })
@@ -188,8 +194,14 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   height() {
     return this.refs.root && this.refs.root.clientHeight
   }
-  handleFocus = () => {
+  focus = (e) => {
     this.layout.focusOnWindow(this.window)
+  }
+  handle = (type: string) => (e) => {
+    if (this.window) {
+      const event = this.window.events[type]
+      return event && event(e)
+    }
   }
   render() {
     const { className, style } = this.props
@@ -198,7 +210,10 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
       tabIndex={1}
       className={className}
       style={style}
-      onFocus={this.handleFocus}
+      onKeyDown={this.handle("keydown")}
+      onKeyPress={this.handle("keypress")}
+      onKeyUp={this.handle("keyup")}
+      onFocus={this.focus}
     />)
   }
 }
@@ -213,9 +228,13 @@ export class WindowComponent<DefaultProps, Props, State>
     super(props)
     this.instance = props.instance
     this.plugin = props.instance.plugin
+    this.events = {}
   }
   isWindow() {
     return true
+  }
+  on(type: string, callback: Function) {
+    this.instance.events[type] = callback
   }
   openWindow(windowClassID: string, options: WindowOptions) {
     const { layout } = this.instance
