@@ -76,7 +76,12 @@ function dataTransfertToObject(dataTransfer: Object): Object {
   return obj
 }
 
-export class DragZone extends Component {
+type DragPropsType = {
+  onDragStart: Function,
+  onDragEnd: Function,
+}
+
+export class DragZone extends Component<void, DragPropsType, void> {
   props: DragPropsType
 
   handleDragStart = (evt) => {
@@ -104,27 +109,33 @@ export class DragZone extends Component {
     const { onDragStart, onDragEnd, ...otherProps } = this.props
     return (
       <div
-        style={ this.props.style }
         draggable
-        onMouseDown={ stopPropagation }
-        onDragStart={ this.handleDragStart }
-        onDragEnd={ this.handleDragEnd }
-        { ...otherProps }
+        onMouseDown={stopPropagation}
+        onDragStart={this.handleDragStart}
+        onDragEnd={this.handleDragEnd}
+        {...otherProps}
       />)
   }
 }
 
 type DropPropsType = {
+  // Event when mouse enter and exit the zone
+  onSelect: Function,
+  onUnselect: Function,
+
+  // Event for drop validation
+  isDroppable?: Function,
   onDrop: Function,
   onDropMatch: Function,
-  onDropHightlight: Function,
+
+  // Styling
   className: string,
   selectedClassName: string,
   highlightClassName: string,
-  isDroppable?: Function
+  [string]: any,
 }
 
-export class DropZone extends Component {
+export class DropZone extends Component<void, DropPropsType, void> {
   props: DropPropsType
 
   componentWillMount = () => {
@@ -174,6 +185,7 @@ export class DropZone extends Component {
     else {
       dom.className = props.className
     }
+    props.onSelect && props.onSelect()
   }
   unselect() {
     const props = this.props
@@ -184,6 +196,7 @@ export class DropZone extends Component {
     else {
       dom.className = props.className
     }
+    props.onUnselect && props.onUnselect()
   }
   handleDrop = (evt) => {
     if (dropSuggested === this) {
@@ -229,18 +242,18 @@ export class DropZone extends Component {
   render(): React$Element<any> {
     const {
       // eslint-disable-next-line no-unused-vars
-      onDrop, onDropMatch, onDropHightlight, selectedClassName,
+      onDrop, onDropMatch, selectedClassName,
       // eslint-disable-next-line no-unused-vars
       highlightClassName, isDroppable, ...otherProps } = this.props
     return (
       <div
-        ref={ "zone" }
-        className={ this.props.className }
-        onDrop={ this.handleDrop }
-        onDragOver={ this.handleDragOver }
-        onDragEnter={ this.handleDragEnter }
-        onDragLeave={ this.handleDragLeave }
-        { ...otherProps }
+        ref={"zone"}
+        className={this.props.className}
+        onDrop={this.handleDrop}
+        onDragOver={this.handleDragOver}
+        onDragEnter={this.handleDragEnter}
+        onDragLeave={this.handleDragLeave}
+        {...otherProps}
       />)
   }
 }
@@ -263,24 +276,24 @@ export class DragDropZone extends DropZone {
   render(): React$Element<any> {
     const {
       // eslint-disable-next-line no-unused-vars
-      onDrop, onDropMatch, onDropHightlight, selectedClassName,
+      onDrop, onDropMatch, selectedClassName,
       // eslint-disable-next-line no-unused-vars
       highlightClassName, isDroppable, onDragStart, onDragEnd,
       ...otherProps
     } = this.props
     return (
       <div
-        ref={ "zone" }
+        ref={"zone"}
         draggable
-        className={ this.props.className }
-        onMouseDown={ stopPropagation }
-        onDragStart={ this.handleDragStart }
-        onDragEnd={ this.handleDragEnd }
-        onDrop={ this.handleDrop }
-        onDragOver={ this.handleDragOver }
-        onDragEnter={ this.handleDragEnter }
-        onDragLeave={ this.handleDragLeave }
-        { ...otherProps }
+        className={this.props.className}
+        onMouseDown={stopPropagation}
+        onDragStart={this.handleDragStart}
+        onDragEnd={this.handleDragEnd}
+        onDrop={this.handleDrop}
+        onDragOver={this.handleDragOver}
+        onDragEnter={this.handleDragEnter}
+        onDragLeave={this.handleDragLeave}
+        {...otherProps}
       />)
   }
 }
