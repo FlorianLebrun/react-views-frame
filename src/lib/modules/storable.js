@@ -1,24 +1,25 @@
 import Listenable from "./listenable"
 
+let uidGenerator = window.localStorage.getItem("#uidGenerator") | 0
+
+function generateUid() {
+  const uid = "obj#" + (uidGenerator++)
+  window.localStorage.setItem("#uidGenerator", uidGenerator)
+  return uid
+}
+
+export const globalStorage = {}
+export const storableClasses = {}
+
 export default class Storable extends Listenable {
   $$storeUid: string
   $$storeDirectory: Array
 
-  constructor(uid: string) {
-    super()
-    this.$$storeUid = uid
-    const data = this.readStorageData()
-    if (data) this.storableShouldRestore(data)
-    else this.storableShouldInitiate()
-  }
-  storableShouldInitiate() {
+  storableShouldInitiate(data: Object) {
 
   }
-  storableShouldRestore(data: Object) {
-
-  }
-  storableShouldSave(): Object {
-
+  storableShouldSerialize(): Object {
+    return null
   }
   storableWillUnmount() {
 
@@ -34,8 +35,19 @@ export default class Storable extends Listenable {
     return null
   }
   writeStorageData(data: Object): boolean {
+    if (!data[".className"])
+      throw new Error("Invalid storable record")
     try {
       const bytes = JSON.stringify(data)
+      window.localStorage.setItem(this.$$storeUid, bytes)
+      return true
+    }
+    catch (e) { }
+    return false
+  }
+  patchStorageData(data: Object): boolean {
+    try {
+      const bytes = JSON.stringify(Object.assign(this.readStorageData(), data))
       window.localStorage.setItem(this.$$storeUid, bytes)
       return true
     }
@@ -61,22 +73,100 @@ export default class Storable extends Listenable {
     }
     hasChange && this.writeStorageData(data)
   }
-  forceRestore() {
-    const data = this.readStorageData()
-    if (data) this.storableShouldRestore(data)
-  }
-  forceSave() {
-    const data = this.storableShouldSave()
-    if (data) this.writeStorageData(data)
+  forceSave(): boolean {
+    try {
+      let data = this.storableShouldSerialize() || {}
+      data[".className"] = this.constructor[".className"]
+      window.localStorage.setItem(this.$$storeUid, JSON.stringify(data))
+      return true
+    }
+    catch (e) {
+      window.localStorage.setItem(this.$$storeUid, e.toString())
+      console.error(e)
+    }
+    return false
   }
   terminateState() {
     super.terminateState()
-    this.storableShouldSave()
+    this.forceSave()
     this.storableWillUnmount()
+    delete globalStorage[this.$$storeUid]
   }
   deleteState() {
-    this.terminateState()
-    this.storableWillUnmount()
+    super.terminateState()
     window.localStorage.removeItem(this.$$storeUid)
+    this.storableWillUnmount()
+    delete globalStorage[this.$$storeUid]
   }
 }
+
+Storable.registerClass = function (name: string) {
+  if (!name) name = this.name
+  this[".className"] = name
+  storableClasses[name] = this
+  return this
+}
+
+Storable.openStorable = function (uid: string) {
+  try {
+    let obj, data
+    if (uid) {
+      obj = globalStorage[uid]
+      if (obj) return obj
+      data = readStorageData(uid)
+    }
+    else {
+      uid = generateUid()
+    }
+
+    const className = data ? data[".className"] : this[".className"]
+    const StorableClass = storableClasses[className]
+    if (StorableClass) {
+      obj = new StorableClass(uid)
+      obj.$$storeUid = uid
+      globalStorage[uid] = obj
+      arguments[0] = data
+      obj.storableShouldInitiate.apply(obj, arguments)
+    }
+
+    if (!(obj instanceof this)) {
+      throw new Error("Bad storable className '" + className + "' for class " + this.name)
+    }
+    return obj
+  }
+  catch (e) {
+    console.error(e)
+    return null
+  }
+}
+
+export function getAllStorable(): { [string]: Storable } {
+  return globalStorage
+}
+
+export function saveAllStorable() {
+  for (const uid in globalStorage) {
+    globalStorage[uid].forceSave()
+  }
+}
+
+function readStorageData(uid: string): Object {
+  try {
+    const bytes = window.localStorage.getItem(uid)
+    if (bytes) {
+      const data = JSON.parse(bytes)
+      const className = data[".className"]
+      if (!className || !storableClasses[className])
+        throw new Error("Invalid storable data")
+      return data
+    }
+  }
+  catch (e) {
+    window.localStorage.removeItem(uid)
+  }
+  return null
+}
+
+
+//window.addEventListener('beforeunload', saveAllStorable)
+window.addEventListener('unload', saveAllStorable)

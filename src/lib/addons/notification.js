@@ -32,6 +32,7 @@ export default {
     addNotification(notification: NotificationType) {
       if (typeof notification !== "object") {
         notification = {
+          position: "tc",
           level: arguments[0],
           message: Array.prototype.slice.call(arguments, 1).join(),
         }

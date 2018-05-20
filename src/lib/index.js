@@ -14,7 +14,7 @@ import WindowsFrame from "./addons/windows-frame"
 
 import Waitable from "./modules/waitable"
 import Listenable from "./modules/listenable"
-import Storable from "./modules/storable"
+import Storable, { getAllStorable, saveAllStorable } from "./modules/storable"
 import CallChain, { CallSite } from "./modules/callchain"
 import createApplication from "./sandbox/createApplication"
 import { SandBox } from "./sandbox/SandBox"
@@ -41,6 +41,8 @@ export const Modules = {
   SandBox,
   Waitable,
   Storable,
+  getAllStorable,
+  saveAllStorable,
   Listenable,
   CallChain,
   CallSite,
