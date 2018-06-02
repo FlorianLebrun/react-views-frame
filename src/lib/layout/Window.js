@@ -48,7 +48,7 @@ export class WindowClass {
     const plugInstance = plugins[pluginName]
     if (plugInstance) {
       const plugLinks = this.links[pluginName]
-      bind && plugInstance.listenState(instance.updateParams, Object.keys(plugLinks))
+      bind && plugInstance.addEventListener(Object.keys(plugLinks), instance.updateParams)
       for (const key in plugLinks) {
         const path = plugLinks[key]
         instance.parameters[key] = plugInstance[path]
@@ -67,7 +67,7 @@ export class WindowClass {
       const { plugins } = instance.application.layout
       for (const pluginName in this.links) {
         const plugInstance = plugins[pluginName]
-        plugInstance && plugInstance.unlistenState(instance.updateParams)
+        plugInstance && plugInstance.removeEventListener(instance.updateParams)
       }
     }
   }

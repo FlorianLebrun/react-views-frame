@@ -69,8 +69,19 @@ export class PluginClass {
     deps.push(pluginClass)
     return pluginClass.addUser(this)
   }
+  raiseInvalid() {
+    let msg = "The plugin '" + this.name + "' is invalid or missing"
+    if (this.users) {
+      msg += ", check dependencies at:"
+      for (const user of this.users) {
+        msg += "\n > plugin '" + user.name + "'"
+      }
+    }
+    throw new Error(msg)
+  }
   mount() {
     if (!this.instance) {
+      if (!this.component) this.raiseInvalid()
 
       // Create instance
       this.instance = new (this.component)(this)

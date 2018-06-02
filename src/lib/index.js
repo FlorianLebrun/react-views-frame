@@ -13,6 +13,7 @@ import Notification from "./addons/notification"
 import WindowsFrame from "./addons/windows-frame"
 
 import Waitable from "./modules/waitable"
+import EventEmitter from "./modules/event-emitter"
 import Listenable from "./modules/listenable"
 import Storable, { getAllStorable, saveAllStorable } from "./modules/storable"
 import CallChain, { CallSite } from "./modules/callchain"
@@ -43,6 +44,7 @@ export const Modules = {
   Storable,
   getAllStorable,
   saveAllStorable,
+  EventEmitter,
   Listenable,
   CallChain,
   CallSite,

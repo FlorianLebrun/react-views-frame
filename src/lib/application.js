@@ -23,7 +23,7 @@ export class ApplicationInstance {
     })
   }
   absoluteUrl(url: string): string {
-    if (url.charCodeAt(0) === "/".charCodeAt(0)) {
+    if (url[0] === '/') {
       return window.location.origin + url
     }
     return url
