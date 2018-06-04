@@ -105,7 +105,7 @@ function dispatchStateEvent(key, value) {
     // Update change event
     const prevState = this[".events"][0]
     if (!prevState) this[".events"][0] = { [key]: value }
-    else if (prevState.hasOwnProperty(key)) prevState[key] = this[key]
+    else if (!prevState.hasOwnProperty(key)) prevState[key] = this[key]
 
     // Update object
     this[key] = value
