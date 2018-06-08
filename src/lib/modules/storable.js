@@ -75,9 +75,11 @@ export default class Storable extends Listenable {
   }
   forceSave(): boolean {
     try {
-      let data = this.storableShouldSerialize() || {}
-      data[".className"] = this.constructor[".className"]
-      window.localStorage.setItem(this.$$storeUid, JSON.stringify(data))
+      let data = this.storableShouldSerialize()
+      if (data) {
+        data[".className"] = this.constructor[".className"]
+        window.localStorage.setItem(this.$$storeUid, JSON.stringify(data))
+      }
       return true
     }
     catch (e) {

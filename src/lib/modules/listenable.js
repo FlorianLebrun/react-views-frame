@@ -3,6 +3,9 @@ import EventEmitter from "./event-emitter"
 export default class Listenable extends EventEmitter {
   ".status": string = "changed" // Current data status
 
+  stateWillTerminate() {
+    // TO OVERRIDE
+  }
   setState() {
     EventEmitter.setState.apply(this, arguments)
     if (this[".events"] && this[".events"][0]) {
@@ -13,6 +16,7 @@ export default class Listenable extends EventEmitter {
     return this[".status"] === "released"
   }
   terminateState() {
+    this.stateWillTerminate()
     this[".status"] = "released"
     this.dispatchEvent("terminate")
   }
