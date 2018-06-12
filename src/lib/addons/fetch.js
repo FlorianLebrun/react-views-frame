@@ -1,47 +1,72 @@
 import { PluginInstance } from "../layout"
 
+function makeWebsocketUrl(url) {
+  if (url[0] === '/') {
+    url = window.location.origin + url
+  }
+  return url.replace("http", "ws")
+}
+
+const defaultEndPoint = {
+  request(req, url, options): string {
+    return url
+  },
+  websocket(url, options): string {
+    return url
+  },
+  login(req, res, url, options): Promise {
+    return null
+  },
+  feedback(req, res, url, options) {
+  },
+}
+
 export default {
   name: "fetch-addon",
   component: class extends PluginInstance {
-    endpoints: Array = null
+    router: Object = null
     loginPromise: Promise = null
     enableLoginRecovery: boolean = true
 
     pluginWillMount(parameters: Object) {
       this.application.fetchAPI = this.fetchAPI.bind(this)
-      this.endpoints = parameters.endpoints
+      this.application.websocketAPI = this.websocketAPI.bind(this)
+      this.resolveUrl = parameters.resolveUrl || this.resolveUrl
     }
-    fetchAPI(url, options) {
+    resolveEndPoint(url, options) {
+      return defaultEndPoint
+    }
+    websocketAPI(url, options): WebSocket {
+      const endpoint = this.resolveUrl("ws", url) || defaultEndPoint
+      return new WebSocket(makeWebsocketUrl(endpoint.websocket(url, options)))
+    }
+    fetchAPI(url, options): Promise<Response> {
       let hasLoginRecovery = this.enableLoginRecovery && (!options || !options.noCredentials)
+      const endpoint = this.resolveUrl("http", url) || defaultEndPoint
 
-      const endpoint = this.endpoints.find(e => url.match(e.pattern))
-      if (!endpoint) {
-        throw new Error("no endpoint for " + url)
-      }
-
-      const request = Object.assign({}, options)
-      request.headers = {
+      const req = Object.assign({}, options)
+      req.headers = {
         "Accept": "application/json",
-        ...request.headers,
+        ...req.headers,
       }
-      if (request.body) {
-        request.method = request.method || "POST"
-        if (request.body instanceof File) {
-          request.headers["Content-Type"] = request.body.type
+      if (req.body) {
+        req.method = req.method || "POST"
+        if (req.body instanceof File) {
+          req.headers["Content-Type"] = req.body.type
         }
-        else if (request.body instanceof Object) {
-          request.headers["Content-Type"] = "application/json"
-          request.body = JSON.stringify(request.body)
+        else if (req.body instanceof Object) {
+          req.headers["Content-Type"] = "application/json"
+          req.body = JSON.stringify(req.body)
         }
-        else if (!request.headers["Content-Type"]) {
-          request.headers["Content-Type"] = "text/plain"
+        else if (!req.headers["Content-Type"]) {
+          req.headers["Content-Type"] = "text/plain"
         }
       }
       else {
-        request.method = request.method || "GET"
+        req.method = req.method || "GET"
       }
 
-      const response = (res) => {
+      function handleResponse(res) {
         return new Promise((resolve, reject) => {
 
           const respondError = function (error) {
@@ -53,12 +78,12 @@ export default {
 
           if (res.status >= 200 && res.status < 300) {
             if (endpoint.feedback) {
-              endpoint.feedback(res, data)
+              endpoint.feedback(req, res, url, options)
             }
             if (res.status === 204) {
               resolve({ status: res.status, headers: res.headers, json: isJson ? {} : undefined })
             }
-            else if (request.useBlob) {
+            else if (req.useBlob) {
               return res.blob().then((blob) => {
                 return resolve({ status: res.status, headers: res.headers, blob })
               }, respondError)
@@ -76,14 +101,13 @@ export default {
           }
           else if (res.status === 401 && hasLoginRecovery && endpoint.login) {
             if (!this.loginPromise) {
-              this.loginPromise = endpoint.login(request, res)
+              this.loginPromise = endpoint.login(req, res, url, options)
               if (!this.loginPromise) throw new Error()
             }
             this.loginPromise.then(() => {
               this.loginPromise = null
               hasLoginRecovery = false
-              const data = { ...request }
-              resolve(fetch(endpoint.prepare(url, data), data).then(response, response))
+              resolve(fetch(endpoint.request(req, url, options), req).then(handleResponse, handleResponse))
             }, (error) => {
               this.loginPromise = null
               this.enableLoginRecovery = false
@@ -102,8 +126,7 @@ export default {
         })
       }
 
-      const data = { ...request }
-      return fetch(endpoint.prepare(url, data), data).then(response, response)
+      return fetch(endpoint.request(req, url, options), req).then(handleResponse, handleResponse)
     }
   },
 }
