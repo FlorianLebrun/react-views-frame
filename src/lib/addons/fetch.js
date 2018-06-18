@@ -66,7 +66,7 @@ export default {
         req.method = req.method || "GET"
       }
 
-      function handleResponse(res) {
+      const handleResponse = (res) => {
         return new Promise((resolve, reject) => {
 
           const respondError = function (error) {
