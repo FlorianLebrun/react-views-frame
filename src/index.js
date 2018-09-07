@@ -1,8 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
+import "babel-polyfill"
 import Application, { extendApplication, createApplication, Addons, UI, Modules } from "./lib"
-//import "./test"
-import "codemirror/lib/codemirror.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 
 Application.installPlugin(Addons.Notification)
@@ -82,15 +81,6 @@ if (applicationModuleId) {
     "react-intl": require("react-intl"),
     "prop-types": require("prop-types"),
     "react-application-frame": require("./lib"),
-    "codemirror": require("codemirror/lib/codemirror.js"),
-    "codemirror/mode/javascript": require("codemirror/mode/javascript/javascript.js"),
-
-    "codemirror/lib/codemirror.js": require("codemirror/lib/codemirror.js"),
-    "codemirror/addon/scroll/simplescrollbars.js": require("codemirror/addon/scroll/simplescrollbars.js"),
-    "codemirror/addon/dialog/dialog.js": require("codemirror/addon/dialog/dialog.js"),
-    "codemirror/addon/search/search.js": require("codemirror/addon/search/search.js"),
-    "codemirror/addon/search/searchcursor.js": require("codemirror/addon/search/searchcursor.js"),
-    "codemirror/mode/javascript/javascript.js": require("codemirror/mode/javascript/javascript.js"),
   }, function (cmodule) {
     switch (cmodule[".type"]) {
       case "plugin": {

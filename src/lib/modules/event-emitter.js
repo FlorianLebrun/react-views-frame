@@ -1,41 +1,54 @@
 
+type ListenersArray = Array<Array<Function | string>>
+
 export default class EventEmitter {
   ".events": Array // Events ready to be dispatched
-  ".listeners": Array<Array<Function | string>>
+  ".listeners": ListenersArray
 }
 
+let dispatcheds: ListenersArray = null
+
 EventEmitter.addEventListener = function () {
+
+  // Prepare listeners array
+  let listeners = this[".listeners"]
+  if (!listeners) this[".listeners"] = listeners = []
+  else if (dispatcheds === listeners) this[".listeners"] = listeners = listeners.slice()
+
   // function addEventListener(callback: Function)
   //  - object.addEventListener(eventName, (data: any) => {})
   //  - object.addEventListener("change", (data: Listenable, prevState: Object) => {})
   //  - object.addEventListener(["field0","field1"], (data: Listenable, prevState: Object) => {})
   if (arguments.length === 1) {
     if (!arguments[0]) return false
-    if (!this[".listeners"]) this[".listeners"] = []
-    this[".listeners"].push(arguments[0])
-    this[".listeners"].push(null)
+    listeners.push(arguments[0])
+    listeners.push(null)
     return this
   }
   // function addEventListener(type: string|Array|null, callback: Function)
   //  - object.addEventListener((type: string, data: any) => {})
   else if (arguments.length === 2) {
     if (!arguments[1]) return false
-    if (!this[".listeners"]) this[".listeners"] = []
-    this[".listeners"].push(arguments[1])
-    this[".listeners"].push(arguments[0])
+    listeners.push(arguments[1])
+    listeners.push(arguments[0])
     return this
   }
 }
 
 EventEmitter.removeEventListener = function () {
+
+  // Prepare listeners array
+  let listeners = this[".listeners"]
+  if (!listeners) return false
+  else if (dispatcheds === listeners) this[".listeners"] = listeners = listeners.slice()
+
   // function removeEventListener(callback: Function)
   //  - remove first matching listener of this callback
   if (arguments.length === 1) {
     let index = 0
-    if (!this[".listeners"]) return false
     while (true) {
-      index = this[".listeners"].indexOf(arguments[0], index)
-      if (index >= 0) this[".listeners"].splice(index, 2)
+      index = listeners.indexOf(arguments[0], index)
+      if (index >= 0) listeners.splice(index, 2)
       else break
     }
   }
@@ -43,14 +56,13 @@ EventEmitter.removeEventListener = function () {
   //  - remove every listener of this callback
   if (arguments.length === 2) {
     let index = 0
-    if (!this[".listeners"]) return false
     while (true) {
-      index = this[".listeners"].indexOf(arguments[1], index)
-      if (index < 0 || this[".listeners"][index] === arguments[0]) break
+      index = listeners.indexOf(arguments[1], index)
+      if (index < 0 || listeners[index] === arguments[0]) break
       index++
     }
     if (index >= 0) {
-      this[".listeners"].splice(index, 2)
+      listeners.splice(index, 2)
       return true
     }
   }
@@ -73,6 +85,35 @@ EventEmitter.dispatchEvent = function (type: string, data: any) {
     this[".events"].push(type)
     this[".events"].push(data)
   }
+}
+
+EventEmitter.executeEvent = function (type: string, data: any) {
+  let listeners = this[".listeners"]
+  const count = listeners ? listeners.length : 0
+  if (!count) return
+
+  // Retain listeners array
+  if (dispatcheds === null) dispatcheds = listeners
+  else listeners = listeners.slice()
+
+  // Execute lsiteners
+  let i = 0
+  const promises = []
+  for (let k = 1; k < count; k += 2) {
+    try {
+      let result
+      const ltype = listeners[k]
+      if (!ltype) result = listeners[k - 1](type, data, this)
+      else if (ltype === type) result = listeners[k - 1](data, this)
+      if (result instanceof Promise) promises.push(result)
+    }
+    catch (e) { console.error(e) }
+  }
+
+  // Release listeners array
+  if (dispatcheds === listeners) dispatcheds = null
+
+  return Promise.all(promises)
 }
 
 EventEmitter.setState = function (value: Object) {
@@ -113,11 +154,15 @@ function dispatchStateEvent(key, value) {
 }
 
 function event_dispatcher() {
-  const listeners = this[".listeners"]
+  let listeners = this[".listeners"]
   const events = this[".events"]
   const count = listeners ? listeners.length : 0
   this[".events"] = null
   if (!count) return
+
+  // Retain listeners array
+  if (dispatcheds === null) dispatcheds = listeners
+  else listeners = listeners.slice()
 
   // Dispatch change event
   const prevState = events[0]
@@ -158,4 +203,7 @@ function event_dispatcher() {
       catch (e) { console.error(e) }
     }
   }
+
+  // Release listeners array
+  if (dispatcheds === listeners) dispatcheds = null
 }

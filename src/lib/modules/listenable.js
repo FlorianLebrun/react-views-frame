@@ -25,3 +25,4 @@ export default class Listenable extends EventEmitter {
 Listenable.prototype.addEventListener = EventEmitter.addEventListener
 Listenable.prototype.removeEventListener = EventEmitter.removeEventListener
 Listenable.prototype.dispatchEvent = EventEmitter.dispatchEvent
+Listenable.prototype.executeEvent = EventEmitter.executeEvent

@@ -115,7 +115,6 @@ export class WindowInstance {
   }
   updateParams = (plugin, prevState) => {
     this.windowClass.updateParametersFor(this, plugin[".class"].name)
-    console.log("update window", this.windowClass.name)
     this.render()
   }
   updateOptions(options: WindowOptions) {

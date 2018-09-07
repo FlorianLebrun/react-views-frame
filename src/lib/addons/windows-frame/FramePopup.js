@@ -86,7 +86,6 @@ class FramePopupDock extends Component<void, void, DockStateType> {
         right: rect.left + elemnt.clientWidth,
         bottom: rect.top + elemnt.clientHeight,
       }
-      console.log(position)
       window.addEventListener("mousedown", this.handleMouseDown)
       this.setState({ render, marker, position, onClose })
     }

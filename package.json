@@ -1,6 +1,6 @@
 {
   "name": "react-application-frame",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "main": "dist/index.js",
   "dependencies": {
     "base-64": "^0.1.0",
@@ -20,7 +20,6 @@
     "babel-register": "^6.11.6",
     "babel-register-cli": "^4.0.0",
     "bootstrap": "^3.3.7",
-    "codemirror": "^5.30.0",
     "font-awesome": "^4.7.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -37,7 +36,7 @@
   },
   "scripts": {
     "start": "set \"PORT=3000\" && react-scripts start",
-    "build-lib": "babel src/lib -d dist",
+    "lib:build": "babel src/lib -d dist",
     "build": "set \"PUBLIC_URL=.\" && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
