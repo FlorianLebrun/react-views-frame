@@ -190,10 +190,9 @@ function event_dispatcher() {
   }
 
   // Dispatch other events
-  let i = 0
-  while (i < events.length) {
-    const type = events[++i]
-    const data = events[++i]
+  for (let i = 2; i < events.length; i += 2) {
+    const type = events[i-1]
+    const data = events[i]
     for (let k = 1; k < count; k += 2) {
       try {
         const ltype = listeners[k]
