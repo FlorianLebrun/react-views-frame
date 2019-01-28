@@ -92,15 +92,6 @@ export class PluginContext {
     delete this.windows[wnd.id]
     wnd.close()
   }
-  focusOnWindow(focused: WindowInstance) {
-    const prev_focused = this.focused
-    if (prev_focused !== focused) {
-      this.focused = focused
-      prev_focused && prev_focused.notifyBlur()
-      this.frame && this.frame.notifyFocusChange(this.focused, prev_focused)
-      this.focused && this.focused.notifyFocus()
-    }
-  }
   openSubWindow(windowClass: WindowClass, parent: WindowInstance, options: WindowOptions) {
     if (windowClass && parent) {
       let wnd = (options && options.openNew) ? null : this.findOneWindowByClass(windowClass)

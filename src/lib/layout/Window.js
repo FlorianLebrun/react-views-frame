@@ -7,6 +7,7 @@ import React, { Component } from "react"
 import ReactDOM from "react-dom"
 
 import { isInheritedOf } from "../utils"
+import Listenable from "../modules/listenable"
 
 export type WindowOptions = {
   title: string,
@@ -73,13 +74,17 @@ export class WindowClass {
   }
 }
 
-export class WindowInstance {
+export class WindowInstance extends Listenable {
+
   // Definition
   id: string
   windowClass: WindowClass
+  window: WindowComponent
+
+  // Hierarchy
+  layout: PluginContext
   parent: WindowInstance
   plugin: PluginComponent
-  component: WindowComponent
   container: WindowContainer
   node: HtmlElement
 
@@ -87,31 +92,36 @@ export class WindowInstance {
   dockId: DockID
   title: string
   icon: string
-  events: { [string]: Function }
   parameters: { [string]: any }
 
   constructor(windowId: string, windowClass: WindowClass,
     parent: WindowInstance, plugin: PluginComponent, options: WindowOptions
   ) {
+    super()
     this.id = windowId
     this.windowClass = windowClass
     this.parent = parent
     this.plugin = plugin
-    this.component = windowClass.component
     this.node = document.createElement("div")
     this.node.className = "position-relative width-100 height-100 overflow-" + windowClass.overflow
     this.layout.windows[windowId] = this
     this.title = windowClass.defaultTitle
     this.icon = windowClass.defaultIcon
     this.dockId = windowClass.defaultDockId
-    this.events = {}
     this.parameters = {
       ...this.defaultParameters,
       instance: this,
-      onChange: this.notifyChange,
+      onChange: (parameters) => this.updateOptions({ parameters }),
     }
     this.windowClass.connectParameters(this)
     this.updateOptions(options)
+  }
+  get hasFocus() {
+    return this.layout.focused === this
+  }
+  setWindow(window: WindowComponent) {
+    this.window = window
+    this.executeEvent("update")
   }
   updateParams = (plugin, prevState) => {
     this.windowClass.updateParametersFor(this, plugin[".class"].name)
@@ -131,24 +141,33 @@ export class WindowInstance {
     }
     this.render()
   }
+  updateTitle(animation: Object) {
+
+    // Clear previous animation
+    if (this.animation) {
+      const { timer } = this.animation
+      if (timer) clearTimeout(timer)
+      this.animation = undefined
+    }
+
+    // Prepare new animation
+    if (animation) {
+      const { duration } = animation
+      if (duration) {
+        animation.timer = setTimeout(this.updateTitle.bind(this), duration)
+      }
+      this.animation = animation
+    }
+
+    this.dispatchEvent("update")
+  }
   close() {
     this.windowClass.disconnectParameters(this)
     ReactDOM.unmountComponentAtNode(this.node)
   }
-  notifyFocus(e) {
-    const event = this.events["focus"]
-    return event && event(e)
-  }
-  notifyBlur(e) {
-    const event = this.events["blur"]
-    return event && event(e)
-  }
-  notifyChange = (parameters) => {
-    this.updateOptions({ parameters })
-  }
   render() {
     const { frame } = this.layout
-    frame && ReactDOM.unstable_renderSubtreeIntoContainer(frame, React.createElement(this.component, this.parameters), this.node)
+    frame && ReactDOM.unstable_renderSubtreeIntoContainer(frame, React.createElement(this.windowClass.component, this.parameters), this.node)
   }
 }
 
@@ -160,7 +179,7 @@ export type PropsType = {
 
 export class WindowContainer extends Component<void, PropsType, StateType> {
   props: PropsType
-  window: WindowInstance
+  instance: WindowInstance
 
   componentDidMount() {
     this.mountWindow(this.props.current)
@@ -174,17 +193,17 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   componentWillUnmount() {
     this.unmountWindow()
   }
-  mountWindow(window) {
-    this.window = window
-    if (window) {
-      this.refs.root.appendChild(window.node)
-      window.container = this
+  mountWindow(instance: WindowInstance) {
+    this.instance = instance
+    if (instance) {
+      this.refs.root.appendChild(instance.node)
+      instance.container = this
     }
   }
   unmountWindow() {
-    if (this.window && this.window.container === this) {
-      this.refs.root.removeChild(this.window.node)
-      this.window.container = null
+    if (this.instance && this.instance.container === this) {
+      this.refs.root.removeChild(this.instance.node)
+      this.instance.container = null
     }
   }
   width() {
@@ -194,13 +213,21 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
     return this.refs.root && this.refs.root.clientHeight
   }
   focus = (e) => {
-    this.layout.focusOnWindow(this.window)
+    const prev_focused = this.layout.focused
+    if (prev_focused !== this.instance) {
+      this.layout.focused = this.instance
+      if (prev_focused) {
+        prev_focused.executeEvent("blur", e)
+        prev_focused.dispatchEvent("update")
+      }
+      if (this.instance) {
+        this.instance.executeEvent("focus", e)
+        this.instance.updateTitle()
+      }
+    }
   }
   handle = (type: string) => (e) => {
-    if (this.window) {
-      const event = this.window.events[type]
-      return event && event(e)
-    }
+    this.instance && this.instance.executeEvent(type, e)
   }
   render() {
     const { className, style } = this.props
@@ -227,13 +254,16 @@ export class WindowComponent<DefaultProps, Props, State>
     super(props)
     this.instance = props.instance
     this.plugin = props.instance.plugin
-    this.events = {}
+    this.instance.setWindow(this)
   }
   isWindow() {
     return true
   }
-  on(type: string, callback: Function) {
-    this.instance.events[type] = callback
+  addEventListener() {
+    this.instance.addEventListener.apply(this.instance, arguments)
+  }
+  removeEventListener() {
+    this.instance.removeEventListener.apply(this.instance, arguments)
   }
   openWindow(windowClassID: string, options: WindowOptions) {
     const { layout } = this.instance
@@ -247,5 +277,20 @@ export class WindowComponent<DefaultProps, Props, State>
     else {
       layout.removeWindow(this.instance)
     }
+  }
+  updateWindowTitle(animation: Object) {
+    this.instance.updateTitle(animation)
+  }
+  renderWindowIcon() {
+    const { icon } = this.instance
+    if (icon instanceof Function) return icon()
+    else if (icon) return <span className={"padding-right fa fa-" + icon} />
+    else return null
+  }
+  renderWindowTitle() {
+    return <React.Fragment>
+      {this.renderWindowIcon()}
+      {this.instance.title}
+    </React.Fragment>
   }
 }

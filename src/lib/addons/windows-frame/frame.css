@@ -5,6 +5,11 @@
 *********************************
 *********************************/
 
+.WND_root_panel {
+  height: 100%;
+  width: 100%;
+}
+
 .WND_side_panel {
   display: flex;
   height: 100%;
@@ -72,13 +77,33 @@
 
 
 /* Bar button */
+@keyframes _highlight_danger_active {
+  0%  {background-color: #def;}
+  50%  {background-color: red;}
+  100%  {background-color: #def;}
+}
+@keyframes _highlight_danger_inactive {
+  0%  {background-color: #123;}
+  50%  {background-color: red;}
+  100%  {background-color: #123;}
+}
+@keyframes _highlight_warning_active {
+  0%  {background-color: #def;}
+  50%  {background-color: gold;}
+  100%  {background-color: #def;}
+}
+@keyframes _highlight_warning_inactive {
+  0%  {background-color: #123;}
+  50%  {background-color: gold;}
+  100%  {background-color: #123;}
+}
 
 .WND_panel_button_H {
   min-width: 30px;
   max-width: 120px;
   margin-right: 1px;
   align-items: center;
-  padding-left: 10px;
+  justify-content: center;
 }
 
 .WND_panel_button_H > div {
@@ -104,14 +129,30 @@
   cursor: pointer;
 }
 
+.WND_panel_button_danger {
+  animation-duration: 1s;
+  animation-name: _highlight_danger_inactive;
+  animation-iteration-count: infinite;
+}
+.WND_panel_button_danger.current {
+  animation-name: _highlight_danger_active;
+}
+
+.WND_panel_button_warning {
+  animation-duration: 1s;
+  animation-name: _highlight_warning_inactive;
+  animation-iteration-count: infinite;
+}
+.WND_panel_button_warning.current {
+  animation-name: _highlight_warning_active;
+}
+
 .WND_panel_button.current {
   background-color: #def;
   color: #234;
 }
 
 .WND_panel_button.focused {
-  background-color: #def;
-  color: #234;
   background-image: linear-gradient(to bottom,
   gold 0px,
   gold 3px,

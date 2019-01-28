@@ -1,9 +1,6 @@
-/* eslint-disable guard-for-in */
 import React, { Component } from "react"
-
 import { Application } from "../../application"
-
-import { PanelProps, SidePanelTop, SidePanelLeft, SidePanelRight, SidePanelBottom, CenterPanelTop } from "./FramePanels"
+import PanelComponents, { PanelProps } from "./FramePanels"
 
 type PropsType = {
   displayLayout: any,
@@ -111,7 +108,7 @@ export class Frame extends Component<void, PropsType, StateType> {
     if (panel) {
       panel = { ...panel }
       if (panel.items.indexOf(wnd) < 0) {
-        panel.items = [ ...panel.items, wnd ]
+        panel.items = [...panel.items, wnd]
       }
       panel.current = foreground ? (wnd || panel.current) : (panel.current || wnd)
       panels[dockId] = panel
@@ -125,60 +122,16 @@ export class Frame extends Component<void, PropsType, StateType> {
     panels[panel.id] = { ...panel, size }
     this.setState({ panels })
   }
-  notifyFocusChange(focused: WindowInstance, prev_focused: WindowInstance) {
-    const panels = this.state.panels
-    
-    if(prev_focused) {
-      const origin = panels[prev_focused.dockId]
-      if (origin) {
-        panels[prev_focused.dockId] = {
-          ...origin,
-          focused:false,
-        }
-      }
-    }
-    if(focused) {
-      const origin = panels[focused.dockId]
-      if (origin) {
-        panels[focused.dockId] = {
-          ...origin,
-          focused:true,
-        }
-      }
-    }
-    this.setState({ panels })
-    this.forceUpdate()
-  }
   renderPanel(id: string) {
     const panel = this.state.panels[id]
-    const props = {
+    return React.createElement(PanelComponents[panel.type] || PanelComponents["#"], {
       id: id,
       frame: this,
       panel: panel,
       children: panel.child && this.renderPanel(panel.child),
-    }
-    switch (panel.type) {
-    case "#":
-      return (<div style={ styles.root }> {props.children} </div>)
-    case "side-left":
-      return React.createElement(SidePanelLeft, props)
-    case "side-top":
-      return React.createElement(SidePanelTop, props)
-    case "side-right":
-      return React.createElement(SidePanelRight, props)
-    case "side-bottom":
-      return React.createElement(SidePanelBottom, props)
-    case "center-top":
-      return React.createElement(CenterPanelTop, props)
-    default:
-      return null
-    }
+    })
   }
   render() {
     return this.renderPanel("#")
   }
-}
-
-const styles = {
-  root: { height: "100%", width: "100%" },
 }

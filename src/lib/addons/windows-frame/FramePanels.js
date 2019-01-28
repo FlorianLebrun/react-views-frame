@@ -2,7 +2,7 @@
 /* eslint-disable react/no-string-refs */
 import React, { Component } from "react"
 
-import { DropZone, DragZone } from "../../ui-modules/DragAndDrop"
+import { DropZone, DragDropZone } from "../../ui-modules/DragAndDrop"
 import { HtmlGrabReaction, stopEvent } from "../../ui-modules/event.utils"
 import { Application } from "../../application"
 
@@ -27,7 +27,7 @@ const CSS_panel_bar_horizontal = {
   menu_btn: "WND_panel_menu_btn WND_panel_menu_btn_H WND_center_vertical",
   item_button: "WND_panel_button WND_panel_button_H",
   item_button_CURRENT: "WND_panel_button WND_panel_button_H current",
-  item_button_FOCUSED: "WND_panel_button WND_panel_button_H focused",
+  item_button_FOCUSED: "WND_panel_button WND_panel_button_H current focused",
   item_button_transform: "rotate(0deg)",
 }
 
@@ -36,8 +36,12 @@ const CSS_panel_bar_vertical = {
   menu_btn: "WND_panel_menu_btn WND_panel_menu_btn_V WND_center_horizontal",
   item_button: "WND_panel_button WND_panel_button_V",
   item_button_CURRENT: "WND_panel_button WND_panel_button_V current",
-  item_button_FOCUSED: "WND_panel_button WND_panel_button_V focused",
+  item_button_FOCUSED: "WND_panel_button WND_panel_button_V current focused",
   item_button_transform: "rotate(-90deg)",
+}
+const CSS_panel_button_animation = {
+  "danger": " WND_panel_button_danger",
+  "warning": " WND_panel_button_warning",
 }
 
 type PanelButtonPropsType = {
@@ -49,29 +53,37 @@ type PanelButtonPropsType = {
 
 class PanelButton extends Component {
   props: PanelButtonPropsType
-  handleClick = () => {
+  componentWillMount() {
+    this.props.item.addEventListener("update", this.handleEvent)
+  }
+  componentWillUnmount() {
+    this.props.item.removeEventListener(this.handleEvent)
+  }
+  handleEvent = () => {
+    this.forceUpdate()
+  }
+  handleClick = (e) => {
     const { item, panel, frame } = this.props
-    if (item === panel.current) frame.hideWindow(item)
-    else frame.showWindow(item)
+    if (item === panel.current) {
+      frame.hideWindow(item)
+    }
+    else {
+      if(item.animation) item.updateTitle()
+      frame.showWindow(item)
+    }
   }
   handleDragWindow = () => {
     return {
-      "window": {
-        id: this.props.item.id,
-      },
+      "window": { id: this.props.item.id }
     }
   }
-  handleDragOver = (e) => {
-    const { item, panel } = this.props
-    if (e.dataTransfer && e.dataTransfer.types.find(x => x === "window")) {
+  handleDragMatch = (types) => {
+    if (types.find(x => x === "window")) {
       return true
     }
-    else {
-      if (panel.current !== item) {
-        this.handleClick()
-      }
-      return false
-    }
+    const { item, panel } = this.props
+    if (panel.current !== item) this.handleClick()
+    return false
   }
   handleClose = (e) => {
     if (e.button === 1) {
@@ -82,25 +94,29 @@ class PanelButton extends Component {
   }
   render() {
     const { item, panel, css } = this.props
-    const className = (panel.current !== item)
+    let className = (panel.current !== item)
       ? css.item_button
-      : (panel.focused
+      : (item.hasFocus
         ? css.item_button_FOCUSED
         : css.item_button_CURRENT)
+    if (item.animation) {
+      className += CSS_panel_button_animation[item.animation.mode] || ""
+    }
     return (
-      <DragZone
+      <DragDropZone
         className={className}
         title={item.title}
         onDragStart={this.handleDragWindow}
-        onDragOver={this.handleDragOver}
+        onDropMatch={this.handleDragMatch}
         onClick={this.handleClick}
         onMouseDown={this.handleClose}
       >
-        <div style={{ transform: css.item_button_transform }}>
-          {item.icon && <span className={"padding-right fa fa-" + item.icon} />}
-          {item.title}
-        </div>
-      </DragZone>)
+        {item.window &&
+          <div style={{ transform: css.item_button_transform }}>
+            {item.window.renderWindowTitle()}
+          </div>
+        }
+      </DragDropZone>)
   }
 }
 
@@ -356,4 +372,17 @@ export class CenterPanelTop extends SidePanelTop {
       <CenterPanelContainer ref={"container"} current={panel.current} />
     </div>)
   }
+}
+
+export function RootPanel(props) {
+  return (<div className="WND_root_panel"> {props.children} </div>)
+}
+
+export default {
+  "#": RootPanel,
+  "side-left": SidePanelLeft,
+  "side-top": SidePanelTop,
+  "side-right": SidePanelRight,
+  "side-bottom": SidePanelBottom,
+  "center-top": CenterPanelTop,
 }
