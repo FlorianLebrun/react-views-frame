@@ -23,6 +23,7 @@ export class PluginClass {
     this.parameters = parameters
     this.component = desc.component || PluginInstance
     this.export = desc.export
+    this.menu = desc.menu
 
     // Setup dependencies
     if (desc.dependencies) {

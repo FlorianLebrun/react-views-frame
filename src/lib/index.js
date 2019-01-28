@@ -5,6 +5,7 @@ import "./css"
 import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
 import Split from "./ui-modules/Split"
 import Listener from "./ui-modules/Listener"
+import openContextualMenu from "./ui-modules/openContextualMenu"
 
 import Envs from "./addons/envs"
 import Popup from "./addons/popup"
@@ -28,6 +29,7 @@ export const UI = {
   DragDropZone,
   Split,
   Listener,
+  openContextualMenu,
 }
 
 export const Addons = {

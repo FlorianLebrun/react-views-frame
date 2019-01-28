@@ -1,47 +1,55 @@
 import React, { Component } from "react"
-
+import openContextualMenu from "../../ui-modules/openContextualMenu"
 import { Application } from "../../application"
+const classItem = "hoverbox hoverbox-highlight cursor-pointer"
 
-export default class FrameMenu extends Component<void, void, void> {
+class FrameMenu extends Component<void, void, void> {
   props: any
-  handleMouseDown = (e) => {
-    e.stopPropagation()
-  }
   handleClick = (plugin, windowName) => () => {
     plugin.openWindow(windowName)
     this.props.close()
   }
-  render() {
-    const style = { width: 200 }
-    const plugins = Application.layout.plugins
-    return (<div className="text-bold" style={style}>
-      {Object.keys(plugins).map((name, i) => {
-        const plugin = plugins[name]
+  handleMenu = (e) => {
+    const open = Application.openContextualMenu || openContextualMenu
+    open(this, e.currentTarget, (f) => {
+      const plugins = Application.layout.plugins
+      const list = []
+      for (const pluginName in plugins) {
+        const plugin = plugins[pluginName]
         const windows = plugin[".class"].windows
-        return (<div key={i} className="padding-top">
-          <span className="font-style-italic">{plugin[".class"].title || name}</span>
-          <div>
-            {windows && Object.keys(windows).map((name, i) => {
-              const wnd = windows[name]
-              return (<div
-                key={i}
-                className="margin-left-lg hoverbox hoverbox-highlight cursor-pointer"
-                onClick={this.handleClick(plugin, name)}
-                onMouseDown={this.handleMouseDown}
-              >
-                <span className={"text-shade fa fa-" + wnd.defaultIcon} style={styles.icon} />
-                {wnd.defaultTitle || name}
-              </div>)
-            })}
-          </div>
-        </div>)
+        for (const name in windows) {
+          const { userOpenable, defaultIcon, defaultTitle } = windows[name]
+          userOpenable && list.push(<div key={list.length} className={classItem} onClick={this.handleClick(plugin, name)}>
+            <span className={"text-shade margin-left margin-right fa fa-fw fa-" + defaultIcon} />
+            {defaultTitle || name}
+          </div>)
+        }
+      }
+      return (<div className="text-bold">
+        {list}
+      </div >)
+    }, "right-down")
+  }
+  render() {
+    const plugins = Application.layout.plugins
+    return (<div className="text-bold">
+      {Object.keys(plugins).map((name) => {
+        const plugin = plugins[name]
+        const menu = plugin[".class"].menu
+        return menu && menu.component && <menu.component key={name} plugin={plugin} onClose={this.props.close} />
       })}
+      <div className={classItem} onClick={this.handleMenu}>
+        <i className="margin-left margin-right fa fa-fw fa-window-restore" />
+        {"Windows"}
+        <i className="fa fa-fw fa-caret-right margin-left" />
+      </div>
     </div>)
   }
 }
 
-const styles = {
-  icon: {
-    width: 20,
-  },
+export function openFrameMenu(e) {
+  const open = Application.openContextualMenu || openContextualMenu
+  open(this, e.target, (f) => {
+    return <FrameMenu close={f} />
+  })
 }

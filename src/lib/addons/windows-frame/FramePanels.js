@@ -1,13 +1,10 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/no-string-refs */
 import React, { Component } from "react"
-
 import { DropZone, DragDropZone } from "../../ui-modules/DragAndDrop"
 import { HtmlGrabReaction, stopEvent } from "../../ui-modules/event.utils"
 import { Application } from "../../application"
-
-import { ButtonPopup } from "./FramePopup"
-import FrameMenu from "./FrameMenu"
+import { openFrameMenu } from "./FrameMenu"
 
 export type PanelProps = {
   id: DockID,
@@ -68,7 +65,7 @@ class PanelButton extends Component {
       frame.hideWindow(item)
     }
     else {
-      if(item.animation) item.updateTitle()
+      if (item.animation) item.updateTitle()
       frame.showWindow(item)
     }
   }
@@ -139,16 +136,15 @@ class PanelBar extends Component {
       wnd && Application.layout.dockWindow(wnd, this.props.panel.id, true)
     }
   }
-  renderMenu(close) {
-    return (<FrameMenu close={close} />)
-  }
   render() {
     const { panel, frame, vertical } = this.props
     const css = vertical ? CSS_panel_bar_vertical : CSS_panel_bar_horizontal
 
     // Bar render
     return (<DropZone onDrop={this.handleDropWindow} className={css.bar}>
-      {panel.menu && <ButtonPopup className={css.menu_btn + " fa fa-caret-down"} render={this.renderMenu} />}
+      {panel.menu &&
+        <div className={css.menu_btn + " fa fa-caret-down"} onClick={openFrameMenu} />
+      }
       {panel.items.map((item, i) => {
         return (<PanelButton key={i} css={css} item={item} panel={panel} frame={frame} />)
       })}
