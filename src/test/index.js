@@ -1,5 +1,6 @@
 import React from "react"
 import Application from '../lib'
+import "font-awesome/css/font-awesome.min.css"
 
 
 export class ToolboxX extends Application.WindowComponent {
