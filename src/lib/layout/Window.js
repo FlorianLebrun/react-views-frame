@@ -284,7 +284,7 @@ export class WindowComponent<DefaultProps, Props, State>
   renderWindowIcon() {
     const { icon } = this.instance
     if (icon instanceof Function) return icon()
-    else if (icon) return <span className={"padding-right fa fa-" + icon} />
+    else if (React.isValidElement(icon)) return icon
     else return null
   }
   renderWindowTitle() {
