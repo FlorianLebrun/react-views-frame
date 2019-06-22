@@ -132,7 +132,7 @@ type DropPropsType = {
   className: string,
   selectedClassName: string,
   highlightClassName: string,
-  [string]: any,
+  [key:string]: any,
 }
 
 export class DropZone extends Component<void, DropPropsType, void> {

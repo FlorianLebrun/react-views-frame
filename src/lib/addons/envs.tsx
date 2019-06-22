@@ -17,7 +17,7 @@ export default {
   },
 }
 
-function connectEnv(mapping: Function | Array<string> | { [string]: string }, ConnectedComponent) {
+function connectEnv(mapping: Function | Array<string> | { [key:string]: string }, ConnectedComponent) {
   return function (props) {
     return (<ConnectedComponent {...props} />)
   }

@@ -12,11 +12,11 @@ import Listenable from "../modules/listenable"
 export type WindowOptions = {
   title: string,
   dockId: DockID,
-  parameters: { [string]: any },
+  parameters: { [key:string]: any },
 }
 
 export type ParameterLink = {
-  [string]: string, // key -> path
+  [key:string]: string, // key -> path
 }
 
 export class WindowClass {
@@ -28,8 +28,8 @@ export class WindowClass {
   defaultDockId: DockID
   defaultParameters: Object
 
-  windows: { [string]: WindowClass }
-  links: { [string]: ParameterLink }
+  windows: { [key:string]: WindowClass }
+  links: { [key:string]: ParameterLink }
 
   constructor(name: string, desc: Object, pluginClass: PluginClass) {
     for (const key in desc) this[key] = desc[key]
@@ -92,7 +92,7 @@ export class WindowInstance extends Listenable {
   dockId: DockID
   title: string
   icon: string
-  parameters: { [string]: any }
+  parameters: { [key:string]: any }
 
   constructor(windowId: string, windowClass: WindowClass,
     parent: WindowInstance, plugin: PluginComponent, options: WindowOptions

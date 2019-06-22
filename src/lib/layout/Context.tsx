@@ -3,10 +3,10 @@ import { PluginInstance, PluginClass } from "./Plugin"
 import { WindowInstance, WindowClass, WindowContainer } from "./Window"
 
 export class PluginContext {
-  pluginClasses: { [string]: PluginClass } = {}
-  plugins: { [string]: PluginInstance } = {}
-  windows: { [string]: WindowInstance } = {}
-  docks: { [string]: Array<WindowInstance> } = {}
+  pluginClasses: { [key:string]: PluginClass } = {}
+  plugins: { [key:string]: PluginInstance } = {}
+  windows: { [key:string]: WindowInstance } = {}
+  docks: { [key:string]: Array<WindowInstance> } = {}
   focused: WindowInstance = null
   frame: Frame = null
   application: Object = null

@@ -142,7 +142,7 @@ Storable.openStorable = function (uid: string) {
   }
 }
 
-export function getAllStorable(): { [string]: Storable } {
+export function getAllStorable(): { [key:string]: Storable } {
   return globalStorage
 }
 

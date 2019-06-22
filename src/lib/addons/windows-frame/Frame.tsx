@@ -1,18 +1,20 @@
-import React, { Component } from "react"
+import React from "react"
 import { Application } from "../../application"
 import PanelComponents, { PanelProps } from "./FramePanels"
+import { WindowInstance } from "../../layout/Window"
 
-type PropsType = {
+export type PropsType = {
   displayLayout: any,
 }
 
-type StateType = {
-  panels: { [string]: PanelProps },
+export type StateType = {
+  panels: { [key:string]: PanelProps },
 }
 
-export class Frame extends Component<void, PropsType, StateType> {
+export class Frame extends React.Component {
   props: PropsType
   state: StateType
+  
   componentWillMount() {
     this.loadDisplayLayout(Application.layout.displayLayout)
   }
@@ -86,7 +88,7 @@ export class Frame extends Component<void, PropsType, StateType> {
 
     wnd.dockId = null
   }
-  attachWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
+  attachWindow(wnd: WindowInstance, dockId: string, foreground: boolean) {
     const panels = this.state.panels
     if (!wnd) return null
 

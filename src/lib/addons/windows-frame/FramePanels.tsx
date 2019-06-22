@@ -8,9 +8,11 @@ import { openFrameMenu } from "./FrameMenu"
 
 export type PanelProps = {
   id: DockID,
+  type: string,
   size: number,
   current: WindowInstance,
   items: Array<WindowInstance>,
+  child: string,
 }
 
 /** ******************************

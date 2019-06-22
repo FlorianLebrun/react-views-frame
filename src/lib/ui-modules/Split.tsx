@@ -9,8 +9,8 @@ import { PanelResizer } from "../addons/windows-frame/FramePanels"
 *********************************
 *********************************/
 
-type SplitItemType = {
-  content: React$Element<any>,
+export type SplitItemType = {
+  content: any,
   size: number,
   overflow: string,
 }
@@ -22,7 +22,7 @@ type PropsType = {
 
 const defaultArray = []
 
-export default class Split extends Component<void, PropsType, void> {
+export default class Split extends Component {
   props: PropsType
 
   items: Array<SplitItemType>
@@ -84,7 +84,7 @@ export default class Split extends Component<void, PropsType, void> {
     // Normalize sizes
     const factor = len ? 100 / len : 1
     for (let i = 0; i < items.length; i++) {
-      const style = this.styles[i] = { ...styles.content }
+      const style: any = this.styles[i] = { ...styles.content }
       const mode = modes[i], item = items[i]
       this.sizes[i] *= factor
       if (mode > 0) {
@@ -108,7 +108,7 @@ export default class Split extends Component<void, PropsType, void> {
   handleResize = (index) => (delta) => {
     const { sizes, modes } = this
     if (modes[index] > 0) {
-      const csize = this.refs[index].clientHeight
+      const csize = (this.refs[index] as any).clientHeight
 
       // Update sizes
       const size = sizes[index]

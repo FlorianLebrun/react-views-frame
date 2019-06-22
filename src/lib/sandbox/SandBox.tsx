@@ -19,7 +19,7 @@ export class Module extends Export {
 
 export class SandBox {
   name: string
-  modules: { [string]: Object } = {}
+  modules: { [key:string]: Object } = {}
   connector: Connector
   devMode: boolean
 
@@ -57,7 +57,7 @@ export class SandBox {
       else console.error(guid, "is imported more than once.")
     }
   }
-  getModulesRegister(): { [string]: Module } {
+  getModulesRegister(): { [key:string]: Module } {
     return this.modules
   }
   getModule(guid: string): Module {

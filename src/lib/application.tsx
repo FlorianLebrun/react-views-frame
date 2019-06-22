@@ -1,13 +1,14 @@
 
 export type MenuType = {
-  menu: Array,
-  callbacks: { [string]: Function }
+  menu: [],
+  callbacks: { [key: string]: Function }
 }
 
 export class ApplicationInstance {
   windowMenu: MenuType
+  [addonName: string]: any
 
-  installFeatures(features: { [string]: any }, onlyFunction: boolean) {
+  installFeatures(features: { [key: string]: any }, onlyFunction: boolean) {
     Object.keys(features).forEach(key => {
       if (!onlyFunction || (features[key] instanceof Function)) {
         this[key] = features[key]
@@ -37,7 +38,7 @@ export class ApplicationInstance {
       window.parent.postMessage(JSON.stringify({ redirect: url, }), '*')
     }
     else {
-      window.location = url
+      (window as any).location = url
     }
   }
   openWindow(url: string) {
@@ -46,7 +47,7 @@ export class ApplicationInstance {
       window.parent.postMessage(JSON.stringify({ open: url, }), '*')
     }
     else {
-      window.open(url)
+      (window as any).open(url)
     }
   }
   reloadWindow() {
@@ -54,7 +55,7 @@ export class ApplicationInstance {
       window.location.reload()
     }
     else {
-      window.reload()
+      (window as any).reload()
     }
   }
   setWindowTitle(title: string, icon: string) {
@@ -65,7 +66,7 @@ export class ApplicationInstance {
       document.title = title
     }
   }
-  setWindowMenu(menu: Array, callbacks: { [string]: Function }) {
+  setWindowMenu(menu: [], callbacks: { [key: string]: Function }) {
     this.windowMenu = {
       menu,
       callbacks,
@@ -99,10 +100,10 @@ window.addEventListener("message", (msg) => {
       return Application.receiveHostMessage(data)
     }
   }
-  catch (e) {}
+  catch (e) { }
 })
 
-export function extendApplication(features: { [string]: any }) {
+export function extendApplication(features: { [key: string]: any }) {
   Object.keys(features).forEach(key => {
     Object.defineProperty(ApplicationInstance.prototype, key, {
       value: features[key],

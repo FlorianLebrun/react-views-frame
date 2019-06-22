@@ -7,7 +7,7 @@ export class PluginClass {
   instance: PluginInstance
   component: Function
   parameters: Object
-  windows: { [string]: WindowClass }
+  windows: { [key:string]: WindowClass }
   export: Object
   import: Object
   context: PluginContext
