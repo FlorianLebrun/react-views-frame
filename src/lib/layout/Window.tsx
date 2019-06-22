@@ -1,37 +1,40 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable react/no-multi-comp */
-/* eslint-disable react/prop-types */
-/* eslint-disable react/no-string-refs */
-/* eslint-disable react/sort-comp */
+/* eslint-disable */
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
-
-import { isInheritedOf } from "../utils"
 import Listenable from "../modules/listenable"
+import { Application } from "../application"
+import { isInheritedOf } from "../utils"
+import { PluginClass, PluginInstance } from "./Plugin"
+import { PluginContext } from "./Context"
 
 export type WindowOptions = {
-  title: string,
-  dockId: DockID,
-  parameters: { [key:string]: any },
+  title?: string,
+  icon?: Function,
+  dockId?: string,
+  parameters?: { [key: string]: any },
+  openNew?: boolean,
 }
 
 export type ParameterLink = {
-  [key:string]: string, // key -> path
+  [key: string]: string, // key -> path
 }
 
 export class WindowClass {
   name: string
   overflow: string
   keepAlive: boolean
-  component: Function<WindowComponent> // constructor of WindowComponent
+  pluginClass: PluginClass
+  component: typeof WindowComponent // constructor of WindowComponent
+  parameters: { [key: string]: any }
   defaultTitle: string
-  defaultDockId: DockID
+  defaultDockId: string
   defaultParameters: Object
+  defaultIcon: Function
 
-  windows: { [key:string]: WindowClass }
-  links: { [key:string]: ParameterLink }
+  windows: { [key: string]: WindowClass }
+  links: { [key: string]: ParameterLink }
 
-  constructor(name: string, desc: Object, pluginClass: PluginClass) {
+  constructor(name: string, desc: any, pluginClass: PluginClass) {
     for (const key in desc) this[key] = desc[key]
     this.name = name
     this.overflow = desc.overflow || "auto"
@@ -44,8 +47,8 @@ export class WindowClass {
     if (!this.links[pluginName]) this.links[pluginName] = {}
     this.links[pluginName][key] = path
   }
-  updateParametersFor(instance, pluginName, bind: boolean) {
-    const { plugins } = instance.application.layout
+  updateParametersFor(instance, pluginName, bind: boolean = false) {
+    const { plugins } = Application.layout
     const plugInstance = plugins[pluginName]
     if (plugInstance) {
       const plugLinks = this.links[pluginName]
@@ -65,7 +68,7 @@ export class WindowClass {
   }
   disconnectParameters(instance: WindowInstance) {
     if (this.links) {
-      const { plugins } = instance.application.layout
+      const { plugins } = Application.layout
       for (const pluginName in this.links) {
         const plugInstance = plugins[pluginName]
         plugInstance && plugInstance.removeEventListener(instance.updateParams)
@@ -82,20 +85,20 @@ export class WindowInstance extends Listenable {
   window: WindowComponent
 
   // Hierarchy
-  layout: PluginContext
   parent: WindowInstance
-  plugin: PluginComponent
+  plugin: PluginInstance
   container: WindowContainer
-  node: HtmlElement
+  node: HTMLElement
 
   // Options
-  dockId: DockID
+  dockId: string
   title: string
-  icon: string
-  parameters: { [key:string]: any }
+  icon: Function
+  parameters: { [key: string]: any }
+  animation: any
 
   constructor(windowId: string, windowClass: WindowClass,
-    parent: WindowInstance, plugin: PluginComponent, options: WindowOptions
+    parent: WindowInstance, plugin: PluginInstance, options: WindowOptions
   ) {
     super()
     this.id = windowId
@@ -104,7 +107,7 @@ export class WindowInstance extends Listenable {
     this.plugin = plugin
     this.node = document.createElement("div")
     this.node.className = "position-relative width-100 height-100 overflow-" + windowClass.overflow
-    this.layout.windows[windowId] = this
+    Application.layout.windows[windowId] = this
     this.title = windowClass.defaultTitle
     this.icon = windowClass.defaultIcon
     this.dockId = windowClass.defaultDockId
@@ -117,7 +120,7 @@ export class WindowInstance extends Listenable {
     this.updateOptions(options)
   }
   get hasFocus() {
-    return this.layout.focused === this
+    return Application.layout.focused === this
   }
   setWindow(window: WindowComponent) {
     this.window = window
@@ -141,7 +144,7 @@ export class WindowInstance extends Listenable {
     }
     this.render()
   }
-  updateTitle(animation: Object) {
+  updateTitle(animation?: any) {
 
     // Clear previous animation
     if (this.animation) {
@@ -166,8 +169,8 @@ export class WindowInstance extends Listenable {
     ReactDOM.unmountComponentAtNode(this.node)
   }
   render() {
-    const { frame } = this.layout
-    frame && ReactDOM.unstable_renderSubtreeIntoContainer(frame, React.createElement(this.windowClass.component, this.parameters), this.node)
+    const { frame } = Application.layout
+    frame && ReactDOM.unstable_renderSubtreeIntoContainer(frame.getComponent(), React.createElement(this.windowClass.component, this.parameters), this.node)
   }
 }
 
@@ -177,7 +180,7 @@ export type PropsType = {
   style: any,
 }
 
-export class WindowContainer extends Component<void, PropsType, StateType> {
+export class WindowContainer extends React.Component {
   props: PropsType
   instance: WindowInstance
 
@@ -196,26 +199,26 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   mountWindow(instance: WindowInstance) {
     this.instance = instance
     if (instance) {
-      this.refs.root.appendChild(instance.node)
+      (this.refs.root as HTMLElement).appendChild(instance.node)
       instance.container = this
     }
   }
   unmountWindow() {
     if (this.instance && this.instance.container === this) {
-      this.refs.root.removeChild(this.instance.node)
+      (this.refs.root as HTMLElement).removeChild(this.instance.node)
       this.instance.container = null
     }
   }
   width() {
-    return this.refs.root && this.refs.root.clientWidth
+    return this.refs.root && (this.refs.root as HTMLElement).clientWidth
   }
   height() {
-    return this.refs.root && this.refs.root.clientHeight
+    return this.refs.root && (this.refs.root as HTMLElement).clientHeight
   }
   focus = (e) => {
-    const prev_focused = this.layout.focused
+    const prev_focused = Application.layout.focused
     if (prev_focused !== this.instance) {
-      this.layout.focused = this.instance
+      Application.layout.focused = this.instance
       if (prev_focused) {
         prev_focused.executeEvent("blur", e)
         prev_focused.dispatchEvent("update")
@@ -244,11 +247,9 @@ export class WindowContainer extends Component<void, PropsType, StateType> {
   }
 }
 
-export class WindowComponent<DefaultProps, Props, State>
-  extends Component<DefaultProps, Props, State>
-{
+export class WindowComponent extends Component {
   instance: WindowInstance
-  plugin: PluginComponent
+  plugin: PluginInstance
 
   constructor(props) {
     super(props)
@@ -266,17 +267,11 @@ export class WindowComponent<DefaultProps, Props, State>
     this.instance.removeEventListener.apply(this.instance, arguments)
   }
   openWindow(windowClassID: string, options: WindowOptions) {
-    const { layout } = this.instance
-    layout.openSubWindow(this.windowClass.windows[windowClassID], this, options)
+    const { windowClass } = this.instance
+    Application.layout.openSubWindow(windowClass.windows[windowClassID], this.instance, options)
   }
-  closeWindow(windowClassID: string) {
-    const { layout } = this.instance
-    if (windowClassID) {
-      layout.closeSubWindow(this.windowClass.windows[windowClassID], this)
-    }
-    else {
-      layout.removeWindow(this.instance)
-    }
+  closeWindow() {
+    Application.layout.removeWindow(this.instance)
   }
   updateWindowTitle(animation: Object) {
     this.instance.updateTitle(animation)

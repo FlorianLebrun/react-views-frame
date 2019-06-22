@@ -1,10 +1,10 @@
 import Listenable from "./listenable"
 
-let uidGenerator = window.localStorage.getItem("#uidGenerator") | 0
+let uidGenerator: number = (window.localStorage.getItem("#uidGenerator") as any) | 0
 
 function generateUid() {
   const uid = "obj#" + (uidGenerator++)
-  window.localStorage.setItem("#uidGenerator", uidGenerator)
+  window.localStorage.setItem("#uidGenerator", uidGenerator.toString())
   return uid
 }
 
@@ -13,7 +13,7 @@ export const storableClasses = {}
 
 export default class Storable extends Listenable {
   $$storeUid: string
-  $$storeDirectory: Array
+  $$storeDirectory: any[]
 
   storableShouldInitiate(data: Object) {
 
@@ -54,7 +54,7 @@ export default class Storable extends Listenable {
     catch (e) { }
     return false
   }
-  setStorageData(value: Object) {
+  setStorageData(value: any) {
     const data = this.readStorageData()
     let hasChange = false
     if (arguments.length === 1) {
@@ -100,49 +100,49 @@ export default class Storable extends Listenable {
     this.storableWillUnmount()
     delete globalStorage[this.$$storeUid]
   }
-}
 
-Storable.registerClass = function (name: string) {
-  if (!name) name = this.name
-  this[".className"] = name
-  storableClasses[name] = this
-  return this
-}
-
-Storable.openStorable = function (uid: string) {
-  try {
-    let obj, data
-    if (uid) {
-      obj = globalStorage[uid]
-      if (obj) return obj
-      data = readStorageData(uid)
-    }
-    else {
-      uid = generateUid()
-    }
-
-    const className = data ? data[".className"] : this[".className"]
-    const StorableClass = storableClasses[className]
-    if (StorableClass) {
-      obj = new StorableClass(uid)
-      obj.$$storeUid = uid
-      globalStorage[uid] = obj
-      arguments[0] = data
-      obj.storableShouldInitiate.apply(obj, arguments)
-    }
-
-    if (!(obj instanceof this)) {
-      throw new Error("Bad storable className '" + className + "' for class " + this.name)
-    }
-    return obj
+  static registerClass(name: string) {
+    if (!name) name = this.name
+    this[".className"] = name
+    storableClasses[name] = this
+    return this
   }
-  catch (e) {
-    console.error(e)
-    return null
+
+  static openStorable = function (uid: string) {
+    try {
+      let obj, data
+      if (uid) {
+        obj = globalStorage[uid]
+        if (obj) return obj
+        data = readStorageData(uid)
+      }
+      else {
+        uid = generateUid()
+      }
+
+      const className = data ? data[".className"] : this[".className"]
+      const StorableClass = storableClasses[className]
+      if (StorableClass) {
+        obj = new StorableClass(uid)
+        obj.$$storeUid = uid
+        globalStorage[uid] = obj
+        arguments[0] = data
+        obj.storableShouldInitiate.apply(obj, arguments)
+      }
+
+      if (!(obj instanceof this)) {
+        throw new Error("Bad storable className '" + className + "' for class " + this.name)
+      }
+      return obj
+    }
+    catch (e) {
+      console.error(e)
+      return null
+    }
   }
 }
 
-export function getAllStorable(): { [key:string]: Storable } {
+export function getAllStorable(): { [key: string]: Storable } {
   return globalStorage
 }
 

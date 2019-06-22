@@ -1,7 +1,7 @@
 
 const defaultMargin = 5
 
-function computeHorizontalEdgeBox(position: number, element: HTMLElement, tracked: DOMRect, host: DOMRect): Object {
+function computeHorizontalEdgeBox(position: number, element: HTMLElement, tracked: ClientRect | DOMRect, host: ClientRect | DOMRect): any {
   const { style } = element
   // Vertical position
   var top_0 = tracked.top - host.top
@@ -76,7 +76,7 @@ function computeHorizontalEdgeBox(position: number, element: HTMLElement, tracke
   }
 }
 
-function computeVerticalEdgeBox(position: number, element: HTMLElement, tracked: DOMRect, host: DOMRect): Object {
+function computeVerticalEdgeBox(position: number, element: HTMLElement, tracked: ClientRect | DOMRect, host: ClientRect | DOMRect): any {
   const { style } = element
   // Vertical position
   var top_0 = tracked.top - host.top
@@ -150,7 +150,7 @@ function computeVerticalEdgeBox(position: number, element: HTMLElement, tracked:
   }
 }
 
-const positionsMap = {
+const positionsMap: { [key: string]: number } = {
   "down-left": 1,
   "down-right": 5,
   "up-left": 3,
@@ -165,14 +165,14 @@ const positionsMap = {
 // - Axis => (0) horizontal, (1) vertical
 // - Axis direction => (0) default side, (2) other side
 // - Cross axis alignement => (0) default side, (4) other side
-export function computeEdgeBox(position: string, element: HTMLElement, tracked: DOMRect, host: DOMRect): Object {
-  position = positionsMap[position]
-  if (position === undefined) position = positionsMap["down-left"]
-  if (position & 1) {
-    return computeVerticalEdgeBox(position, element, tracked, host)
+export function computeEdgeBox(position: string, element: HTMLElement, tracked: ClientRect | DOMRect, host: ClientRect | DOMRect): Object {
+  let positionId = positionsMap[position]
+  if (position === undefined) positionId = positionsMap["down-left"]
+  if (positionId & 1) {
+    return computeVerticalEdgeBox(positionId, element, tracked, host)
   }
   else {
-    return computeHorizontalEdgeBox(position, element, tracked, host)
+    return computeHorizontalEdgeBox(positionId, element, tracked, host)
   }
 }
 

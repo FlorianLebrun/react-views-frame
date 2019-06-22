@@ -1,25 +1,28 @@
-import { WindowClass } from "./Window"
+/* eslint-disable */
 import Listenable from "../modules/listenable"
-
+import { WindowClass } from "./Window"
+import { PluginContext } from "./Context"
+import { Application } from "../application"
 
 export class PluginClass {
   name: string
   instance: PluginInstance
-  component: Function
+  component: typeof PluginInstance
   parameters: Object
-  windows: { [key:string]: WindowClass }
-  export: Object
-  import: Object
+  windows: { [key: string]: WindowClass }
+  export: any[]
+  import: { [key: string]: any }
   context: PluginContext
   users: Array<PluginClass>
   dependencies: Array<PluginClass>
   isMounted: boolean
+  menu: any
 
   constructor(name: string, context: PluginContext) {
     this.name = name
     this.context = context
   }
-  setup(desc: Object, parameters: Object) {
+  setup(desc: { [key: string]: any }, parameters: { [key: string]: any }) {
     this.parameters = parameters
     this.component = desc.component || PluginInstance
     this.export = desc.export
@@ -101,7 +104,7 @@ export class PluginClass {
       // Notify all user plugins
       if (this.users) {
         for (const user of this.users) {
-          user.promptMount(this)
+          user.promptMount()
         }
       }
 
@@ -147,7 +150,7 @@ export class PluginClass {
       this.isMounted = true
     }
   }
-  resolveValueReference(reference: string, key: string) {
+  resolveValueReference(reference: boolean | string, key: string) {
     let pluginName, path
     if (reference === true) {
       pluginName = this.name
@@ -170,10 +173,13 @@ export class PluginClass {
 
 export class PluginInstance extends Listenable {
   ".class": PluginClass
+  openWindow: Function
+  closeWindow: Function
+  closeAllWindow: Function
 
   // Life Cycle management functions
-  pluginWillMount(parameters: Object) { } // eslint-disable-line
-  pluginDidMount() { }
+  pluginWillMount(parameters: { [key: string]: any }) { } // eslint-disable-line
+  pluginDidMount(parameters: { [key: string]: any }) { }
   pluginWillUnmount() { }
 
   constructor(pluginClass: PluginClass) {
@@ -181,13 +187,13 @@ export class PluginInstance extends Listenable {
     this[".class"] = pluginClass
     if (pluginClass.windows) {
       this.openWindow = function (windowName: string, options: Object) {
-        this.layout.openPluginWindow(pluginClass.windows[windowName], this, options)
+        Application.layout.openPluginWindow(pluginClass.windows[windowName], this, options)
       }
       this.closeWindow = function (windowName: string) {
-        this.layout.closePluginWindows(pluginClass.windows[windowName], this)
+        Application.layout.closePluginWindows(pluginClass.windows[windowName], this)
       }
       this.closeAllWindow = function () {
-        this.layout.closePluginWindows(null, this)
+        Application.layout.closePluginWindows(null, this)
       }
     }
   }

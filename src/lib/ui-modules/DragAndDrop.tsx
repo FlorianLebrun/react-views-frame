@@ -1,13 +1,10 @@
-/* eslint-disable react/no-string-refs */
-/* eslint-disable react/no-multi-comp */
-/* eslint-disable no-use-before-define */
-import React, { Component } from "react"
+import React from "react"
 
 import { stopPropagation } from "./event.utils"
 
 let draggedZone: DragZone = null
 let dropSuggested: DropZone = null
-const dropRegistry: Array<DropZone | number> = []
+const dropRegistry: DropZone[] = []
 
 function SelectDropSuggested(zone: DropZone) {
   if (dropSuggested) {
@@ -51,7 +48,7 @@ type DragPropsType = {
   style?: any,
 }
 
-function objectToDataTransfert(obj: Object, dataTransfer: Object) {
+function objectToDataTransfert(obj: { [key: string]: any }, dataTransfer: DataTransfer) {
   Object.keys(obj).forEach(key => {
     if (key !== "dragImage") {
       dataTransfer.setData(key, JSON.stringify(obj[key]))
@@ -62,8 +59,8 @@ function objectToDataTransfert(obj: Object, dataTransfer: Object) {
   }
 }
 
-function dataTransfertToObject(dataTransfer: Object): Object {
-  const obj = {}
+function dataTransfertToObject(dataTransfer: DataTransfer): any {
+  const obj: any = {}
   dataTransfer.types.forEach((key) => {
     try {
       obj[key] = JSON.parse(dataTransfer.getData(key))
@@ -76,12 +73,7 @@ function dataTransfertToObject(dataTransfer: Object): Object {
   return obj
 }
 
-type DragPropsType = {
-  onDragStart: Function,
-  onDragEnd: Function,
-}
-
-export class DragZone extends Component<void, DragPropsType, void> {
+export class DragZone extends React.Component {
   props: DragPropsType
 
   handleDragStart = (evt) => {
@@ -98,13 +90,13 @@ export class DragZone extends Component<void, DragPropsType, void> {
     this.dragComplete()
     BlurDropZone()
   }
-  dragComplete(data: any) {
+  dragComplete(data?: any) {
     if (draggedZone === this) {
       this.props.onDragEnd && this.props.onDragEnd(data || {})
     }
     draggedZone = null
   }
-  render(): React$Element<any> {
+  render() {
     // eslint-disable-next-line no-unused-vars
     const { onDragStart, onDragEnd, ...otherProps } = this.props
     return (
@@ -120,23 +112,26 @@ export class DragZone extends Component<void, DragPropsType, void> {
 
 type DropPropsType = {
   // Event when mouse enter and exit the zone
-  onSelect: Function,
-  onUnselect: Function,
+  onSelect?: Function,
+  onUnselect?: Function,
 
   // Event for drop validation
   isDroppable?: Function,
-  onDrop: Function,
-  onDropMatch: Function,
+  onDrop?: Function,
+  onDropMatch?: Function,
 
   // Styling
-  className: string,
-  selectedClassName: string,
-  highlightClassName: string,
-  [key:string]: any,
+  className?: string,
+  selectedClassName?: string,
+  highlightClassName?: string,
+  [key: string]: any,
 }
 
-export class DropZone extends Component<void, DropPropsType, void> {
+export class DropZone extends React.Component {
   props: DropPropsType
+
+  zoneId: number = undefined
+  active: boolean = false
 
   componentWillMount = () => {
     RegisterDropZone(this)
@@ -144,9 +139,6 @@ export class DropZone extends Component<void, DropPropsType, void> {
   componentWillUnmount = () => {
     UnregisterDropZone(this)
   }
-
-  zoneId: number = undefined
-  active: boolean = false
 
   activate(data) {
     const props = this.props
@@ -156,7 +148,7 @@ export class DropZone extends Component<void, DropPropsType, void> {
     else {
       this.active = false
     }
-    const dom = this.refs.zone
+    const dom: any = this.refs.zone
     if (this.active && props.highlightClassName) {
       dom.className = props.className + " " + props.highlightClassName
     }
@@ -166,14 +158,14 @@ export class DropZone extends Component<void, DropPropsType, void> {
   }
   deactivate() {
     if (this.active) {
-      const dom = this.refs.zone
+      const dom: any = this.refs.zone
       dom.className = this.props.className
       this.active = false
     }
   }
   select() {
     const props = this.props
-    const dom = this.refs.zone
+    const dom: any = this.refs.zone
     if (this.active && props.selectedClassName) {
       if (props.highlightClassName) {
         dom.className = props.className + " " + props.highlightClassName + " " + props.selectedClassName
@@ -189,7 +181,7 @@ export class DropZone extends Component<void, DropPropsType, void> {
   }
   unselect() {
     const props = this.props
-    const dom = this.refs.zone
+    const dom: any = this.refs.zone
     if (this.active && props.highlightClassName) {
       dom.className = props.className + " " + props.highlightClassName
     }
@@ -239,7 +231,7 @@ export class DropZone extends Component<void, DropPropsType, void> {
       UnselectDropSuggested(this)
     }
   }
-  render(): React$Element<any> {
+  render() {
     const {
       // eslint-disable-next-line no-unused-vars
       onSelect, onUnselect, onDrop, onDropMatch, selectedClassName,
@@ -259,6 +251,7 @@ export class DropZone extends Component<void, DropPropsType, void> {
 }
 
 export class DragDropZone extends DropZone {
+  props: DropPropsType
 
   handleDragStart = (evt) => {
     const bag = this.props.onDragStart && this.props.onDragStart(evt)
@@ -273,7 +266,7 @@ export class DragDropZone extends DropZone {
     this.props.onDragEnd && this.props.onDragEnd(evt)
     BlurDropZone()
   }
-  render(): React$Element<any> {
+  render() {
     const {
       // eslint-disable-next-line no-unused-vars
       onSelect, onUnselect, onDrop, onDropMatch, selectedClassName,

@@ -18,8 +18,8 @@ import EventEmitter from "./modules/event-emitter"
 import Listenable from "./modules/listenable"
 import Storable, { getAllStorable, saveAllStorable } from "./modules/storable"
 import CallChain, { CallSite } from "./modules/callchain"
-import createApplication from "./sandbox/createApplication"
-import { SandBox } from "./sandbox/SandBox"
+//import createApplication from "./sandbox/createApplication"
+//import { SandBox } from "./sandbox/SandBox"
 
 installApplicationLayout(Application)
 
@@ -41,7 +41,6 @@ export const Addons = {
 }
 
 export const Modules = {
-  SandBox,
   Waitable,
   Storable,
   getAllStorable,
@@ -52,5 +51,5 @@ export const Modules = {
   CallSite,
 }
 
-export { extendApplication, createApplication }
+export { extendApplication }
 export default Application

@@ -10,9 +10,10 @@ import { PanelResizer } from "../addons/windows-frame/FramePanels"
 *********************************/
 
 export type SplitItemType = {
-  content: any,
-  size: number,
-  overflow: string,
+  header?: any,
+  content?: any,
+  size?: number,
+  overflow?: string,
 }
 
 type PropsType = {
@@ -155,7 +156,7 @@ export default class Split extends Component {
       // Render content
       contents.push(<div
         key={contents.length}
-        ref={i}
+        ref={i as any}
         style={this.styles[i]}
       >
         {item.content}
@@ -178,7 +179,7 @@ export default class Split extends Component {
 }
 
 
-const styles = {
+const styles: any = {
   header: {
     display: "flex",
     flexDirection: "row",

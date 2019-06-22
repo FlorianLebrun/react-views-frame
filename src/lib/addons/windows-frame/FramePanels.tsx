@@ -4,14 +4,17 @@ import React, { Component } from "react"
 import { DropZone, DragDropZone } from "../../ui-modules/DragAndDrop"
 import { HtmlGrabReaction, stopEvent } from "../../ui-modules/event.utils"
 import { Application } from "../../application"
+import { WindowInstance } from "../../layout"
 import { openFrameMenu } from "./FrameMenu"
+import { Frame } from "./Frame"
 
 export type PanelProps = {
-  id: DockID,
+  id: string,
   type: string,
   size: number,
   current: WindowInstance,
   items: Array<WindowInstance>,
+  menu: boolean,
   child: string,
 }
 
@@ -61,7 +64,7 @@ class PanelButton extends Component {
   handleEvent = () => {
     this.forceUpdate()
   }
-  handleClick = (e) => {
+  handleClick = () => {
     const { item, panel, frame } = this.props
     if (item === panel.current) {
       frame.hideWindow(item)
@@ -122,7 +125,7 @@ class PanelButton extends Component {
 type PanelBarPropsType = {
   panel: PanelProps,
   frame: Frame,
-  vertical: boolean,
+  vertical?: boolean,
 }
 
 class PanelBar extends Component {
@@ -164,9 +167,9 @@ const CSS_panel_resizer_vertical = "WND_panel_resizer WND_panel_resizer_V"
 const CSS_panel_resizer_horizontal = "WND_panel_resizer WND_panel_resizer_H"
 
 export type PanelResizerPropsType = {
-  vertical: boolean,
   transformDelta: Function,
   onResize: Function,
+  vertical?: boolean,
 }
 
 export class PanelResizer extends Component {
@@ -193,8 +196,8 @@ export class PanelResizer extends Component {
 
 type SidePanelContainerPropsType = {
   current: WindowInstance,
-  vertical: boolean,
   size: number,
+  vertical?: boolean,
 }
 
 class SidePanelContainer extends Component {
@@ -208,7 +211,7 @@ class SidePanelContainer extends Component {
       || curProps.size !== nextProps.size
   }
   getSize() {
-    const container = this.refs.container
+    const container: any = this.refs.container
     if (container) {
       return this.props.vertical ? container.width() : container.height()
     }
@@ -288,7 +291,8 @@ class SidePanel extends Component {
       || curProps.children !== nextProps.children
   }
   handleResize = (delta) => {
-    const csize = this.refs.container.getSize()
+    const container: any = this.refs.container
+    const csize = container.getSize()
     if (csize !== undefined) {
       let size = this.props.panel.size
       size += Math.max(size, 1) * delta / Math.max(csize, 1)

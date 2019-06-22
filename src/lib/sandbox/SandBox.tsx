@@ -13,13 +13,14 @@ export class Export {
 }
 
 export class Module extends Export {
-  ".sandbox": SandBox = null
-  "$": Array<Export> = null
+  ".sandbox": SandBox
+  "$": any
+  [key: string]: any
 }
 
 export class SandBox {
   name: string
-  modules: { [key:string]: Object } = {}
+  modules: { [key: string]: Module } = {}
   connector: Connector
   devMode: boolean
 
@@ -57,7 +58,7 @@ export class SandBox {
       else console.error(guid, "is imported more than once.")
     }
   }
-  getModulesRegister(): { [key:string]: Module } {
+  getModulesRegister(): { [key: string]: Module } {
     return this.modules
   }
   getModule(guid: string): Module {
@@ -93,25 +94,25 @@ export class SandBox {
   }
 }
 
-function installPack(context: SandBox, data: PackObject) {
+function installPack(context: SandBox, data: any) {
   for (const cmodule of data.modules) {
     installModule(context, cmodule)
   }
 }
 
-function installModule(context: SandBox, data: ModuleObject): Object {
+function installModule(context: SandBox, data: any): Object {
   const objectsCount = data.objects ? data.objects.length : 0
 
   // Create object export register
   const cmodule = context.getModule(data.name)
   if (data.type) cmodule[".type"] = data.type
-  const register = [cmodule]
+  const register: any[] = [cmodule]
   for (let i = 1; i < objectsCount; i++) {
     register.push({})
   }
   cmodule.$ = register
 
-  function installJs(obj: BasicObject, cexports: Object) {
+  function installJs(obj: any, cexports: Object) {
     let code = obj.data
 
     // Append source map
@@ -139,9 +140,9 @@ function installModule(context: SandBox, data: ModuleObject): Object {
     }
     return cexports
   }
-  function installCss(obj: BasicObject) {
+  function installCss(obj: any) {
     const head = document.getElementsByTagName("head")[0]
-    const style = document.createElement("style")
+    const style: any = document.createElement("style")
     style.setAttribute("type", "text/css")
     if (style.styleSheet) { // IE
       style.styleSheet.cssText = obj.data
@@ -151,7 +152,7 @@ function installModule(context: SandBox, data: ModuleObject): Object {
     }
     head.appendChild(style)
   }
-  function installImage(obj: BasicObject, cexports: Object) {
+  function installImage(obj: any, cexports: any) {
     cexports.default = obj.data
   }
 
@@ -165,7 +166,7 @@ function installModule(context: SandBox, data: ModuleObject): Object {
           installJs(obj, cexports)
           break
         case "css":
-          installCss(obj, cexports)
+          installCss(obj)
           break
         case "image":
           installImage(obj, cexports)

@@ -1,31 +1,30 @@
-/* eslint-disable react/no-multi-comp */
+import React from "react"
 import { PluginInstance, PluginClass } from "./Plugin"
-import { WindowInstance, WindowClass, WindowContainer } from "./Window"
+import { WindowInstance, WindowClass, WindowOptions } from "./Window"
+
+export interface IApplicationFrame {
+  attachWindow(wnd: WindowInstance, dockId: string, foreground?: boolean): void;
+  dettachWindow(wnd: WindowInstance): void;
+  getComponent(): React.Component;
+}
 
 export class PluginContext {
-  pluginClasses: { [key:string]: PluginClass } = {}
-  plugins: { [key:string]: PluginInstance } = {}
-  windows: { [key:string]: WindowInstance } = {}
-  docks: { [key:string]: Array<WindowInstance> } = {}
+  pluginClasses: { [key: string]: PluginClass } = {}
+  plugins: { [key: string]: PluginInstance } = {}
+  windows: { [key: string]: WindowInstance } = {}
+  docks: { [key: string]: Array<WindowInstance> } = {}
   focused: WindowInstance = null
-  frame: Frame = null
-  application: Object = null
+  frame: IApplicationFrame = null
 
+  splashComponent: typeof React.Component
   displayLayout: Object
   windowLoaded: boolean = false
   uidGenerator: number = 0
 
-  constructor(application) {
-    this.application = application
-    PluginInstance.prototype.layout = this
-    PluginInstance.prototype.application = application
-    WindowInstance.prototype.layout = this
-    WindowInstance.prototype.application = application
-    WindowContainer.prototype.layout = this
-    WindowContainer.prototype.application = application
+  constructor() {
     window.addEventListener("beforeunload", this.unmountPlugins)
   }
-  registerFrame(frame: Frame) {
+  registerFrame(frame: IApplicationFrame) {
     this.frame = frame
     frame && Object.keys(this.windows).forEach(key => {
       const wnd = this.windows[key]
@@ -39,7 +38,7 @@ export class PluginContext {
 
     // Connect plugins
     pluginNames.forEach(name => {
-      this.pluginClasses[name].willMount()
+      this.pluginClasses[name].mount()
     })
 
     // Finalize plugins mount
@@ -53,7 +52,7 @@ export class PluginContext {
       plugin.pluginWillUnmount()
     })
   }
-  configureLayout(description: Object) {
+  configureLayout(description: any) {
     this.splashComponent = description.splashComponent
     this.displayLayout = description.displayLayout
   }
@@ -65,23 +64,23 @@ export class PluginContext {
     }
     return pluginClass
   }
-  installPlugin(description: Object, parameters: Object): PluginClass {
+  installPlugin(description: any, parameters: any): PluginClass {
     const pluginClass = this.mapPlugin(description.name)
     pluginClass.setup(description, parameters)
     pluginClass.mount()
     return pluginClass
   }
-  declarePlugin(description: Object, parameters: Object): PluginClass {
+  declarePlugin(description: any, parameters: any): PluginClass {
     const pluginClass = this.mapPlugin(description.name)
     pluginClass.setup(description, parameters)
     return pluginClass
   }
-  mountPlugin(name: Object): PluginClass {
+  mountPlugin(name: string): PluginClass {
     const pluginClass = this.pluginClasses[name]
     pluginClass && pluginClass.mount()
     return pluginClass
   }
-  dockWindow(wnd: WindowInstance, dockId: DockID, foreground: boolean) {
+  dockWindow(wnd: WindowInstance, dockId: string, foreground: boolean) {
     this.frame && this.frame.attachWindow(wnd, dockId, foreground)
   }
   dettachWindow(wnd: WindowInstance) {
@@ -122,7 +121,7 @@ export class PluginContext {
     else windows = this.findAllWindowsByPlugin(plugin)
     windows.forEach(wnd => this.removeWindow(wnd))
   }
-  getWindowInstance(windowId: WindowID) {
+  getWindowInstance(windowId: string) {
     return this.windows[windowId]
   }
   findOneWindowByClass(windowClass: WindowClass): WindowInstance {
@@ -146,7 +145,7 @@ export class PluginContext {
     }
     return windows
   }
-  findAllWindowsByClass(windowClass: WindowClass): Array<WindowInstance> {
+  findAllWindowsByClass(windowClass: WindowClass): WindowInstance[] {
     if (windowClass) {
       let windowId
       const windows = []
@@ -158,7 +157,7 @@ export class PluginContext {
       return windows
     }
     else {
-      return this.windows.values()
+      return (this.windows as any).values()
     }
   }
 }

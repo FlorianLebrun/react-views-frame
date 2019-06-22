@@ -11,6 +11,13 @@ export function stopPropagation(e) {
 }
 
 export class HtmlScrollingReaction {
+  element: HTMLElement
+  mouseX: number
+  mouseY: number
+  scrollX: number
+  scrollY: number
+  onMouseScroll: Function
+
   constructor(element, event, onMouseScroll) {
     stopEvent(event)
     this.element = element
@@ -40,6 +47,15 @@ export class HtmlScrollingReaction {
 }
 
 export class HtmlGrabReaction {
+  element: HTMLElement
+  mouseX: number
+  mouseY: number
+  left: number
+  top: number
+  deltaX: number
+  deltaY: number
+  onMouseGrab: Function
+  
   constructor(element, event, onMouseGrab) {
     stopEvent(event)
     this.element = element
@@ -71,6 +87,12 @@ export class HtmlGrabReaction {
 }
 
 export class SVGGrabReaction {
+  element: any
+  mouseX: number
+  mouseY: number
+  x: number
+  y: number
+  onMouseGrab: Function
   constructor(element, event, onMouseGrab) {
     stopEvent(event)
     this.element = element
@@ -107,9 +129,9 @@ function setCurrentGrabReaction(reaction) {
 function removeCurrentGrabReaction(reaction) {
   if (grabReaction === reaction) grabReaction = null
 }
-window.addEventListener("mousemove", function(e) {
+window.addEventListener("mousemove", function (e) {
   grabReaction && grabReaction.handleMouseMove(e)
 })
-window.addEventListener("mouseup", function() {
+window.addEventListener("mouseup", function () {
   grabReaction && grabReaction.handleCompleted()
 })

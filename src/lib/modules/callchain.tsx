@@ -8,7 +8,7 @@ export class CallSite {
   next: CallSite
   back: CallSite
 
-  _when: Promise
+  _when: Promise<any>
   _resolve: Function
   _reject: Function
   _data: any
@@ -20,14 +20,14 @@ export class CallSite {
     this.args = args
   }
   containOf(proc): CallSite {
-    for (let c = this; c; c = c.back) {
+    for (let c = this as CallSite; c; c = c.back) {
       if (c.proc === proc && c.status < 2) {
         return c
       }
     }
   }
   abortAllOf(proc) {
-    for (let c = this; c; c = c.back) {
+    for (let c = this as CallSite; c; c = c.back) {
       if (c.proc === proc && c.status < 2) {
         this.abort("aborted")
       }

@@ -1,3 +1,4 @@
+import { Application } from "../application"
 import { PluginInstance } from "../layout"
 
 function makeWebsocketUrl(url) {
@@ -14,7 +15,7 @@ const defaultEndPoint = {
   websocket(url, options): string {
     return url
   },
-  login(req, res, url, options): Promise {
+  login(req, res, url, options): Promise<any> {
     return null
   },
   feedback(req, res, url, options) {
@@ -25,12 +26,13 @@ export default {
   name: "fetch-addon",
   component: class extends PluginInstance {
     router: Object = null
-    loginPromise: Promise = null
+    loginPromise: Promise<any> = null
     enableLoginRecovery: boolean = true
+    resolveUrl: Function = null
 
-    pluginWillMount(parameters: Object) {
-      this.application.fetchAPI = this.fetchAPI.bind(this)
-      this.application.websocketAPI = this.websocketAPI.bind(this)
+    pluginWillMount(parameters: any) {
+      Application.fetchAPI = this.fetchAPI.bind(this)
+      Application.websocketAPI = this.websocketAPI.bind(this)
       this.resolveUrl = parameters.resolveUrl || this.resolveUrl
     }
     resolveEndPoint(url, options) {
@@ -40,7 +42,7 @@ export default {
       const endpoint = this.resolveUrl("ws", url) || defaultEndPoint
       return new WebSocket(makeWebsocketUrl(endpoint.websocket(url, options)))
     }
-    fetchAPI(url, options): Promise<Response> {
+    fetchAPI(url, options): Promise<any> {
       let hasLoginRecovery = this.enableLoginRecovery && (!options || !options.noCredentials)
       const endpoint = this.resolveUrl("http", url) || defaultEndPoint
 

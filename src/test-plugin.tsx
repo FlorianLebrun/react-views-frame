@@ -1,5 +1,5 @@
 import React from "react"
-import Application from '../lib'
+import Application from './lib'
 import "font-awesome/css/font-awesome.min.css"
 
 
@@ -34,7 +34,6 @@ export class ToolboxY extends Application.WindowComponent {
   }
 }
 export class DevTextPlugin extends Application.PluginInstance {
-  console: DevConsolePlugin
 
   pluginDidMount() {
     this.openWindow("toolbox-x")
@@ -54,9 +53,9 @@ export class DevTextPlugin extends Application.PluginInstance {
   }
 }
 
-Application.installPlugin({
-  name: "ewam",
-  title: "Gold IDE",
+Application.declarePlugin({
+  name: "test",
+  title: "Test Plugin",
   component: DevTextPlugin,
   importPlugins: { console: "dev-console" },
   windows: {

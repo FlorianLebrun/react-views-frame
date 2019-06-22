@@ -1,7 +1,7 @@
 
 export default class Waitable {
   $$status: number = 0
-  $$when: Promise
+  $$when: Promise<any>
   $$resolve: Function
   $$reject: Function
   $$data: any

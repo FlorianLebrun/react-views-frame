@@ -3,7 +3,7 @@ import openContextualMenu from "../../ui-modules/openContextualMenu"
 import { Application } from "../../application"
 const classItem = "hoverbox hoverbox-highlight cursor-pointer"
 
-class FrameMenu extends Component<void, void, void> {
+class FrameMenu extends Component {
   props: any
   handleClick = (plugin, windowName) => () => {
     plugin.openWindow(windowName)
@@ -50,6 +50,6 @@ class FrameMenu extends Component<void, void, void> {
 export function openFrameMenu(e) {
   const open = Application.openContextualMenu || openContextualMenu
   open(this, e.target, (f) => {
-    return <FrameMenu close={f} />
+    return (<FrameMenu close={f} />)
   })
 }

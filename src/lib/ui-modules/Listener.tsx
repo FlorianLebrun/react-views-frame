@@ -1,12 +1,15 @@
-import { Component } from "react"
+import React from "react"
+import Listenable from "../modules/listenable"
 
 export type PropsType = {
   object: Listenable,
   onChange: Function | Array<Function | string>,
+  onEvent: Function,
+  children?: any
 }
 
-export default class Listener extends Component<void, Object, void> {
-  props: Object
+export default class Listener extends React.Component {
+  props: PropsType
 
   componentWillMount() {
     const { object } = this.props
@@ -27,7 +30,7 @@ export default class Listener extends Component<void, Object, void> {
   handleChange = (type, data1, data2) => {
     if (type === "change") {
       const { onChange } = this.props
-      onChange && onChange(data1, data2)
+      onChange && (onChange as Function)(data1, data2)
     }
     else {
       const { onEvent } = this.props

@@ -1,6 +1,6 @@
 
 export type MenuType = {
-  menu: [],
+  menu: any[],
   callbacks: { [key: string]: Function }
 }
 
@@ -8,7 +8,7 @@ export class ApplicationInstance {
   windowMenu: MenuType
   [addonName: string]: any
 
-  installFeatures(features: { [key: string]: any }, onlyFunction: boolean) {
+  installFeatures(features: { [key: string]: any }, onlyFunction?: boolean) {
     Object.keys(features).forEach(key => {
       if (!onlyFunction || (features[key] instanceof Function)) {
         this[key] = features[key]
@@ -66,7 +66,7 @@ export class ApplicationInstance {
       document.title = title
     }
   }
-  setWindowMenu(menu: [], callbacks: { [key: string]: Function }) {
+  setWindowMenu(menu: any[], callbacks?: { [key: string]: Function }) {
     this.windowMenu = {
       menu,
       callbacks,

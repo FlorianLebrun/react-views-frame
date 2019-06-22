@@ -6,7 +6,7 @@ export default class Listenable extends EventEmitter {
   stateWillTerminate() {
     // TO OVERRIDE
   }
-  setState() {
+  setState(value?: any, value2?: any) {
     EventEmitter.setState.apply(this, arguments)
     if (this[".events"] && this[".events"][0]) {
       this[".status"] = "changed"

@@ -1,20 +1,21 @@
 import React from "react"
 import { Application } from "../../application"
 import PanelComponents, { PanelProps } from "./FramePanels"
+import { IApplicationFrame } from "../../layout/Context"
 import { WindowInstance } from "../../layout/Window"
 
 export type PropsType = {
-  displayLayout: any,
+  displayLayout?: any,
 }
 
 export type StateType = {
-  panels: { [key:string]: PanelProps },
+  panels: { [key: string]: PanelProps },
 }
 
-export class Frame extends React.Component {
+export class Frame extends React.Component implements IApplicationFrame {
   props: PropsType
   state: StateType
-  
+
   componentWillMount() {
     this.loadDisplayLayout(Application.layout.displayLayout)
   }
@@ -23,6 +24,9 @@ export class Frame extends React.Component {
   }
   componentWillUnmount() {
     Application.layout.registerFrame()
+  }
+  getComponent(): React.Component {
+    return this
   }
   loadDisplayLayout = (displayLayout) => {
     const panels = {}

@@ -1,12 +1,13 @@
 import React from "react"
+import { Application } from "../application"
 import { PluginInstance } from "../layout"
 
 export default {
   name: "envs",
   component: class extends PluginInstance {
     pluginWillMount() {
-      this.application.envs = this
-      this.application.connectEnv = connectEnv.bind(this.application)
+      Application.envs = this
+      Application.connectEnv = connectEnv.bind(Application)
 
       window.addEventListener("hashchange", this.updateLocation)
       this.updateLocation()

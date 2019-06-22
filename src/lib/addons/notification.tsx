@@ -1,15 +1,16 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import NotificationSystem from "react-notification-system"
+import { Application } from "../application"
 import { PluginInstance } from "../layout"
 
 type NotificationType = {
-  uid: number,
-  title: string,
+  level: string,
   message: string,
   position: string,
-  autoDismiss: number,
-  level: string,
+  uid?: number,
+  title?: string,
+  autoDismiss?: number,
 }
 
 export default {
@@ -27,17 +28,17 @@ export default {
         this.notificationNode
       )
 
-      this.application.addNotification = this.addNotification.bind(this)
+      Application.addNotification = this.addNotification.bind(this)
     }
-    addNotification(notification: NotificationType) {
-      if (typeof notification !== "object") {
-        notification = {
+    addNotification(error: string | NotificationType, message?: string) {
+      if (typeof error !== "object") {
+        error = {
           position: "tc",
           level: arguments[0],
           message: Array.prototype.slice.call(arguments, 1).join(),
         }
       }
-      this.notificationSystem.addNotification(notification)
+      this.notificationSystem.addNotification(error)
     }
   },
 }

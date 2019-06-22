@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-
+import { Application } from "../application"
 import { PluginInstance } from "../layout"
 
 export default {
@@ -8,15 +8,15 @@ export default {
   component: class extends PluginInstance {
     modalStack = []
     pluginWillMount() {
-      this.application.popup = this.popup.bind(this)
+      Application.popup = this.popup.bind(this)
     }
-    popup(renderer: Function, outsideReject): Promise {
+    popup(renderer: Function, outsideReject): Promise<any> {
       return new Promise((resolve, reject) => {
         const htmlRoot = document.createElement("div")
         htmlRoot.style.position = "absolute"
         htmlRoot.style.left = "0px"
         htmlRoot.style.top = "0px"
-        htmlRoot.style.zIndex = this.modalStack.length * 1000 + 1000
+        htmlRoot.style.zIndex = (this.modalStack.length * 1000 + 1000).toString()
         document.body.appendChild(htmlRoot)
 
         function handleResolve(data) {
@@ -51,7 +51,7 @@ export default {
   },
 }
 
-const styles = {
+const styles: any = {
   backdropWrapper: {
     position: "fixed",
     height: "100%",

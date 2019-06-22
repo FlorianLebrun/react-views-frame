@@ -1,7 +1,7 @@
-import React from "react"
 import ReactDOM from "react-dom"
 import "babel-polyfill"
-import Application, { extendApplication, createApplication, Addons, UI, Modules } from "./lib"
+import Application, { Addons } from "./lib"
+import "./test-plugin"
 import "bootstrap/dist/css/bootstrap.min.css"
 
 Application.installPlugin(Addons.Notification)
@@ -71,7 +71,7 @@ Application.configureLayout({
 }, function (Component) {
   ReactDOM.render(<Component.default name="user" />, document.getElementById("root"))
 })*/
-
+/*
 const applicationModuleId = window.location.hash.split("/")[1]
 if (applicationModuleId) {
   console.log(`load application with module '${applicationModuleId}'`)
@@ -94,7 +94,8 @@ if (applicationModuleId) {
     }
   })
 }
-else {
-  ReactDOM.render(Application.renderDisplayFrame(), document.getElementById("root"))
+else {*/
+Application.mountPlugin("test")
+ReactDOM.render(Application.renderDisplayFrame(), document.getElementById("root"))
   //ReactDOM.render(<span>No application</span>, document.getElementById("root"))
-}
+//}

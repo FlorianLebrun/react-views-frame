@@ -1,9 +1,10 @@
+import React from "react"
 import ReactDOM from "react-dom"
 import { computeEdgeBoxDOM } from "./computeEdgeBox"
 
 const stack = []
 
-export default function (parent: Component, target: HTMLElement, renderer: Function, position: string) {
+export default function (parent: React.Component, target: HTMLElement, renderer: Function, position: string) {
   console.assert(renderer instanceof Function)
   var resolve = null
 
@@ -22,7 +23,7 @@ export default function (parent: Component, target: HTMLElement, renderer: Funct
   node.style.visibility = "hidden"
   node.className = "dropdown-menu cursor-pointer manual scroll-wrapper"
   node.style.position = "absolute"
-  node.style.zIndex = (stackIndex + 1) * 100
+  node.style.zIndex = ((stackIndex + 1) * 100).toString()
 
   function clickOutside(e) {
     if (node) {
@@ -41,7 +42,7 @@ export default function (parent: Component, target: HTMLElement, renderer: Funct
     }
   }
 
-  function close(value) {
+  function close(value?: any) {
     if (node) {
 
       // Remove popup
@@ -75,7 +76,7 @@ export default function (parent: Component, target: HTMLElement, renderer: Funct
     if (node) resolve = _resolve
     else resolve()
   })
-  promise.close = close
+  promise["close"] = close
   return promise
 }
 

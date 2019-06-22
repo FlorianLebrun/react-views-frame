@@ -1,11 +1,11 @@
-
-import { WindowInstance, WindowComponent, WindowContainer } from "./Window"
+import { Application } from "../application"
+import { WindowComponent, WindowContainer } from "./Window"
 import { PluginInstance } from "./Plugin"
 import { PluginContext } from "./Context"
 
 export default function(app) {
-  const layout = new PluginContext(app)
-  app.installFeatures({
+  const layout = new PluginContext()
+  Application.installFeatures({
     layout,
     WindowComponent,
     WindowContainer,
@@ -17,10 +17,6 @@ export default function(app) {
   })
 }
 
-export {
-  WindowInstance,
-  WindowComponent,
-  WindowContainer,
-  PluginInstance,
-  PluginContext,
-}
+export { WindowInstance, WindowComponent, WindowContainer } from "./Window"
+export { PluginInstance } from "./Plugin"
+export { PluginContext } from "./Context"

@@ -16,7 +16,7 @@ export default class Connector {
         return res.json
       })
   }
-  createFileByName(name: string, descriptor: Object) {
+  createFileByName(name: string, descriptor: any) {
     if (typeof descriptor !== "object" ||
       typeof descriptor.type !== "string" ||
       typeof name !== "string"
@@ -40,9 +40,9 @@ export default class Connector {
     })
   }
   deleteFile(guid: string) {
-    if (this.register[guid]) {
+    /*if (this.register[guid]) {
       // TODO: manage deletion of mounted file
-    }
+    } */
     return Application.fetchAPI("app:/webfile?guid=" + guid, {
       method: "DELETE",
     })
