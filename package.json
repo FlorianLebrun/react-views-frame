@@ -40,8 +40,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build:lib": "babel src/lib -d dist",
-    "build:test": "react-scripts build",
+    "build": "node ./scripts/build_dist.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   }
