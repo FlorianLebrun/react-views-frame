@@ -377,7 +377,14 @@ export class CenterPanelTop extends SidePanelTop {
 }
 
 export function RootPanel(props) {
-  return (<div className="WND_root_panel"> {props.children} </div>)
+  return (<div className="WND_root_panel" onContextMenu={preventContextMenu}> {props.children} </div>)
+}
+
+function preventContextMenu(e) {
+  if (e.target.readOnly !== false) {
+    e.preventDefault()
+  }
+  return true
 }
 
 export default {
