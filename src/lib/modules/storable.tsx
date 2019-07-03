@@ -108,7 +108,7 @@ export default class Storable extends Listenable {
     return this
   }
 
-  static openStorable = function (uid: string) {
+  static openStorable = function (uid: string, ...args) {
     try {
       let obj, data
       if (uid) {
@@ -120,25 +120,41 @@ export default class Storable extends Listenable {
         uid = generateUid()
       }
 
-      const className = data ? data[".className"] : this[".className"]
-      const StorableClass = storableClasses[className]
-      if (StorableClass) {
-        obj = new StorableClass(uid)
-        obj.$$storeUid = uid
-        globalStorage[uid] = obj
-        arguments[0] = data
-        obj.storableShouldInitiate.apply(obj, arguments)
+      // Create object from stored data
+      const dataStorableClass = data ? storableClasses[data[".className"]] : null
+      if (dataStorableClass) {
+        obj = new dataStorableClass(...args)
+        if (!(obj instanceof this)) {
+          console.error("Bad stored className '" + data[".className"] + "' for class " + this.name)
+          obj = null
+        }
       }
 
-      if (!(obj instanceof this)) {
-        throw new Error("Bad storable className '" + className + "' for class " + this.name)
+      // Create object from this class
+      if (!obj) {
+        const defaultStorableClass = storableClasses[this[".className"]]
+        if (defaultStorableClass) {
+          obj = new defaultStorableClass(...args)
+          if (!(obj instanceof this)) {
+            console.error("Mis registered storable for class " + this.name)
+            return null
+          }
+        }
+        else {
+          return null
+        }
       }
+
+      // Initiate object
+      obj.$$storeUid = uid
+      globalStorage[uid] = obj
+      obj.storableShouldInitiate(data, ...args)
       return obj
     }
     catch (e) {
       console.error(e)
-      return null
     }
+    return null
   }
 }
 
