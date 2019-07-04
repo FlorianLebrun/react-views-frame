@@ -1,6 +1,6 @@
 {
   "name": "react-application-frame",
-  "version": "0.1.25",
+  "version": "0.1.25-alpha.1",
   "main": "dist/index.js",
   "dependencies": {
     "base-64": "^0.1.0",
