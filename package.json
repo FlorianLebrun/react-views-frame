@@ -2,6 +2,7 @@
   "name": "react-application-frame",
   "version": "0.1.25-alpha.1",
   "main": "dist/index.js",
+  "private": true,
   "dependencies": {
     "base-64": "^0.1.0",
     "react-notification-system": "^0.2.14"
@@ -39,7 +40,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "prepack": "node ./scripts/build_dist.js",
+    "build": "node ./scripts/build_dist.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   }

@@ -5,7 +5,7 @@ import { stopEvent } from "../../ui-modules/event.utils"
 import { Application } from "../../application"
 import { WindowInstance } from "../../layout"
 import { openFrameMenu } from "./FrameMenu"
-import { Frame } from "./Frame"
+import { Frame } from "."
 
 export type PanelProps = {
   id: string,
@@ -227,10 +227,7 @@ class CenterPanelContainer extends Component {
       />)
     }
     else {
-      const SplashComponent = Application.layout.splashComponent
-      return (<div className="WND_panel_container_center WND_panel_container_splash">
-        {SplashComponent && <SplashComponent />}
-      </div>)
+      return (<div className="WND_panel_container_center WND_panel_container_splash" />)
     }
   }
 }

@@ -1,32 +1,45 @@
 import React from "react"
 import { Application } from "../../application"
 import PanelComponents, { PanelProps } from "./FramePanels"
-import { IApplicationFrame } from "../../layout/Context"
 import { WindowInstance } from "../../layout/Window"
+import "./frame.css"
 
-export type PropsType = {
-  displayLayout?: any,
+type DisplayItemType = {
+  header?: any,
+  content?: any,
 }
 
-export type StateType = {
+type LayoutItemType = {
+  size: number,
+  [customKey: string]: any,
+}
+
+type LayoutType = LayoutItemType[]
+
+type PropsType = {
+  displayLayout?: any,
+  //value: LayoutType,
+  style?: any,
+  children?: (item: LayoutItemType) => DisplayItemType;
+  onChange?: (layout: LayoutType) => void,
+  onNew?: (data: any) => { [customKey: string]: any },
+}
+
+type StateType = {
   panels: { [key: string]: PanelProps },
 }
 
-export class Frame extends React.Component implements IApplicationFrame {
+export class Frame extends React.Component {
   props: PropsType
   state: StateType
 
   componentWillMount() {
-    this.loadDisplayLayout(Application.layout.displayLayout)
+    this.loadDisplayLayout(this.props.displayLayout)
   }
-  componentDidMount() {
-    Application.layout.registerFrame(this)
-  }
-  componentWillUnmount() {
-    Application.layout.registerFrame()
-  }
-  getComponent(): React.Component {
-    return this
+  componentWillReceiveProps(nextProps) {
+    if (this.props.displayLayout !== nextProps.displayLayout) {
+      this.loadDisplayLayout(nextProps.displayLayout)
+    }
   }
   loadDisplayLayout = (displayLayout) => {
     const panels = {}

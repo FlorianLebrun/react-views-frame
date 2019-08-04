@@ -5,7 +5,8 @@ import { WindowInstance, WindowClass, WindowOptions } from "./Window"
 export interface IApplicationFrame {
   attachWindow(wnd: WindowInstance, dockId: string, foreground?: boolean): void;
   dettachWindow(wnd: WindowInstance): void;
-  getComponent(): React.Component;
+  getFrameComponent(): React.Component;
+  renderFrameComponent(): void;
 }
 
 export class PluginContext {
@@ -16,24 +17,12 @@ export class PluginContext {
   focused: WindowInstance = null
   frame: IApplicationFrame = null
 
-  splashComponent: typeof React.Component
-  displayLayout: Object
-  windowLoaded: boolean = false
   uidGenerator: number = 0
 
   constructor() {
     window.addEventListener("beforeunload", this.unmountPlugins)
   }
-  registerFrame(frame: IApplicationFrame) {
-    this.frame = frame
-    frame && Object.keys(this.windows).forEach(key => {
-      const wnd = this.windows[key]
-      frame.attachWindow(wnd, wnd.dockId)
-      wnd.render()
-    })
-  }
   mountPlugins = () => {
-    this.windowLoaded = true
     const pluginNames = Object.keys(this.pluginClasses)
 
     // Connect plugins
@@ -51,10 +40,6 @@ export class PluginContext {
       const plugin = this.plugins[name]
       plugin.pluginWillUnmount()
     })
-  }
-  configureLayout(description: any) {
-    this.splashComponent = description.splashComponent
-    this.displayLayout = description.displayLayout
   }
   mapPlugin(name) {
     let pluginClass = this.pluginClasses[name]

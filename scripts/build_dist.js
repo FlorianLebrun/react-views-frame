@@ -2,6 +2,8 @@ const child_process = require("child_process")
 const fs = require("fs")
 const Path = require("path")
 
+const package_json = JSON.parse(fs.readFileSync("./package.json").toString())
+
 function makeDirSync(...paths) {
   let path = paths[0]
   if (paths.length > 1) path = Path.join.apply(Path, paths)
@@ -27,41 +29,64 @@ function removeDirSync(dir_path) {
 }
 
 function copyFileSync(target, source) {
-  var targetFile = target;
+  try {
+    var targetFile = target;
 
-  //if target is a directory a new file with the same name will be created
-  if (fs.existsSync(target)) {
-    if (fs.lstatSync(target).isDirectory()) {
-      targetFile = Path.join(target, Path.basename(source));
+    //if target is a directory a new file with the same name will be created
+    if (fs.existsSync(target)) {
+      if (fs.lstatSync(target).isDirectory()) {
+        targetFile = Path.join(target, Path.basename(source));
+      }
     }
-  }
 
-  fs.writeFileSync(targetFile, fs.readFileSync(source));
+    fs.writeFileSync(targetFile, fs.readFileSync(source));
+  } catch (e) {
+    console.error(e.message)
+  }
 }
 
 function copyDirSync(target, source, filter) {
-  var files = [];
+  try {
+    var files = [];
 
-  //check if folder needs to be created or integrated
-  makeDirSync(target)
+    //check if folder needs to be created or integrated
+    makeDirSync(target)
 
-  //copy
-  if (fs.lstatSync(source).isDirectory()) {
-    files = fs.readdirSync(source)
-    files.forEach(function (filename) {
-      var srcfile = Path.join(source, filename)
-      var dstfile = Path.join(target, filename)
-      if (fs.lstatSync(srcfile).isDirectory()) {
-        copyDirSync(dstfile, srcfile, filter)
-      }
-      else if (!filter || filter(filename)) {
-        copyFileSync(dstfile, srcfile)
-      }
-    });
+    //copy
+    if (fs.lstatSync(source).isDirectory()) {
+      files = fs.readdirSync(source)
+      files.forEach(function (filename) {
+        var srcfile = Path.join(source, filename)
+        var dstfile = Path.join(target, filename)
+        if (fs.lstatSync(srcfile).isDirectory()) {
+          copyDirSync(dstfile, srcfile, filter)
+        }
+        else if (!filter || filter(filename)) {
+          copyFileSync(dstfile, srcfile)
+        }
+      });
+    }
+  } catch (e) {
+    console.error(e.message)
   }
 }
 
+// 1. Clean 'dist' directory
 removeDirSync("./dist")
-copyDirSync("./dist", "./src/lib", (name) => name.indexOf(".css") > 0)
-child_process.execSync("tsc --project tsconfig.lib.json")
+makeDirSync("./dist")
 
+// 2. Copy 'package.json'
+fs.writeFileSync("./dist/package.json", JSON.stringify({
+  ...package_json,
+  private: false,
+}, null, 2))
+
+// 2. Copy documentation
+copyFileSync("./dist/readme.md", "./readme.md")
+copyDirSync("./dist/doc", "./doc")
+
+// 3. Copy css files
+copyDirSync("./dist", "./src/lib", (name) => name.indexOf(".css") > 0)
+
+// 4. Generate js files
+child_process.execSync("tsc --project tsconfig.lib.json")

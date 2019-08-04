@@ -169,7 +169,14 @@ export class WindowInstance extends Listenable {
   }
   render() {
     const { frame } = Application.layout
-    frame && ReactDOM.unstable_renderSubtreeIntoContainer(frame.getComponent(), React.createElement(this.windowClass.component, this.parameters), this.node)
+    const parentComponent = frame && frame.getFrameComponent()
+    if (parentComponent) {
+      ReactDOM.unstable_renderSubtreeIntoContainer(
+        parentComponent,
+        React.createElement(this.windowClass.component, this.parameters),
+        this.node
+      )
+    }
   }
 }
 
