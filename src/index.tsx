@@ -1,12 +1,16 @@
 import ReactDOM from "react-dom"
 import "babel-polyfill"
-import Application, { Addons } from "./lib"
+import Application from "./lib"
+import NotificationAddon from "./lib/addons/notification"
+import PopupAddon from "./lib/addons/popup"
+import FetchAddon from "./lib/addons/fetch"
+import WindowsFrameAddon from "./lib/addons/windows-frame"
 import "./test-plugin"
 import "bootstrap/dist/css/bootstrap.min.css"
 
-Application.installPlugin(Addons.Notification)
-Application.installPlugin(Addons.Popup)
-Application.installPlugin(Addons.Fetch, {
+Application.installPlugin(NotificationAddon)
+Application.installPlugin(PopupAddon)
+Application.installPlugin(FetchAddon, {
   endpoints: [
     {
       pattern: /^app:.*/,
@@ -25,7 +29,7 @@ Application.installPlugin(Addons.Fetch, {
   ],
 })
 
-Application.installPlugin(Addons.WindowsFrame, {
+Application.installPlugin(WindowsFrameAddon, {
   displayLayout: {
     "#": {
       type: "#",

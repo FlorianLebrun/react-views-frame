@@ -1,6 +1,6 @@
 import React from "react"
-import { HtmlGrabReaction } from "./event.utils"
-import "./ResizableBorder.css"
+import { HtmlGrabReaction } from "../event.utils"
+import "./index.css"
 
 type PropsType = {
   transformDelta: Function,

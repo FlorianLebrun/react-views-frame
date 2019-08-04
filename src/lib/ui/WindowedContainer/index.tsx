@@ -1,8 +1,9 @@
 import React from "react"
 import { Application } from "../../application"
-import PanelComponents, { PanelProps } from "./FramePanels"
+import { PanelProps } from "./PanelButton"
+import PanelComponents from "./Panels"
 import { WindowInstance } from "../../layout/Window"
-import "./frame.css"
+import "./index.css"
 
 type DisplayItemType = {
   header?: any,
@@ -29,7 +30,7 @@ type StateType = {
   panels: { [key: string]: PanelProps },
 }
 
-export class Frame extends React.Component {
+export default class WindowedContainer extends React.Component {
   props: PropsType
   state: StateType
 

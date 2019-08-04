@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import openContextualMenu from "../../ui-modules/openContextualMenu"
+import openContextualMenu from "../openContextualMenu"
 import { Application } from "../../application"
 const classItem = "hoverbox hoverbox-highlight cursor-pointer"
 

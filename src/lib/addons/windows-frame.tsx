@@ -2,12 +2,12 @@ import React from "react"
 import { Application } from "../application"
 import { PluginInstance, WindowInstance } from "../layout"
 import { IApplicationFrame } from "../layout/Context";
-import { Frame } from "../ui-modules/WindowedContainer"
+import WindowedContainer from "../ui/WindowedContainer"
 
 export default {
   name: "windows-frame",
   component: class extends PluginInstance implements IApplicationFrame {
-    frame: Frame
+    frame: WindowedContainer
     displayLayout: any
 
     pluginWillMount(options) {
@@ -26,7 +26,7 @@ export default {
       }
     }
     renderFrameComponent() {
-      return (<Frame ref={this.registerFrameComponent} displayLayout={this.displayLayout} />)
+      return (<WindowedContainer ref={this.registerFrameComponent} displayLayout={this.displayLayout} />)
     }
     getFrameComponent(): React.Component {
       return this.frame

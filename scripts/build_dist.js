@@ -77,8 +77,11 @@ makeDirSync("./dist")
 
 // 2. Copy 'package.json'
 fs.writeFileSync("./dist/package.json", JSON.stringify({
-  ...package_json,
-  private: false,
+  name: package_json.name,
+  version: package_json.version,
+  main: package_json.main,
+  dependencies: package_json.dependencies,
+  license: package_json.license,
 }, null, 2))
 
 // 2. Copy documentation
