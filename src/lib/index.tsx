@@ -3,6 +3,7 @@ import { Application, extendApplication } from "./application"
 import "./css"
 
 import { DragZone, DropZone, DragDropZone } from "./ui-modules/DragAndDrop"
+import { ResizableBorder } from "./ui-modules/ResizableBorder"
 import Split from "./ui-modules/Split"
 import Listener from "./ui-modules/Listener"
 import openContextualMenu from "./ui-modules/openContextualMenu"
@@ -27,6 +28,7 @@ export const UI = {
   DragZone,
   DropZone,
   DragDropZone,
+  ResizableBorder,
   Split,
   Listener,
   openContextualMenu,

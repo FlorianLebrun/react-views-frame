@@ -97,7 +97,6 @@ export class DragZone extends React.Component {
     draggedZone = null
   }
   render() {
-    // eslint-disable-next-line no-unused-vars
     const { onDragStart, onDragEnd, ...otherProps } = this.props
     return (
       <div
@@ -233,9 +232,7 @@ export class DropZone extends React.Component {
   }
   render() {
     const {
-      // eslint-disable-next-line no-unused-vars
       onSelect, onUnselect, onDrop, onDropMatch, selectedClassName,
-      // eslint-disable-next-line no-unused-vars
       highlightClassName, isDroppable, ...otherProps } = this.props
     return (
       <div
@@ -268,9 +265,7 @@ export class DragDropZone extends DropZone {
   }
   render() {
     const {
-      // eslint-disable-next-line no-unused-vars
       onSelect, onUnselect, onDrop, onDropMatch, selectedClassName,
-      // eslint-disable-next-line no-unused-vars
       highlightClassName, isDroppable, onDragStart, onDragEnd,
       ...otherProps
     } = this.props

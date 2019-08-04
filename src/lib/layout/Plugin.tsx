@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-use-before-define */
 import Listenable from "../modules/listenable"
 import { WindowClass } from "./Window"
 import { PluginContext } from "./Context"
@@ -178,7 +178,7 @@ export class PluginInstance extends Listenable {
   closeAllWindow: Function
 
   // Life Cycle management functions
-  pluginWillMount(parameters: { [key: string]: any }) { } // eslint-disable-line
+  pluginWillMount(parameters: { [key: string]: any }) { }
   pluginDidMount(parameters: { [key: string]: any }) { }
   pluginWillUnmount() { }
 

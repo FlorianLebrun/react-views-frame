@@ -1,11 +1,10 @@
-/* eslint-disable */
+/* eslint-disable no-use-before-define */
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
 import Listenable from "../modules/listenable"
 import { Application } from "../application"
 import { isInheritedOf } from "../utils"
 import { PluginClass, PluginInstance } from "./Plugin"
-import { PluginContext } from "./Context"
 
 export type WindowOptions = {
   title?: string,

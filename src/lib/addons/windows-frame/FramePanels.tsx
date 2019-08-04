@@ -1,8 +1,7 @@
-/* eslint-disable react/no-multi-comp */
-/* eslint-disable react/no-string-refs */
 import React, { Component } from "react"
 import { DropZone, DragDropZone } from "../../ui-modules/DragAndDrop"
-import { HtmlGrabReaction, stopEvent } from "../../ui-modules/event.utils"
+import { ResizableBorder } from "../../ui-modules/ResizableBorder"
+import { stopEvent } from "../../ui-modules/event.utils"
 import { Application } from "../../application"
 import { WindowInstance } from "../../layout"
 import { openFrameMenu } from "./FrameMenu"
@@ -159,37 +158,6 @@ class PanelBar extends Component {
 
 /** ******************************
 *********************************
-*** Panel Resizer
-*********************************
-*********************************/
-
-const CSS_panel_resizer_vertical = "WND_panel_resizer WND_panel_resizer_V"
-const CSS_panel_resizer_horizontal = "WND_panel_resizer WND_panel_resizer_H"
-
-export type PanelResizerPropsType = {
-  transformDelta: Function,
-  onResize: Function,
-  vertical?: boolean,
-}
-
-export class PanelResizer extends Component {
-  props: PanelResizerPropsType
-  handleMouseDown = (e) => {
-    new HtmlGrabReaction(e.target, e, this.handleMouseGrab)
-  }
-  handleMouseGrab = (e) => {
-    this.props.onResize(this.props.transformDelta(e))
-  }
-  render() {
-    return (<div
-      className={this.props.vertical ? CSS_panel_resizer_vertical : CSS_panel_resizer_horizontal}
-      onMouseDown={this.handleMouseDown}
-    />)
-  }
-}
-
-/** ******************************
-*********************************
 *** Panel Container
 *********************************
 *********************************/
@@ -312,7 +280,7 @@ export class SidePanelTop extends SidePanel {
     return (<div className={CSS_side_panel_horizontal}>
       <PanelBar panel={panel} frame={frame} />
       <SidePanelContainer ref={"container"} current={panel.current} size={size} />
-      <PanelResizer onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <ResizableBorder onResize={this.handleResize} transformDelta={this.transformDelta} />
       <div className="WND_panel_container_center">{this.props.children}</div>
     </div>)
   }
@@ -327,7 +295,7 @@ export class SidePanelBottom extends SidePanel {
     const size = panel.current ? panel.size : 0
     return (<div className={CSS_side_panel_horizontal}>
       <div className="WND_panel_container_center">{this.props.children}</div>
-      <PanelResizer onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <ResizableBorder onResize={this.handleResize} transformDelta={this.transformDelta} />
       <PanelBar panel={panel} frame={frame} />
       <SidePanelContainer ref={"container"} current={panel.current} size={size} />
     </div>)
@@ -344,7 +312,7 @@ export class SidePanelLeft extends SidePanel {
     return (<div className={CSS_side_panel_vertical}>
       <PanelBar vertical panel={panel} frame={frame} />
       <SidePanelContainer ref={"container"} vertical current={panel.current} size={size} />
-      <PanelResizer vertical onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <ResizableBorder vertical onResize={this.handleResize} transformDelta={this.transformDelta} />
       <div className="WND_panel_container_center">{this.props.children}</div>
     </div>)
   }
@@ -359,7 +327,7 @@ export class SidePanelRight extends SidePanel {
     const size = panel.current ? panel.size : 0
     return (<div className={CSS_side_panel_vertical}>
       <div className="WND_panel_container_center">{this.props.children}</div>
-      <PanelResizer vertical onResize={this.handleResize} transformDelta={this.transformDelta} />
+      <ResizableBorder vertical onResize={this.handleResize} transformDelta={this.transformDelta} />
       <SidePanelContainer ref={"container"} vertical current={panel.current} size={size} />
       <PanelBar vertical panel={panel} frame={frame} />
     </div>)

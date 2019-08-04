@@ -1,7 +1,6 @@
-/* eslint-disable react/no-string-refs */
 import React, { Component } from "react"
 
-import { PanelResizer } from "../addons/windows-frame/FramePanels"
+import { ResizableBorder } from "./ResizableBorder"
 
 /** ******************************
 *********************************
@@ -164,7 +163,7 @@ export default class Split extends Component {
 
       // Render resizer
       if (i < lastIndex) {
-        contents.push(<PanelResizer
+        contents.push(<ResizableBorder
           key={contents.length}
           onResize={this.handleResize(i)}
           transformDelta={this.transformDelta}

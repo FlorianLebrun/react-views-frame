@@ -24,29 +24,6 @@
   flex-direction: column;
 }
 
-
-/********************************
-*********************************
-*** Panel Resizer Classes
-*********************************
-*********************************/
-
-.WND_panel_resizer {
-  flex: 0 0 auto;
-  background-color: #123;
-}
-
-.WND_panel_resizer_V {
-  width: 5px;
-  cursor: w-resize;
-}
-
-.WND_panel_resizer_H {
-  height: 5px;
-  cursor: n-resize;
-}
-
-
 /********************************
 *********************************
 *** Panel Bar Classes

@@ -1,4 +1,3 @@
-/* eslint-disable no-eval */
 import base64 from "base-64"
 import Connector from "./Connector"
 
