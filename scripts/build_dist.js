@@ -79,9 +79,9 @@ makeDirSync("./dist")
 fs.writeFileSync("./dist/package.json", JSON.stringify({
   name: package_json.name,
   version: package_json.version,
-  main: package_json.main,
   dependencies: package_json.dependencies,
   license: package_json.license,
+  main: "./index.js",
 }, null, 2))
 
 // 2. Copy documentation
