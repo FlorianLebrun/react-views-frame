@@ -55,8 +55,9 @@ export class HtmlGrabReaction {
   deltaX: number
   deltaY: number
   onMouseGrab: Function
-  
-  constructor(element, event, onMouseGrab) {
+  onMouseRelease: Function
+
+  constructor(element: HTMLElement, event: any, onMouseGrab: Function, onMouseRelease?: Function) {
     stopEvent(event)
     this.element = element
     this.mouseX = event.screenX
@@ -64,6 +65,7 @@ export class HtmlGrabReaction {
     this.left = element.offsetLeft
     this.top = element.offsetTop
     this.onMouseGrab = onMouseGrab
+    this.onMouseRelease = onMouseRelease
     setCurrentGrabReaction(this)
   }
   move() {
@@ -82,6 +84,7 @@ export class HtmlGrabReaction {
     else this.move()
   }
   handleCompleted() {
+    if (this.onMouseRelease) this.onMouseRelease(this)
     removeCurrentGrabReaction(this)
   }
 }

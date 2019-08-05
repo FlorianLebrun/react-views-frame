@@ -1,22 +1,21 @@
 import React from "react"
 import Application from './lib'
 import "font-awesome/css/font-awesome.min.css"
+import LinearContainer from "./lib/ui/LinearContainer";
 
 
 export class ToolboxX extends Application.WindowComponent {
-  handleClick = () => {
-    //Application.redirect("https://www.qwant.com/?q=js+postMessage&client=opensearch")
-    Application.openWindow("https://www.qwant.com/?q=js+postMessage&client=opensearch")
-  }
   render() {
-    return (<div>
-      <button onClick={this.handleClick}>
-        {"Message"}
-      </button>
-    </div>)
+    return (<LinearContainer value={[{ size: 2 }, { size: 1 }]} style={{ height: "100vh" }}>
+      {() => {
+        return {
+          header: "hello",
+          content: "world",
+        }
+      }}
+    </LinearContainer>)
   }
 }
-
 
 export class ToolboxY extends Application.WindowComponent {
   state = { counter: 0 }

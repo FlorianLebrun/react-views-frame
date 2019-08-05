@@ -1,23 +1,16 @@
-.wfs-resizer-bar {
-  position: relative;
-  background-color: #123;
-  min-width: 1px;
-  min-height: 1px;
+.wfs-linear-container {
+  display: flex;
+  background-color: rgba(0, 0, 255, 0.1);
 }
 
-.wfs-resizer-bar>div {
-  position: absolute;
-  /*background-color: rgba(255, 0, 255, 0.3);*/
-  cursor: row-resize;
-  top: -2px;
-  bottom: -2px;
-  left: -2px;
-  right: -2px;
+.wfs-linear-container.vertical {
+  flex-direction: row;
 }
 
-.wfs-resizer-bar>div:hover {
-  top: -5px;
-  bottom: -5px;
-  left: -5px;
-  right: -5px;
+.wfs-linear-container.horizontal {
+  flex-direction: column;
+}
+
+.wfs-linear-container>div {
+  flex: 1;
 }

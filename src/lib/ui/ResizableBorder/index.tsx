@@ -3,22 +3,29 @@ import { HtmlGrabReaction } from "../event.utils"
 import "./index.css"
 
 type PropsType = {
-  transformDelta: Function,
+  transformDelta?: Function,
   vertical?: boolean,
-  onResize: Function,
+  onResize?: Function,
+  onRelease?: Function,
 }
 
 export class ResizableBorder extends React.Component {
   props: PropsType
   handleMouseDown = (e) => {
-    new HtmlGrabReaction(e.target, e, this.handleMouseGrab)
+    new HtmlGrabReaction(e.target, e, this.handleMouseGrab, this.handleMouseRelease)
   }
   handleMouseGrab = (e) => {
-    this.props.onResize(this.props.transformDelta(e))
+    const { onResize, transformDelta, vertical } = this.props
+    onResize && onResize(transformDelta ? transformDelta(e) : (vertical ? e.deltaY : e.deltaX))
+  }
+  handleMouseRelease = (e) => {
+    const { onRelease, transformDelta, vertical } = this.props
+    onRelease && onRelease(transformDelta ? transformDelta(e) : (vertical ? e.deltaY : e.deltaX))
   }
   render() {
+    const { vertical } = this.props
     return (<div
-      className={this.props.vertical ? "wfs-resizer-border vertical" : "wfs-resizer-border horizontal"}
+      className={vertical ? "wfs-resizer-border vertical" : "wfs-resizer-border horizontal"}
       onMouseDown={this.handleMouseDown}
     >
       <div />
