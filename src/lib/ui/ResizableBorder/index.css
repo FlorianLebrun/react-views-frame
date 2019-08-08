@@ -1,9 +1,13 @@
 .wfs-resizer-border {
   position: relative;
-  background-color: #123;
-  min-width: 0.8px;
-  min-height: 0.8px;
 }
+.wfs-resizer-border.horizontal {
+  border-top: solid 1px #123;
+}
+.wfs-resizer-border.vertical {
+  border-left: solid 1px #123;
+}
+
 
 .wfs-resizer-border>div {
   position: absolute;
