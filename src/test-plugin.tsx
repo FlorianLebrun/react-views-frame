@@ -2,15 +2,21 @@ import React from "react"
 import Application from './lib'
 import "font-awesome/css/font-awesome.min.css"
 import LinearContainer from "./lib/ui/LinearContainer";
+import openContextualMenu from "./lib/ui/openContextualMenu";
 
 
 export class ToolboxX extends Application.WindowComponent {
+  handleMenu = (e) => {
+    openContextualMenu(this as any, e.currentTarget, (f) => {
+      return <div style={{ width: 200, height: 200 }}>{"hello"}</div>
+    })
+  }
   render() {
     return (<LinearContainer value={[{ size: 2 }, { size: 1 }]} style={{ height: "100vh" }}>
       {() => {
         return {
           header: "hello",
-          content: "world",
+          content: <div onMouseDown={this.handleMenu}>"world"</div>,
         }
       }}
     </LinearContainer>)

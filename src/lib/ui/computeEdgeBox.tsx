@@ -176,6 +176,21 @@ export function computeEdgeBox(position: string, element: HTMLElement, tracked: 
   }
 }
 
-export function computeEdgeBoxDOM(position: string, element: HTMLElement, trackedElement: HTMLElement, hostElement: HTMLElement): Object {
-  return computeEdgeBox(position, element, trackedElement.getBoundingClientRect(), hostElement.getBoundingClientRect())
+export function computeEdgeBoxDOM(position: string, element: HTMLElement, trackedElement: HTMLElement, hostElement?: HTMLElement): Object {
+  let hostRect
+  if (!hostElement) {
+    const hostWidth = document.documentElement.clientWidth
+    const hostHeight = document.documentElement.clientHeight
+    element.style.position = "fixed"
+    hostRect = {
+      left: 0,
+      right: hostWidth,
+      width: hostWidth,
+      top: 0,
+      bottom: hostHeight,
+      height: hostHeight,
+    }
+  }
+  else hostRect = hostElement.getBoundingClientRect()
+  return computeEdgeBox(position, element, trackedElement.getBoundingClientRect(), hostRect)
 }

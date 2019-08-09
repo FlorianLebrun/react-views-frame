@@ -4,7 +4,7 @@ import { computeEdgeBoxDOM } from "./computeEdgeBox"
 
 const stack = []
 
-export default function (parent: React.Component, target: HTMLElement, renderer: Function, position: string) {
+export default function (parent: React.Component, target: HTMLElement, renderer: Function, position?: string, className?: string) {
   console.assert(renderer instanceof Function)
   var resolve = null
 
@@ -21,9 +21,16 @@ export default function (parent: React.Component, target: HTMLElement, renderer:
   // Create popup node
   var node = document.createElement("div")
   node.style.visibility = "hidden"
-  node.className = "dropdown-menu cursor-pointer manual scroll-wrapper"
-  node.style.position = "absolute"
+  node.style.position = "fixed"
   node.style.zIndex = ((stackIndex + 1) * 100).toString()
+  if (className) {
+    node.className = className
+  }
+  else {
+    node.style.border = "1px solid #abc"
+    node.style.backgroundColor = "#fff"
+    node.style.padding = "5px"
+  }
 
   function clickOutside(e) {
     if (node) {
@@ -36,7 +43,7 @@ export default function (parent: React.Component, target: HTMLElement, renderer:
 
   function updatePosition() {
     if (node) {
-      computeEdgeBoxDOM(position, node, target, document.body)
+      computeEdgeBoxDOM(position, node, target)
       node.style.visibility = "visible"
       setTimeout(updatePosition, 25)
     }
