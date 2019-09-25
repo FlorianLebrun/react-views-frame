@@ -20,6 +20,10 @@ export default class Listenable extends EventEmitter {
     this[".status"] = "released"
     this.dispatchEvent("terminate")
   }
+  addEventListener(typeOrCallback: string | Function, callback?: Function) { }
+  removeEventListener(typeOrCallback: string | Function, callback?: Function) { }
+  dispatchEvent(type: string, data?: any) { }
+  executeEvent(type: string, data?: any): Promise<any> | null { return null }
 }
 
 Listenable.prototype.addEventListener = EventEmitter.addEventListener

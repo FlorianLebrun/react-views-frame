@@ -69,6 +69,7 @@ Application.declarePlugin({
   importPlugins: { console: "dev-console" },
   windows: {
     "toolbox-x": {
+      userOpenable: true,
       defaultTitle: "Tool Box 1 - Tool Box 1",
       defaultIcon: "bug",
       defaultDockId: "left",

@@ -53,7 +53,6 @@ export class SidePanelContainer extends Component {
   render() {
     const { current, vertical, size } = this.props
     const style = {
-      ...current && current.style,
       width: vertical ? (size + "%") : "auto",
       height: vertical ? "auto" : (size + "%"),
     }

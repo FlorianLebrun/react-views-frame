@@ -30,19 +30,40 @@ class FrameMenu extends Component {
       </div >)
     }, "right-down")
   }
+  getWindowsCount(): number {
+    let count = 0
+    const plugins = Application.layout.plugins
+    for (const pluginName in plugins) {
+      const plugin = plugins[pluginName]
+      const windows = plugin[".class"].windows
+      for (const name in windows) {
+        const { userOpenable } = windows[name]
+        if (userOpenable) count++
+      }
+    }
+    return count
+  }
   render() {
     const plugins = Application.layout.plugins
-    return (<div className="text-bold">
-      {Object.keys(plugins).map((name) => {
-        const plugin = plugins[name]
-        const menu = plugin[".class"].menu
-        return menu && menu.component && <menu.component key={name} plugin={plugin} onClose={this.props.close} />
-      })}
-      <div className={classItem} onClick={this.handleMenu}>
+    let menuItems = []
+    for (const name in plugins) {
+      const plugin = plugins[name]
+      const menu = plugin[".class"].menu
+      if (menu && menu.component) {
+        menuItems.push(<menu.component key={name} plugin={plugin} onClose={this.props.close} />)
+      }
+    }
+    if (this.getWindowsCount() > 0) {
+      menuItems.push(<div key="." className={classItem} onClick={this.handleMenu}>
         <i className="margin-left margin-right fa fa-fw fa-window-restore" />
         {"Windows"}
         <i className="fa fa-fw fa-caret-right margin-left" />
-      </div>
+      </div>)
+    }
+    return (<div className="text-bold">
+      {menuItems.length
+        ? menuItems
+        : <span style={{ color: "#aaa" }}>{"No Items"}</span>}
     </div>)
   }
 }

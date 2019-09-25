@@ -111,7 +111,6 @@ export class WindowInstance extends Listenable {
     this.icon = windowClass.defaultIcon
     this.dockId = windowClass.defaultDockId
     this.parameters = {
-      ...this.defaultParameters,
       instance: this,
       onChange: (parameters) => this.updateOptions({ parameters }),
     }

@@ -6,7 +6,6 @@ let dispatcheds: ListenersArray = null
 class EventEmitter {
   ".events": any[] // Events ready to be dispatched
   ".listeners": ListenersArray
-  [key: string]: any
 
   static addEventListener() {
 
