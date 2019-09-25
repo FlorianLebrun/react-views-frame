@@ -30,6 +30,7 @@ export default function (parent: React.Component, target: HTMLElement, renderer:
     node.style.border = "1px solid #abc"
     node.style.backgroundColor = "#fff"
     node.style.padding = "5px"
+    node.style.overflow = "auto"
   }
 
   function clickOutside(e) {

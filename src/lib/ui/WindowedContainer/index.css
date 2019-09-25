@@ -1,4 +1,3 @@
-
 /********************************
 *********************************
 *** Side Panel Classes
@@ -30,12 +29,11 @@
 *********************************
 *********************************/
 
-
 /* Bar (flex) */
 
-.WND_panel_bar {  
+.WND_panel_bar {
   font-size: 14px;
-  font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe WPC, Segoe UI, HelveticaNeue-Light, Ubuntu, Droid Sans, sans-serif;
   flex: 0 0 auto;
   display: flex;
   white-space: nowrap;
@@ -52,27 +50,54 @@
   width: 26px;
 }
 
-
 /* Bar button */
+
 @keyframes _highlight_danger_active {
-  0%  {background-color: #def;}
-  50%  {background-color: red;}
-  100%  {background-color: #def;}
+  0% {
+    background-color: #def;
+  }
+  50% {
+    background-color: red;
+  }
+  100% {
+    background-color: #def;
+  }
 }
+
 @keyframes _highlight_danger_inactive {
-  0%  {background-color: #123;}
-  50%  {background-color: red;}
-  100%  {background-color: #123;}
+  0% {
+    background-color: #123;
+  }
+  50% {
+    background-color: red;
+  }
+  100% {
+    background-color: #123;
+  }
 }
+
 @keyframes _highlight_warning_active {
-  0%  {background-color: #def;}
-  50%  {background-color: gold;}
-  100%  {background-color: #def;}
+  0% {
+    background-color: #def;
+  }
+  50% {
+    background-color: gold;
+  }
+  100% {
+    background-color: #def;
+  }
 }
+
 @keyframes _highlight_warning_inactive {
-  0%  {background-color: #123;}
-  50%  {background-color: gold;}
-  100%  {background-color: #123;}
+  0% {
+    background-color: #123;
+  }
+  50% {
+    background-color: gold;
+  }
+  100% {
+    background-color: #123;
+  }
 }
 
 .WND_panel_button_H {
@@ -83,7 +108,7 @@
   justify-content: center;
 }
 
-.WND_panel_button_H > div {
+.WND_panel_button_H>div {
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -111,6 +136,7 @@
   animation-name: _highlight_danger_inactive;
   animation-iteration-count: infinite;
 }
+
 .WND_panel_button_danger.current {
   animation-name: _highlight_danger_active;
 }
@@ -120,6 +146,7 @@
   animation-name: _highlight_warning_inactive;
   animation-iteration-count: infinite;
 }
+
 .WND_panel_button_warning.current {
   animation-name: _highlight_warning_active;
 }
@@ -130,17 +157,13 @@
 }
 
 .WND_panel_button.focused {
-  background-image: linear-gradient(to bottom,
-  gold 0px,
-  gold 3px,
-  transparent 3px);
+  background-image: linear-gradient(to bottom, gold 0px, gold 3px, transparent 3px);
 }
 
 .WND_panel_button:hover {
   background-color: #def;
   color: #567;
 }
-
 
 /* Menu unwinder button */
 
@@ -173,7 +196,6 @@
   color: #def;
 }
 
-
 /********************************
 *********************************
 *** Panel Container Classes
@@ -201,7 +223,7 @@
 }
 
 .WND_panel_container {
-  outline:none;
+  outline: none;
 }
 
 .WND_panel_container_splash {
@@ -209,32 +231,30 @@
 }
 
 div::-webkit-scrollbar {
-  width: 10px;
-  background-color: #bcd;
-}
-
-div::-webkit-scrollbar:horizontal {
-  height: 10px;
-}
-
-div::-webkit-scrollbar-track {
-  border: 1px #789 solid;
-  border-radius: 10px;
-  -webkit-box-shadow: 0 0 6px #cde inset;
+  width: 6px;
+  height: 12px;
+  background-color: transparent;
 }
 
 div::-webkit-scrollbar-thumb {
-  background-color: #567;
-  border: 1px solid #012;
-  border-radius: 16px;
+  background-color: #cde;
+  border-radius: 1px;
+  border: 0;
+  box-shadow: unset;
 }
 
 div::-webkit-scrollbar-thumb:hover {
-  background-color: #678;
-  border: 1px solid #234;
+  background-color: #abc;
 }
 
 div::-webkit-scrollbar-thumb:active {
-  background-color: #456;
-  border: 1px solid #234;
+  background-color: #789;
+  border: 1px solid #456;
+}
+
+div::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 2px;
+  border: 0;
+  box-shadow: unset;
 }

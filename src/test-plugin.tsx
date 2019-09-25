@@ -12,11 +12,15 @@ export class ToolboxX extends Application.WindowComponent {
     })
   }
   render() {
+    const content = []
+    for (let i = 0; i < 100; i++) {
+      content.push(<div key={i} onMouseDown={this.handleMenu}>{"01234567890123456789012345678901234567890123456789"}</div>)
+    }
     return (<LinearContainer value={[{ size: 2 }, { size: 1 }]} style={{ height: "100vh" }}>
       {() => {
         return {
           header: "hello",
-          content: <div onMouseDown={this.handleMenu}>"world"</div>,
+          content,
         }
       }}
     </LinearContainer>)
