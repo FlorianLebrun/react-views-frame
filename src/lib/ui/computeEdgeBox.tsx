@@ -178,7 +178,7 @@ export function computeEdgeBox(position: string, element: HTMLElement, tracked: 
   }
 }
 
-export function computeEdgeBoxDOM(position: string, element: HTMLElement, trackedElement: HTMLElement, hostElement?: HTMLElement): Object {
+export function computeEdgeBoxDOM(position: string, element: HTMLElement, trackedElement: Element, hostElement?: HTMLElement): Object {
   let hostRect
   if (!hostElement) {
     const hostWidth = document.documentElement.clientWidth

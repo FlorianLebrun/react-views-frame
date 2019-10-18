@@ -14,26 +14,40 @@ type StyleType = { [key: string]: string }
 
 const stack = []
 
+const stopableEvents = ["click", "dbclick", "contextmenu"]
+
 let defaultClassName = ""
 
 let defaultStyle: StyleType = {
   border: "1px solid #abc",
   backgroundColor: "#fff",
+  padding: "5px 0 5px 0",
+  minWidth: "150px",
   overflow: "auto",
 }
 
 export const Menu = {
   Item(props: ItemPropsType) {
-    const { icon, title, children, onClick } = props
-    let onMouseEnter
+    let { icon, title, children, onClick } = props
+    let onMouseEnter, onMouseLeave
     if (children) {
+      let closeCallback
       onMouseEnter = (e) => {
         openContextualMenu(this, e.currentTarget, (f) => {
+          closeCallback = f
           return children
         })
       }
+      onMouseLeave = () => {
+        closeCallback && closeCallback()
+      }
+      if (!onClick) {
+        onClick = (e) => {
+          openContextualMenu(this, e.currentTarget as HTMLElement, () => children)
+        }
+      }
     }
-    return <div className="raf-menu-item" onClick={onClick} onMouseEnter={onMouseEnter}>
+    return <div className="raf-menu-item" onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <div>{icon}</div>
       <div>{title}</div>
     </div>
@@ -48,14 +62,35 @@ export function setDefaultMenuStyle(className?: string, style?: StyleType) {
   defaultClassName = className || defaultClassName
 }
 
-export default function openContextualMenu(parent: React.Component, target: HTMLElement, renderer: Function, position?: PositionType, className?: string, style?: StyleType) {
+export default function openContextualMenu(parent: React.Component, target: Element | UIEvent | React.Component, renderer: Function, position?: PositionType, className?: string, style?: StyleType) {
   console.assert(renderer instanceof Function)
   var resolve = null
+
+  // Determine tracked element
+  var tracked: Element
+  if (target instanceof Object) {
+    if (target instanceof Element) {
+      tracked = target
+    }
+    else if (target["currentTarget"] instanceof Element) {
+      if (stopableEvents.indexOf(target["type"]) >= 0) {
+        if (target["stopPropagation"] instanceof Function) target["stopPropagation"]()
+        if (target["preventDefault"] instanceof Function) target["preventDefault"]()
+      }
+      tracked = target["currentTarget"]
+    }
+    else {
+      tracked = ReactDOM.findDOMNode(target as any) as Element
+    }
+  }
+  else {
+    throw new Error("target is required")
+  }
 
   // Purge top of stack popup
   var stackIndex = 0
   while (stackIndex < stack.length) {
-    if (!stack[stackIndex].node.contains(target)) {
+    if (!stack[stackIndex].node.contains(tracked)) {
       stack[stackIndex].close()
       break
     }
@@ -81,7 +116,7 @@ export default function openContextualMenu(parent: React.Component, target: HTML
 
   function updatePosition() {
     if (node) {
-      computeEdgeBoxDOM(position, node, target)
+      computeEdgeBoxDOM(position, node, tracked)
       node.style.visibility = "visible"
       setTimeout(updatePosition, 25)
     }
@@ -110,7 +145,7 @@ export default function openContextualMenu(parent: React.Component, target: HTML
   // Append popup in document on top of stack
   document.body.appendChild(node)
   document.body.addEventListener("mousedown", clickOutside)
-  computeEdgeBoxDOM(position, node, target, document.body)
+  computeEdgeBoxDOM(position, node, tracked, document.body)
   stack.push({ node, close })
 
   // Render popup on node
