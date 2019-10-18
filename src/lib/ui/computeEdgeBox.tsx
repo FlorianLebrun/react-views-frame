@@ -150,7 +150,7 @@ function computeVerticalEdgeBox(position: number, element: HTMLElement, tracked:
   }
 }
 
-const positionsMap: { [key: string]: number } = {
+const positionsMap = {
   "down-left": 1,
   "down-right": 5,
   "up-left": 3,
@@ -160,6 +160,8 @@ const positionsMap: { [key: string]: number } = {
   "right-up": 4,
   "right-down": 0,
 }
+
+export type PositionType = keyof typeof positionsMap
 
 // Position description:
 // - Axis => (0) horizontal, (1) vertical

@@ -1,0 +1,35 @@
+.raf-menu-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.raf-menu-item:hover {
+  background-color: #eee;
+}
+
+.raf-menu-item> :first-child {
+  display: flex;
+  flex-direction: row;
+  flex: 0;
+  min-width: 24px;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.raf-menu-item> :first-child>* {
+  flex: 0;
+}
+
+.raf-menu-item> :last-child {
+  flex: 1;
+  padding: 0 4px 0 3px;
+}
+
+.raf-menu-separator {
+  border-top: 1px solid #eee;
+  margin: 5px;
+}

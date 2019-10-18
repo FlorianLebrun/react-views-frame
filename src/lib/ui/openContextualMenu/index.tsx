@@ -1,10 +1,54 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { computeEdgeBoxDOM } from "./computeEdgeBox"
+import { computeEdgeBoxDOM, PositionType } from "../computeEdgeBox"
+import "./style.css"
+
+type ItemPropsType = {
+  icon?: any
+  title?: any
+  children?: any
+  onClick?: (event: React.SyntheticEvent) => void
+}
+
+type StyleType = { [key: string]: string }
 
 const stack = []
 
-export default function (parent: React.Component, target: HTMLElement, renderer: Function, position?: string, className?: string) {
+let defaultClassName = ""
+
+let defaultStyle: StyleType = {
+  border: "1px solid #abc",
+  backgroundColor: "#fff",
+  overflow: "auto",
+}
+
+export const Menu = {
+  Item(props: ItemPropsType) {
+    const { icon, title, children, onClick } = props
+    let onMouseEnter
+    if (children) {
+      onMouseEnter = (e) => {
+        openContextualMenu(this, e.currentTarget, (f) => {
+          return children
+        })
+      }
+    }
+    return <div className="raf-menu-item" onClick={onClick} onMouseEnter={onMouseEnter}>
+      <div>{icon}</div>
+      <div>{title}</div>
+    </div>
+  },
+  Separator() {
+    return <div className="raf-menu-separator" />
+  },
+}
+
+export function setDefaultMenuStyle(className?: string, style?: StyleType) {
+  defaultStyle = style || defaultStyle
+  defaultClassName = className || defaultClassName
+}
+
+export default function openContextualMenu(parent: React.Component, target: HTMLElement, renderer: Function, position?: PositionType, className?: string, style?: StyleType) {
   console.assert(renderer instanceof Function)
   var resolve = null
 
@@ -20,18 +64,11 @@ export default function (parent: React.Component, target: HTMLElement, renderer:
 
   // Create popup node
   var node = document.createElement("div")
+  node.className = className || defaultClassName
+  Object.assign(node.style, style || defaultStyle)
   node.style.visibility = "hidden"
   node.style.position = "fixed"
   node.style.zIndex = ((stackIndex + 1) * 100).toString()
-  if (className) {
-    node.className = className
-  }
-  else {
-    node.style.border = "1px solid #abc"
-    node.style.backgroundColor = "#fff"
-    node.style.padding = "5px"
-    node.style.overflow = "auto"
-  }
 
   function clickOutside(e) {
     if (node) {
