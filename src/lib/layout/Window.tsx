@@ -19,6 +19,7 @@ export type ParameterLink = {
 }
 
 export class WindowClass {
+  classId: string
   name: string
   overflow: string
   keepAlive: boolean
@@ -35,11 +36,25 @@ export class WindowClass {
 
   constructor(name: string, desc: any, pluginClass: PluginClass) {
     for (const key in desc) this[key] = desc[key]
+    this.classId = pluginClass.name + ":" + name
     this.name = name
     this.overflow = desc.overflow || "auto"
     this.pluginClass = pluginClass
     console.assert(isInheritedOf(this.component, WindowComponent),
       "Window '", this.name, "' shall be based on WindowComponent")
+  }
+  getDefaultDockId() {
+    const { windowsDocks } = this.pluginClass.context
+    return windowsDocks[this.classId] || this.defaultDockId
+  }
+  setDefaultDockId(defaultDockId) {
+    const { windowsDocks } = this.pluginClass.context
+    if (this.defaultDockId !== defaultDockId) {
+      windowsDocks[this.classId] = defaultDockId
+    }
+    else {
+      delete windowsDocks[this.classId]
+    }
   }
   addLink(pluginName: string, key: string, path: string) {
     if (!this.links) this.links = {}
@@ -109,7 +124,7 @@ export class WindowInstance extends Listenable {
     Application.layout.windows[windowId] = this
     this.title = windowClass.defaultTitle
     this.icon = windowClass.defaultIcon
-    this.dockId = windowClass.defaultDockId
+    this.dockId = windowClass.getDefaultDockId()
     this.parameters = {
       instance: this,
       onChange: (parameters) => this.updateOptions({ parameters }),

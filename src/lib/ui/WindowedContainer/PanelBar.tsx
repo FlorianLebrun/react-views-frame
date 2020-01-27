@@ -4,6 +4,7 @@ import { Application } from "../../application"
 import { openFrameMenu } from "./Menu"
 import PanelButton, { PanelProps } from "./PanelButton"
 import WindowedContainer from "../WindowedContainer"
+import { WindowInstance } from "../../layout"
 
 type PropsType = {
   panel: PanelProps,
@@ -38,7 +39,8 @@ export default class PanelBar extends Component {
   }
   handleDropWindow = (data) => {
     if (data["window"]) {
-      const wnd = Application.layout.getWindowInstance(data.window.id)
+      const wnd: WindowInstance = Application.layout.getWindowInstance(data.window.id)
+      wnd.windowClass.setDefaultDockId(this.props.panel.id)
       wnd && Application.layout.dockWindow(wnd, this.props.panel.id, true)
     }
   }

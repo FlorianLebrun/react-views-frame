@@ -89,13 +89,15 @@ export default class Storable extends Listenable {
     return false
   }
   terminateState() {
-    super.terminateState()
+    this[".listeners"] = null
+    this.dispatchEvent("terminate")
     this.forceSave()
     this.storableWillUnmount()
     delete globalStorage[this.$$storeUid]
   }
   deleteState() {
-    super.terminateState()
+    this[".listeners"] = null
+    this.dispatchEvent("terminate")
     window.localStorage.removeItem(this.$$storeUid)
     this.storableWillUnmount()
     delete globalStorage[this.$$storeUid]

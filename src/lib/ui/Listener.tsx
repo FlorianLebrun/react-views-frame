@@ -1,6 +1,5 @@
 import React from "react"
 import Listenable from "../modules/listenable"
-import EventEmitter from "../modules/event-emitter";
 
 export type PropsType = {
   object: Listenable,
@@ -14,19 +13,19 @@ export default class Listener extends React.Component {
 
   componentWillMount() {
     const { object } = this.props
-    object && EventEmitter.addEventListener.call(object, this.handleChange)
+    object && object.addEventListener(this.handleChange)
   }
   componentWillReceiveProps(nextProps) {
     const nextObject = nextProps.object
     const prevObject = this.props.object
     if (nextObject !== prevObject) {
-      prevObject && EventEmitter.removeEventListener.call(prevObject, this.handleChange)
-      nextObject && EventEmitter.addEventListener.call(nextObject, this.handleChange)
+      prevObject && prevObject.removeEventListener(this.handleChange)
+      nextObject && nextObject.addEventListener(this.handleChange)
     }
   }
   componentWillUnmount() {
     const { object } = this.props
-    object && EventEmitter.removeEventListener.call(object, this.handleChange)
+    object && object.removeEventListener(this.handleChange)
   }
   handleChange = (type, data1, data2) => {
     if (type === "change") {

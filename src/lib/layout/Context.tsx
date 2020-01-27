@@ -2,6 +2,8 @@ import React from "react"
 import { PluginInstance, PluginClass } from "./Plugin"
 import { WindowInstance, WindowClass, WindowOptions } from "./Window"
 
+const windowsDocks_Key = "[react-application-frame]#windows-docks"
+
 export interface IApplicationFrame {
   attachWindow(wnd: WindowInstance, dockId: string, foreground?: boolean): void;
   dettachWindow(wnd: WindowInstance): void;
@@ -12,6 +14,7 @@ export interface IApplicationFrame {
 export class PluginContext {
   pluginClasses: { [key: string]: PluginClass } = {}
   plugins: { [key: string]: PluginInstance } = {}
+  windowsDocks: { [windowClassId: string]: string } = {}
   windows: { [key: string]: WindowInstance } = {}
   docks: { [key: string]: Array<WindowInstance> } = {}
   focused: WindowInstance = null
@@ -20,6 +23,10 @@ export class PluginContext {
   uidGenerator: number = 0
 
   constructor() {
+    try {
+      const windowsDocks = JSON.parse(localStorage.getItem(windowsDocks_Key))
+      if (windowsDocks && typeof windowsDocks === "object") this.windowsDocks = windowsDocks
+    } catch (e) { }
     window.addEventListener("beforeunload", this.unmountPlugins)
   }
   mountPlugins = () => {
@@ -36,6 +43,7 @@ export class PluginContext {
     })
   }
   unmountPlugins = () => {
+    localStorage.setItem(windowsDocks_Key, JSON.stringify(this.windowsDocks))
     Object.keys(this.plugins).forEach(name => {
       const plugin = this.plugins[name]
       plugin.pluginWillUnmount()
