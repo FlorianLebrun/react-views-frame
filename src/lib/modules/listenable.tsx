@@ -138,7 +138,14 @@ export default class Listenable {
 
     return Promise.all(promises)
   }
+  
+  static setState(): void;
+  static setState(key: string, value: any): void;
+  static setState(values: { [key: string]: any }): void;
+  static setState() {}
 }
+
+Listenable.setState = Listenable.prototype.setState
 
 function dispatchStateEvent(key, value) {
   if (this[key] !== value) {
