@@ -41,7 +41,7 @@ function copyFileSync(target, source) {
 
     fs.writeFileSync(targetFile, fs.readFileSync(source));
   } catch (e) {
-    console.error(e.message)
+    console.error("copyFileSync:", e.message)
   }
 }
 
@@ -67,7 +67,7 @@ function copyDirSync(target, source, filter) {
       });
     }
   } catch (e) {
-    console.error(e.message)
+    console.error("copyDirSync:", e.message)
   }
 }
 

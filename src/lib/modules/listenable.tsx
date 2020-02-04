@@ -3,6 +3,12 @@ type ListenersArray = Array<Function | string>[]
 
 let dispatcheds: ListenersArray = null
 
+export type ListenableContexts = {
+  [contextName: string]: any
+}
+
+export type ListenableResult = Promise<Listenable> | Listenable | null
+
 export default class Listenable {
   ".events": any[] // Events ready to be dispatched
   ".listeners": ListenersArray
@@ -72,6 +78,31 @@ export default class Listenable {
     return false
   }
 
+  // Add object state listener, which will be called when a 'setState' is applied
+  // > When return Promise: 'addStateListener' shall be retry on the future provided listenable
+  // > When return Listenable: the truly listened object is returned, and 'removeFieldsListener' shall be applied on this returned object. 
+  synchronizeStateInContext(
+    contexts: ListenableContexts, // Collection of data, the listenable can access to it environment variable by key
+    writable: boolean, // true when a writable listenable is required for the resulting listenable
+    fields?: string[], // fields required in the resulting listenable
+    previousResult?: Listenable // give the previous listenable returned by this method (can help to optimize)
+  ): Promise<Listenable> | Listenable {
+    return this
+  }
+
+  // Add object state listener, which will be called when a 'setState' is applied
+  // > When return Promise: 'addStateListener' shall be retry on the future provided listenable
+  // > When return Listenable: the truly listened object is returned, and 'removeFieldsListener' shall be applied on this returned object. 
+  addStateListener(callback: Function, fields?: string[]): boolean {
+    return this.addEventListener("change", callback)
+  }
+
+  // Remove object state listener
+  removeStateListener(callback: Function): boolean {
+    return this.removeEventListener("change", callback)
+  }
+
+  // Mutate the object state
   setState(): void;
   setState(key: string, value: any): void;
   setState(values: { [key: string]: any }): void;
@@ -138,11 +169,11 @@ export default class Listenable {
 
     return Promise.all(promises)
   }
-  
+
   static setState(): void;
   static setState(key: string, value: any): void;
   static setState(values: { [key: string]: any }): void;
-  static setState() {}
+  static setState() { }
 }
 
 Listenable.setState = Listenable.prototype.setState

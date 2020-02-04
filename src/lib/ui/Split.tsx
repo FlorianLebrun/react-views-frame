@@ -108,7 +108,7 @@ export default class Split extends Component {
   handleResize = (index) => (delta) => {
     const { sizes, modes } = this
     if (modes[index] > 0) {
-      const csize = (this.refs[index] as any).clientHeight
+      const csize = (this.refs[index.toString()] as any).clientHeight
 
       // Update sizes
       const size = sizes[index]
@@ -155,7 +155,7 @@ export default class Split extends Component {
       // Render content
       contents.push(<div
         key={contents.length}
-        ref={i as any}
+        ref={i.toString()}
         style={this.styles[i]}
       >
         {item.content}
