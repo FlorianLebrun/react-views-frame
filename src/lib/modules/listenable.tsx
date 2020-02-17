@@ -1,5 +1,5 @@
 
-type ListenersArray = Array<Function | string>[]
+type ListenersArray = (Function | string)[]
 
 let dispatcheds: ListenersArray = null
 
@@ -51,31 +51,37 @@ export default class Listenable {
     if (!listeners) return false
     else if (dispatcheds === listeners) this[".listeners"] = listeners = listeners.slice()
 
-    // function removeEventListener(callback: Function)
-    //  - remove first matching listener of this callback
+    // Get listener information
+    let eventType: string
+    let callback: Function
     if (arguments.length === 1) {
-      let index = 0
-      while (true) {
-        index = listeners.indexOf(arguments[0], index)
-        if (index >= 0) listeners.splice(index, 2)
-        else break
-      }
+      eventType = null
+      callback = arguments[0]
     }
-    // function removeEventListener(type: string|null, callback: Function)
-    //  - remove every listener of this callback
-    if (arguments.length === 2) {
-      let index = 0
-      while (true) {
-        index = listeners.indexOf(arguments[1], index)
-        if (index < 0 || listeners[index] === arguments[0]) break
+    else if (arguments.length === 2) {
+      eventType = arguments[0]
+      callback = arguments[1]
+    }
+    else {
+      return false
+    }
+
+    // Search and remove listener
+    let index = 0
+    while (true) {
+      index = listeners.indexOf(callback, index)
+      if (index >= 0) {
+        if (listeners[index + 1] === eventType) {
+          listeners.splice(index, 2)
+          return true
+        }
         index++
       }
-      if (index >= 0) {
-        listeners.splice(index, 2)
-        return true
+      else {
+        console.warn(`removeEventListener(${eventType}) failed on:`, this)
+        return false
       }
     }
-    return false
   }
 
   // Add object state listener, which will be called when a 'setState' is applied
@@ -84,7 +90,7 @@ export default class Listenable {
   synchronizeStateInContext(
     contexts: ListenableContexts, // Collection of data, the listenable can access to it environment variable by key
     writable: boolean, // true when a writable listenable is required for the resulting listenable
-    fields?: string[], // fields required in the resulting listenable
+    fields?: string[] | boolean, // fields required in the resulting listenable
     previousResult?: Listenable // give the previous listenable returned by this method (can help to optimize)
   ): Promise<Listenable> | Listenable {
     return this
