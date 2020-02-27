@@ -45,12 +45,10 @@ export default class LinearContainer extends React.Component {
     if (vertical) {
       items[i_0].style.minWidth = (size_factor * (size_0 - this.delta)) + "%"
       items[i_1].style.minWidth = (size_factor * (size_1 + this.delta)) + "%"
-      console.log(items[i_0].style.minWidth, items[i_1].style.minWidth)
     }
     else {
       items[i_0].style.minHeight = (size_factor * (size_0 - this.delta)) + "%"
       items[i_1].style.minHeight = (size_factor * (size_1 + this.delta)) + "%"
-      console.log(items[i_0].style.minHeight, items[i_1].style.minHeight)
     }
   }
   onRelease = (i_1) => () => {
