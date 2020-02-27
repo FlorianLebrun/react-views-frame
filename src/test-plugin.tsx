@@ -6,6 +6,12 @@ import openContextualMenu from "./lib/ui/openContextualMenu";
 
 
 export class ToolboxX extends Application.WindowComponent {
+  state = {
+    layout: [
+      { size: 2 },
+      { size: 1 }
+    ]
+  }
   handleMenu = (e) => {
     openContextualMenu(this as any, e.currentTarget, (f) => {
       return <div style={{ width: 200, height: 200 }}>{"hello"}</div>
@@ -16,14 +22,19 @@ export class ToolboxX extends Application.WindowComponent {
     for (let i = 0; i < 100; i++) {
       content.push(<div key={i} onMouseDown={this.handleMenu}>{"01234567890123456789012345678901234567890123456789"}</div>)
     }
-    return (<LinearContainer value={[{ size: 2 }, { size: 1 }]} style={{ height: "100vh" }}>
+    return (<LinearContainer
+      vertical
+      style={{ height: "100vh" }}
+      value={this.state.layout}
+      onChange={layout => this.setState({ layout })}
+    >
       {() => {
         return {
           header: "hello",
           content,
         }
       }}
-    </LinearContainer>)
+    </LinearContainer >)
   }
 }
 
