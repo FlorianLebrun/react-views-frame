@@ -24,9 +24,11 @@
 }
 
 .wfs-linear-container> :nth-child(2n+1)>:first-child {
+  overflow: hidden;
   flex: 0;
 }
 
 .wfs-linear-container> :nth-child(2n+1)> :last-child {
+  overflow: auto;
   flex: auto 1 1;
 }
