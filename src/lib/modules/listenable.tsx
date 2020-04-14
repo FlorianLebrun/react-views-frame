@@ -13,8 +13,8 @@ export default class Listenable {
   ".events": any[] // Events ready to be dispatched
   ".listeners": ListenersArray
 
-  addEventListener(callback: Function): boolean;
-  addEventListener(eventType: string, callback: Function): boolean;
+  addEventListener(callback: Function): boolean
+  addEventListener(eventType: string, callback: Function): boolean
   addEventListener() {
 
     // Prepare listeners array
@@ -42,8 +42,8 @@ export default class Listenable {
     }
   }
 
-  removeEventListener(callback: Function): boolean;
-  removeEventListener(eventType: string, callback: Function): boolean;
+  removeEventListener(callback: Function): boolean
+  removeEventListener(eventType: string, callback: Function): boolean
   removeEventListener() {
 
     // Prepare listeners array
@@ -51,37 +51,40 @@ export default class Listenable {
     if (!listeners) return false
     else if (dispatcheds === listeners) this[".listeners"] = listeners = listeners.slice()
 
-    // Get listener information
-    let eventType: string
-    let callback: Function
+    // a. Remove all listeners of the given callback
     if (arguments.length === 1) {
-      eventType = null
-      callback = arguments[0]
-    }
-    else if (arguments.length === 2) {
-      eventType = arguments[0]
-      callback = arguments[1]
-    }
-    else {
-      return false
-    }
-
-    // Search and remove listener
-    let index = 0
-    while (true) {
-      index = listeners.indexOf(callback, index)
-      if (index >= 0) {
-        if (listeners[index + 1] === eventType) {
+      const callback = arguments[0]
+      let index = 0
+      while (true) {
+        index = listeners.indexOf(callback, index)
+        if (index >= 0) {
           listeners.splice(index, 2)
-          return true
+          index++
         }
-        index++
-      }
-      else {
-        console.warn(`removeEventListener(${eventType}) failed on:`, this)
-        return false
+        else return true
       }
     }
+    // b. Remove one listener of the given eventType+callback
+    else if (arguments.length === 2) {
+      const eventType = arguments[0]
+      const callback = arguments[1]
+      let index = 0
+      while (true) {
+        index = listeners.indexOf(callback, index)
+        if (index >= 0) {
+          if (listeners[index + 1] === eventType) {
+            listeners.splice(index, 2)
+            return true
+          }
+          index++
+        }
+        else {
+          console.warn(`removeEventListener(${eventType}) failed on:`, this)
+          return false
+        }
+      }
+    }
+    return false
   }
 
   // Add object state listener, which will be called when a 'setState' is applied
@@ -109,9 +112,9 @@ export default class Listenable {
   }
 
   // Mutate the object state
-  setState(): void;
-  setState(key: string, value: any): void;
-  setState(values: { [key: string]: any }): void;
+  setState(): void
+  setState(key: string, value: any): void
+  setState(values: { [key: string]: any }): void
   setState() {
     if (arguments.length === 0) {
       if (!this[".events"]) {
@@ -176,9 +179,9 @@ export default class Listenable {
     return Promise.all(promises)
   }
 
-  static setState(): void;
-  static setState(key: string, value: any): void;
-  static setState(values: { [key: string]: any }): void;
+  static setState(): void
+  static setState(key: string, value: any): void
+  static setState(values: { [key: string]: any }): void
   static setState() { }
 }
 

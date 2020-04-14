@@ -43,9 +43,10 @@ function BlurDropZone() {
 }
 
 type DragPropsType = {
-  onDragStart: Function,
-  onDragEnd: Function,
+  onDragStart?: Function,
+  onDragEnd?: Function,
   style?: any,
+  [key: string]: any,
 }
 
 function objectToDataTransfert(obj: { [key: string]: any }, dataTransfer: DataTransfer) {
