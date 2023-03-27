@@ -1,24 +1,32 @@
 {
-  "name": "react-application-frame",
-  "version": "0.2.1-v3",
+  "name": "@polycuber/react-views-frame",
+  "version": "2.0.0",
+  "type": "module",
   "private": true,
   "license": "MIT",
-  "dependencies": {
-    "base-64": "^0.1.0"
-  },
   "devDependencies": {
-    "@types/jest": "24.0.15",
-    "@types/node": "12.0.10",
-    "@types/react": "16.8.22",
-    "@types/react-dom": "16.8.4",
-    "babel-polyfill": "^6.26.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
-    "typescript": "3.5.2",
-    "bootstrap": "^3.3.7",
-    "font-awesome": "^4.7.0",
-    "react-notification-system": "^0.2.14"
+    "@types/react": "^18.0.29",
+    "@types/react-dom": "^18.0.11",
+    "css-loader": "^6.7.3",
+    "font-awesome": "~4.7.0",
+    "html-webpack-plugin": "~5.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.60.0",
+    "sass-loader": "^13.2.1",
+    "scripts": "./scripts",
+    "style-loader": "^3.3.2",
+    "ts-loader": "~9.4.2",
+    "ttypescript": "~1.5.13",
+    "typescript": "~4.8.0",
+    "typescript-transform-paths": "~3.3.1",
+    "webpack": "~5.76.3",
+    "webpack-cli": "~5.0.1",
+    "webpack-dev-server": "~4.13.1"
+  },
+  "optionalDependencies": {
+    "@polycuber/core": "../core/dist",
+    "@polycuber/devtool": "../../devtool-components-distrib"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -26,22 +34,15 @@
       "no-use-before-define": 0
     }
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "node ./scripts/build_dist.js",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "devtool build",
+    "start": "devtool build --watch",
+    "lib:serve": "webpack serve --config webpack.config.cjs",
+    "lib:build": "node ./scripts/build_dist.cjs"
+  },
+  "workspace": {
+    "sources": [
+      "./src"
+    ]
   }
 }

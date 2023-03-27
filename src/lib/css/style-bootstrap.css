@@ -1,9 +1,0 @@
-.dropdown-menu > li > a:focus,
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a.focus,
-.dropdown-menu > li > a:focus span,
-.dropdown-menu > li > a:hover span,
-.dropdown-menu > li > a.focus span {
-  background-color: #337ab7;
-  color: #fff !important;
-}

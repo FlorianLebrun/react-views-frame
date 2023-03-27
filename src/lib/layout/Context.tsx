@@ -1,14 +1,13 @@
 import React from "react"
-import { PluginInstance, PluginClass } from "./Plugin"
+import { PluginInstance, PluginClass, PluginDescriptor } from "./Plugin"
 import { WindowInstance, WindowClass, WindowOptions } from "./Window"
 
 const windowsDocks_Key = "[react-application-frame]#windows-docks"
 
 export interface IApplicationFrame {
-  attachWindow(wnd: WindowInstance, dockId: string, foreground?: boolean): void;
-  dettachWindow(wnd: WindowInstance): void;
-  getFrameComponent(): React.Component;
-  renderFrameComponent(): void;
+  attachWindow(wnd: WindowInstance, dockId: string, foreground?: boolean): void
+  dettachWindow(wnd: WindowInstance): void
+  getFrameComponent(): React.Component
 }
 
 export class PluginContext {
@@ -28,6 +27,16 @@ export class PluginContext {
       if (windowsDocks && typeof windowsDocks === "object") this.windowsDocks = windowsDocks
     } catch (e) { }
     window.addEventListener("beforeunload", this.unmountPlugins)
+  }
+  registerFrameComponent = (frame) => {
+    this.frame = frame
+    if (frame) {
+      for (const key in this.windows) {
+        const wnd = this.windows[key]
+        frame.attachWindow(wnd, wnd.dockId)
+        wnd.render()
+      }
+    }
   }
   mountPlugins = () => {
     const pluginNames = Object.keys(this.pluginClasses)
@@ -57,13 +66,13 @@ export class PluginContext {
     }
     return pluginClass
   }
-  installPlugin(description: any, parameters: any): PluginClass {
+  installPlugin(description: PluginDescriptor, parameters: any): PluginClass {
     const pluginClass = this.mapPlugin(description.name)
     pluginClass.setup(description, parameters)
     pluginClass.mount()
     return pluginClass
   }
-  declarePlugin(description: any, parameters: any): PluginClass {
+  declarePlugin(description: PluginDescriptor, parameters?: any): PluginClass {
     const pluginClass = this.mapPlugin(description.name)
     pluginClass.setup(description, parameters)
     return pluginClass
@@ -78,6 +87,9 @@ export class PluginContext {
   }
   dettachWindow(wnd: WindowInstance) {
     this.frame && this.frame.dettachWindow(wnd)
+  }
+  attachWindow(wnd: WindowInstance, dockId: string, foreground?: boolean): void {
+    this.frame && this.frame.attachWindow.apply(this.frame, arguments)
   }
   removeWindow(wnd: WindowInstance) {
     this.dettachWindow(wnd)

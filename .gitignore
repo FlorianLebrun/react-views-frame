@@ -13,3 +13,4 @@ intl/messages.json
 build
 .output
 package-lock.json
+.dev

@@ -1,3 +1,6 @@
+import React from "react"
+import WindowedContainer from "./components/WindowedContainer"
+import { PluginContext } from "./layout/Context"
 
 export type MenuType = {
   menu: any[],
@@ -6,8 +9,12 @@ export type MenuType = {
 
 export class ApplicationInstance {
   windowMenu: MenuType
-  [addonName: string]: any
+  displayLayout: any
+  layout = new PluginContext()
 
+  renderFrameComponent(displayLayout) {
+    return (<WindowedContainer ref={this.layout.registerFrameComponent} displayLayout={displayLayout} />)
+  }
   installFeatures(features: { [key: string]: any }, onlyFunction?: boolean) {
     Object.keys(features).forEach(key => {
       if (!onlyFunction || (features[key] instanceof Function)) {

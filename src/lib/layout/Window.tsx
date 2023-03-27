@@ -1,10 +1,21 @@
 /* eslint-disable no-use-before-define */
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
-import Listenable from "../modules/listenable"
+import Listenable from "../listenable"
 import { Application } from "../application"
-import { isInheritedOf } from "../utils"
+import { isInheritedOf } from "../components/isInheritedOf"
 import { PluginClass, PluginInstance } from "./Plugin"
+
+export type WindowDescriptor = {
+  layouting?: LayoutingType
+  keepAlive?: boolean
+  userOpenable?: boolean
+  parameters?: { [key: string]: boolean | string } | string[]
+  defaultTitle?: string
+  defaultDockId?: string
+  defaultParameters?: { [key: string]: any }
+  defaultIcon?: WindowIconType
+}
 
 export type WindowOptions = {
   title?: string,
@@ -18,38 +29,53 @@ export type ParameterLink = {
   [key: string]: string, // key -> path
 }
 
+export type LayoutingType
+  = "fitted" // First element is forced to the window size, other are ejected
+  | "flexible" // Elements are set in a flex column dipslay
+  | "undefined" // !Error
+
+export type WindowComponentType = new () => WindowComponent
+
+export type WindowIconType = Function | React.ReactElement | string
+
+export type WindowAnimationType = {
+  mode: string
+  duration: number
+  timer?: any
+}
+
 export class WindowClass {
   classId: string
   name: string
-  overflow: string
-  keepAlive: boolean
   pluginClass: PluginClass
-  component: typeof WindowComponent // constructor of WindowComponent
-  parameters: { [key: string]: any }
-  defaultTitle: string
-  defaultDockId: string
-  defaultParameters: Object
-  defaultIcon: Function
+  component: WindowComponentType // constructor of WindowComponent
+  descriptor: WindowDescriptor
 
+  parameters: { [key: string]: string }
   windows: { [key: string]: WindowClass }
   links: { [key: string]: ParameterLink }
 
-  constructor(name: string, desc: any, pluginClass: PluginClass) {
-    for (const key in desc) this[key] = desc[key]
+  constructor(name: string, desc: WindowDescriptor, component: WindowComponentType, pluginClass: PluginClass) {
     this.classId = pluginClass.name + ":" + name
     this.name = name
-    this.overflow = desc.overflow || "auto"
+    this.component = component
+    this.descriptor = {
+      layouting: "undefined",
+      ...component['Descriptor'],
+      ...desc,
+    }
+    this.parameters = this.descriptor.parameters as any
     this.pluginClass = pluginClass
     console.assert(isInheritedOf(this.component, WindowComponent),
       "Window '", this.name, "' shall be based on WindowComponent")
   }
   getDefaultDockId() {
     const { windowsDocks } = this.pluginClass.context
-    return windowsDocks[this.classId] || this.defaultDockId
+    return windowsDocks[this.classId] || this.descriptor.defaultDockId
   }
   setDefaultDockId(defaultDockId) {
     const { windowsDocks } = this.pluginClass.context
-    if (this.defaultDockId !== defaultDockId) {
+    if (this.descriptor.defaultDockId !== defaultDockId) {
       windowsDocks[this.classId] = defaultDockId
     }
     else {
@@ -107,23 +133,24 @@ export class WindowInstance extends Listenable {
   // Options
   dockId: string
   title: string
-  icon: Function
+  icon: WindowIconType
   parameters: { [key: string]: any }
-  animation: any
+  animation: WindowAnimationType
 
   constructor(windowId: string, windowClass: WindowClass,
     parent: WindowInstance, plugin: PluginInstance, options: WindowOptions
   ) {
     super()
+    const { descriptor } = windowClass
     this.id = windowId
     this.windowClass = windowClass
     this.parent = parent
     this.plugin = plugin
     this.node = document.createElement("div")
-    this.node.className = "position-relative width-100 height-100 overflow-" + windowClass.overflow
+    this.node.className = "WND_frame_window " + descriptor.layouting
     Application.layout.windows[windowId] = this
-    this.title = windowClass.defaultTitle
-    this.icon = windowClass.defaultIcon
+    this.title = descriptor.defaultTitle
+    this.icon = descriptor.defaultIcon
     this.dockId = windowClass.getDefaultDockId()
     this.parameters = {
       instance: this,
@@ -157,7 +184,7 @@ export class WindowInstance extends Listenable {
     }
     this.render()
   }
-  updateTitle(animation?: any) {
+  updateTitle(animation?: WindowAnimationType) {
 
     // Clear previous animation
     if (this.animation) {
@@ -197,7 +224,7 @@ export class WindowInstance extends Listenable {
 export type PropsType = {
   current: WindowInstance,
   className: string,
-  style: any,
+  style?: any,
 }
 
 export class WindowContainer extends React.Component {
@@ -267,9 +294,10 @@ export class WindowContainer extends React.Component {
   }
 }
 
-export class WindowComponent extends Component {
+export class WindowComponent<TPluginInstance extends PluginInstance = PluginInstance> extends Component {
+  static Descriptor: WindowDescriptor
   instance: WindowInstance
-  plugin: PluginInstance
+  plugin: TPluginInstance
 
   constructor(props) {
     super(props)
@@ -293,7 +321,7 @@ export class WindowComponent extends Component {
   closeWindow() {
     Application.layout.removeWindow(this.instance)
   }
-  updateWindowTitle(animation: Object) {
+  updateWindowTitle(animation: WindowAnimationType) {
     this.instance.updateTitle(animation)
   }
   renderWindowIcon() {

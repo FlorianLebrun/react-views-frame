@@ -1,28 +1,51 @@
 /* eslint-disable no-use-before-define */
-import Listenable from "../modules/listenable"
-import { WindowClass } from "./Window"
+import Listenable from "../listenable"
+import { WindowClass, WindowDescriptor } from "./Window"
 import { PluginContext } from "./Context"
 import { Application } from "../application"
+
+export type PluginDescriptor = {
+  name: string
+  title?: string
+  component: new (pluginClass: PluginClass) => PluginInstance
+
+  windows?: {
+    [name: string]: WindowDescriptor & {
+      component: React.ComponentType
+    }
+  }
+  menu?: PluginMenuType
+
+  dependencies?: string[]
+  import?: { [ref: string]: string }
+  export?: string[]
+
+  importPlugins?: { [ref: string]: string }
+}
+
+export type PluginMenuType = {
+  component: React.ComponentType<{ plugin: PluginInstance, onClose: () => void }>
+}
 
 export class PluginClass {
   name: string
   instance: PluginInstance
-  component: typeof PluginInstance
+  component: new (pluginClass: PluginClass) => PluginInstance
   parameters: Object
   windows: { [key: string]: WindowClass }
-  export: any[]
-  import: { [key: string]: any }
+  export: string[]
+  import: { [key: string]: string | boolean }
   context: PluginContext
   users: Array<PluginClass>
   dependencies: Array<PluginClass>
   isMounted: boolean
-  menu: any
+  menu: PluginMenuType
 
   constructor(name: string, context: PluginContext) {
     this.name = name
     this.context = context
   }
-  setup(desc: { [key: string]: any }, parameters: { [key: string]: any }) {
+  setup(desc: PluginDescriptor, parameters: { [key: string]: any }) {
     this.parameters = parameters
     this.component = desc.component || PluginInstance
     this.export = desc.export
@@ -45,7 +68,8 @@ export class PluginClass {
     if (desc.windows) {
       for (const name in desc.windows) {
         if (!this.windows) this.windows = {}
-        const window = new WindowClass(name, desc.windows[name], this)
+        const windowDesc = desc.windows[name]
+        const window = new WindowClass(name, windowDesc, windowDesc.component as any, this)
         for (const key in window.parameters) {
           const reference = window.parameters[key]
           const { pluginName, path } = this.resolveValueReference(reference, key)
@@ -54,7 +78,6 @@ export class PluginClass {
         }
         this.windows[name] = window
       }
-      this.addDependency("windows-frame")
     }
   }
   addUser(user: PluginClass) {
