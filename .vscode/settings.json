@@ -1,3 +1,6 @@
 {
-  "window.title": "views-frame"
+  "window.title": "views-frame",
+  "terminal.integrated.env.windows": {
+    "Path": "${env:PATH};node_modules/.bin"
+ },
 }

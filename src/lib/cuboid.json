@@ -1,3 +1,7 @@
 {
-   "name": "@polycuber/react-views-frame"
+   "name": "@polycuber/react-views-frame",
+   "format": "web.js",
+   "requirements": [
+      "@polycuber/core:v1"
+   ]
 }

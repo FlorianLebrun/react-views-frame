@@ -24,10 +24,6 @@
     "webpack-cli": "~5.0.1",
     "webpack-dev-server": "~4.13.1"
   },
-  "optionalDependencies": {
-    "@polycuber/core": "../core/dist",
-    "@polycuber/devtool": "../../devtool-components-distrib"
-  },
   "eslintConfig": {
     "extends": "react-app",
     "rules": {
@@ -35,14 +31,7 @@
     }
   },
   "scripts": {
-    "build": "devtool build",
-    "start": "devtool build --watch",
     "lib:serve": "webpack serve --config webpack.config.cjs",
     "lib:build": "node ./scripts/build_dist.cjs"
-  },
-  "workspace": {
-    "sources": [
-      "./src"
-    ]
   }
 }
