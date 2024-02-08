@@ -1,7 +1,9 @@
 import React from "react"
-import Application from '../lib'
-import { PluginInstance, WindowComponent } from '../lib/layout'
 import "font-awesome/css/font-awesome.min.css"
+import Views, { FeatureInstance, WindowComponent } from "../lib"
+import LinearContainer from "../lib/components/LinearContainer"
+import "./icons-fontawesome"
+import "./icons-vscode"
 
 
 export class ToolboxX extends WindowComponent {
@@ -17,7 +19,7 @@ export class ToolboxX extends WindowComponent {
     })*/
   }
   render() {
-    /*const content = []
+    const content = []
     for (let i = 0; i < 100; i++) {
       content.push(<div key={i} onMouseDown={this.handleMenu}>{"01234567890123456789012345678901234567890123456789"}</div>)
     }
@@ -33,8 +35,7 @@ export class ToolboxX extends WindowComponent {
           content,
         }
       }}
-    </LinearContainer >)*/
-    return "hello"
+    </LinearContainer >)
   }
 }
 
@@ -53,42 +54,30 @@ export class ToolboxY extends WindowComponent {
     </div>)
   }
 }
-export class DevTextPlugin extends PluginInstance {
 
-  pluginDidMount() {
+export class DevText extends FeatureInstance<DevText> {
+
+  featureDidMount() {
     this.openWindow("toolbox-x")
     this.openWindow("toolbox-y")
-    Application.setWindowMenu([
-      {
-        "icon": "save",
-        "title": "Save current state",
-        "action": "save",
-      },
-      {
-        "icon": "cog",
-        "title": "Show menu",
-        "action": "menu",
-      },
-    ])
   }
 }
 
-Application.layout.declarePlugin({
+Views.declareFeature({
   name: "test",
   title: "Test Plugin",
-  component: DevTextPlugin,
-  importPlugins: { console: "dev-console" },
+  component: DevText,
   windows: {
     "toolbox-x": {
       userOpenable: true,
       defaultTitle: "Tool Box 1 - Tool Box 1",
-      defaultIcon: "bug",
+      defaultIcon: "code:symbol/element",
       defaultDockId: "left",
       component: ToolboxX,
     },
     "toolbox-y": {
       defaultTitle: "Web Page - Web Page",
-      defaultIcon: "globe",
+      defaultIcon: "fa:globe",
       defaultDockId: "center",
       component: ToolboxY,
     },

@@ -13,6 +13,7 @@ module.exports = {
        { test: /\.tsx?$/, loader: "ts-loader" },
        { test: /\.css$/, use: ['style-loader', 'css-loader'] },
        { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] },
+       { test: /\.svg$/, use: ['file-loader'] },
     ]
   },
   resolve: {

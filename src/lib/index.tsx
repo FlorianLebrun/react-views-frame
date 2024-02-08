@@ -1,4 +1,3 @@
-import { Application, extendApplication } from "./application"
-
-export { extendApplication }
-export default Application
+import Views from "./layout"
+export * from "./layout"
+export default Views

@@ -1,0 +1,75 @@
+.rvframe-resizer-border {
+   position: relative;
+   z-index: 1;
+   --rvframe-resizer-size1: 0px;
+   --rvframe-resizer-size2: -4px;
+   --rvframe-resizer-hsize1: -2px;
+   --rvframe-resizer-hsize2: -8px;
+
+   &.selected {
+      --rvframe-resizer-size1: -100px;
+      --rvframe-resizer-size2: -100px;
+      --rvframe-resizer-hsize1: -100px;
+      --rvframe-resizer-hsize2: -100px;
+   }
+
+   &>div {
+      position: absolute;
+      z-index: 2;
+      /*background-color: rgba(255, 0, 255, 0.3);*/
+   }
+
+   &.horizontal {
+      height: 0;
+
+      &::after {
+         position: absolute;
+         border-top: 1px solid #000;
+         left: 0;
+         right: 0;
+         content: '';
+      }
+
+      &>div {
+         cursor: n-resize;
+         left: 0;
+         right: 0;
+         top: var(--rvframe-resizer-size1);
+         bottom: var(--rvframe-resizer-size2);
+      }
+
+      &>div:hover {
+         left: 0;
+         right: 0;
+         top: var(--rvframe-resizer-hsize1);
+         bottom: var(--rvframe-resizer-hsize2);
+      }
+   }
+
+   &.vertical {
+      width: 0;
+
+      &::after {
+         position: absolute;
+         border-left: 1px solid #000;
+         top: 0;
+         bottom: 0;
+         content: '';
+      }
+
+      &>div {
+         cursor: w-resize;
+         left: var(--rvframe-resizer-size1);
+         right: var(--rvframe-resizer-size2);
+         top: 0;
+         bottom: 0;
+      }
+
+      &>div:hover {
+         left: var(--rvframe-resizer-hsize1);
+         right: var(--rvframe-resizer-hsize2);
+         top: 0;
+         bottom: 0;
+      }
+   }
+}

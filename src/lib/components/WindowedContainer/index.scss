@@ -5,46 +5,54 @@
 *********************************/
 
 .WND_root_panel {
-  height: 100%;
-  width: 100%;
-  font-family: var(--window-frame-font-family);
-  --app-windows-tab-inactive-backcolor: #123;
-  --app-windows-tab-inactive-forecolor: #abc;
-  --app-windows-tab-active-backcolor: #def;
-  --app-windows-tab-active-forecolor: #234;
-  --app-windows-tab-hover-backcolor: #def;
-  --app-windows-tab-hover-forecolor: #567;
-  --app-windows-tab-focus-color: gold;
-  --app-windows-bar-backcolor: #012;
-  --app-windows-btn-backcolor: #012;
-  --app-windows-btn-forecolor: #789;
+   height: 100%;
+   width: 100%;
+   font-family: var(--window-frame-font-family);
+   --app-windows-tab-inactive-backColor: #123;
+   --app-windows-tab-inactive-foreColor: #abc;
+   --app-windows-tab-active-backColor: #def;
+   --app-windows-tab-active-foreColor: #234;
+   --app-windows-tab-hover-backColor: #def;
+   --app-windows-tab-hover-foreColor: #567;
+   --app-windows-tab-focus-color: gold;
+   --app-windows-bar-backColor: #012;
+
+   --app-windows-btn-backColor: #012;
+   --app-windows-btn-foreColor: #789;
+
+   --app-windows-scroll-backColor: var(--vscode-scrollbarSlider-background);
+   --app-windows-scroll-hoverColor: var(--vscode-scrollbarSlider-hoverBackground);
+   --app-windows-scroll-activeColor: var(--vscode-scrollbarSlider-activeBackground);
+
+   --app-windows-toolbar-backColor: #444;
+
 }
 
 .theme-dark .WND_root_panel {
-  --app-windows-tab-inactive-backcolor: #222;
-  --app-windows-tab-inactive-forecolor: #bbb;
-  --app-windows-tab-active-backcolor: #aaa;
-  --app-windows-tab-active-forecolor: #333;
-  --app-windows-tab-hover-backcolor: #999;
-  --app-windows-tab-hover-forecolor: #666;
-  --app-windows-tab-focus-color: #666;
-  --app-windows-bar-backcolor: #111;
-  --app-windows-btn-backcolor: #111;
-  --app-windows-btn-forecolor: #888;
+   --app-windows-tab-inactive-backColor: #222;
+   --app-windows-tab-inactive-foreColor: #bbb;
+   --app-windows-tab-active-backColor: #aaa;
+   --app-windows-tab-active-foreColor: #333;
+   --app-windows-tab-hover-backColor: #999;
+   --app-windows-tab-hover-foreColor: #666;
+   --app-windows-tab-focus-color: #666;
+   --app-windows-bar-backColor: #111;
+   --app-windows-btn-backColor: #111;
+   --app-windows-btn-foreColor: #888;
 }
 
 .WND_side_panel {
-  display: flex;
-  height: 100%;
-  width: 100%;
+   display: flex;
+   height: 100%;
+   width: 100%;
 }
 
 .WND_side_panel_V {
-  flex-direction: row;
+   flex-direction: row;
 }
 
 .WND_side_panel_H {
-  flex-direction: column;
+   flex-direction: column;
 }
 
 /********************************
@@ -56,170 +64,192 @@
 /* Bar (flex) */
 
 .WND_panel_bar {
-  font-size: 14px;
-  flex: 0 0 auto;
-  display: flex;
-  white-space: nowrap;
-  background-color: var(--app-windows-bar-backcolor);
+   font-size: 75%;
+   flex: 0 0 auto;
+   display: flex;
+   white-space: nowrap;
+   background-color: var(--app-windows-bar-backColor);
 }
 
 .WND_panel_bar_H {
-  flex-direction: row;
-  height: 26px;
+   flex-direction: row;
+   height: 26px;
 }
 
 .WND_panel_bar_V {
-  flex-direction: column;
-  width: 26px;
+   flex-direction: column;
+   width: 26px;
 }
 
 /* Bar button */
 
 @keyframes _highlight_danger_active {
-  0% {
-    background-color: var(--app-windows-tab-active-backcolor);
-  }
-  50% {
-    background-color: red;
-  }
-  100% {
-    background-color: var(--app-windows-tab-active-backcolor);
-  }
+   0% {
+      background-color: var(--app-windows-tab-active-backColor);
+   }
+
+   50% {
+      background-color: red;
+   }
+
+   100% {
+      background-color: var(--app-windows-tab-active-backColor);
+   }
 }
 
 @keyframes _highlight_danger_inactive {
-  0% {
-    background-color: var(--app-windows-tab-inactive-backcolor);
-  }
-  50% {
-    background-color: red;
-  }
-  100% {
-    background-color: var(--app-windows-tab-inactive-backcolor);
-  }
+   0% {
+      background-color: var(--app-windows-tab-inactive-backColor);
+   }
+
+   50% {
+      background-color: red;
+   }
+
+   100% {
+      background-color: var(--app-windows-tab-inactive-backColor);
+   }
 }
 
 @keyframes _highlight_warning_active {
-  0% {
-    background-color: var(--app-windows-tab-active-backcolor);
-  }
-  50% {
-    background-color: gold;
-  }
-  100% {
-    background-color: var(--app-windows-tab-active-backcolor);
-  }
+   0% {
+      background-color: var(--app-windows-tab-active-backColor);
+   }
+
+   50% {
+      background-color: gold;
+   }
+
+   100% {
+      background-color: var(--app-windows-tab-active-backColor);
+   }
 }
 
 @keyframes _highlight_warning_inactive {
-  0% {
-    background-color: var(--app-windows-tab-inactive-backcolor);
-  }
-  50% {
-    background-color: gold;
-  }
-  100% {
-    background-color: var(--app-windows-tab-inactive-backcolor);
-  }
+   0% {
+      background-color: var(--app-windows-tab-inactive-backColor);
+   }
+
+   50% {
+      background-color: gold;
+   }
+
+   100% {
+      background-color: var(--app-windows-tab-inactive-backColor);
+   }
 }
 
 .WND_panel_button_H {
-  min-width: 30px;
-  max-width: 120px;
-  margin-right: 1px;
-  align-items: center;
-  justify-content: center;
+   min-width: 30px;
+   max-width: 120px;
+   margin-right: 1px;
+   align-items: center;
+   justify-content: center;
 
-  & > div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+   &>div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding-left: 4px;
+      gap: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
 }
 
 .WND_panel_button_V {
-  min-height: 30px;
-  max-height: 120px;
-  margin-bottom: 1px;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+   min-height: 30px;
+   max-height: 120px;
+   margin-bottom: 1px;
+   align-items: center;
+   justify-content: center;
+   overflow: hidden;
+
+   &>div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding-left: 4px;
+      gap: 3px;
+      max-width: 120px;
+   }
 }
 
 .WND_panel_button {
-  flex: 1;
-  display: flex;
-  white-space: nowrap;
-  background-color: var(--app-windows-tab-inactive-backcolor);
-  color: var(--app-windows-tab-inactive-forecolor);
-  cursor: pointer;
+   flex: 1;
+   display: flex;
+   white-space: nowrap;
+   background-color: var(--app-windows-tab-inactive-backColor);
+   color: var(--app-windows-tab-inactive-foreColor);
+   cursor: pointer;
 
-  &.current {
-    background-color: var(--app-windows-tab-active-backcolor);
-    color: var(--app-windows-tab-active-forecolor);
-  }
-  &.focused {
-    background-image: linear-gradient(
-      to bottom,
-      var(--app-windows-tab-focus-color) 0px,
-      var(--app-windows-tab-focus-color) 3px,
-      transparent 3px
-    );
-  }
-  &:hover {
-    background-color: var(--app-windows-tab-hover-backcolor);
-    color: var(--app-windows-tab-hover-forecolor);
-  }
+   &.current {
+      background-color: var(--app-windows-tab-active-backColor);
+      color: var(--app-windows-tab-active-foreColor);
+   }
+
+   &.focused {
+      background-image: linear-gradient(to bottom,
+            var(--app-windows-tab-focus-color) 0px,
+            var(--app-windows-tab-focus-color) 3px,
+            transparent 3px);
+   }
+
+   &:hover {
+      background-color: var(--app-windows-tab-hover-backColor);
+      color: var(--app-windows-tab-hover-foreColor);
+   }
 }
 
 .WND_panel_button_danger {
-  animation-duration: 1s;
-  animation-name: _highlight_danger_inactive;
-  animation-iteration-count: infinite;
+   animation-duration: 1s;
+   animation-name: _highlight_danger_inactive;
+   animation-iteration-count: infinite;
 
-  &.current {
-    animation-name: _highlight_danger_active;
-  }
+   &.current {
+      animation-name: _highlight_danger_active;
+   }
 }
 
 .WND_panel_button_warning {
-  animation-duration: 1s;
-  animation-name: _highlight_warning_inactive;
-  animation-iteration-count: infinite;
+   animation-duration: 1s;
+   animation-name: _highlight_warning_inactive;
+   animation-iteration-count: infinite;
 
-  &.current {
-    animation-name: _highlight_warning_active;
-  }
+   &.current {
+      animation-name: _highlight_warning_active;
+   }
 }
 
 /* Menu unwinder button */
 
 .WND_panel_menu_btn {
-  padding-left: 3px;
-  padding-right: 3px;
-  cursor: pointer;
-  background-color: var(--app-windows-btn-backcolor);
-  border: 1px solid var(--app-windows-btn-forecolor);
-  color: var(--app-windows-btn-forecolor);
+   padding-left: 3px;
+   padding-right: 3px;
+   cursor: pointer;
+   background-color: var(--app-windows-btn-backColor);
+   border: 1px solid var(--app-windows-btn-foreColor);
+   color: var(--app-windows-btn-foreColor);
 
-  &:hover {
-    border: 1px solid var(--app-windows-tab-active-backcolor);
-    color: var(--app-windows-tab-active-backcolor);
-  }
+   &:hover {
+      border: 1px solid var(--app-windows-tab-active-backColor);
+      color: var(--app-windows-tab-active-backColor);
+   }
 }
 
 .WND_panel_menu_btn_H {
-  margin-left: 6px;
-  margin-right: 6px;
-  margin-top: auto;
-  margin-bottom: auto;
+   margin-left: 6px;
+   margin-right: 6px;
+   margin-top: auto;
+   margin-bottom: auto;
 }
 
 .WND_panel_menu_btn_V {
-  text-align: center;
-  margin-top: 6px;
-  margin-bottom: 6px;
-  margin-left: auto;
-  margin-right: auto;
+   text-align: center;
+   margin-top: 6px;
+   margin-bottom: 6px;
+   margin-left: auto;
+   margin-right: auto;
 }
 
 /********************************
@@ -228,61 +258,81 @@
 *********************************
 *********************************/
 
+.WND_panel_container_toolbar {
+   flex: 0 0 auto;
+   min-height: 0px;
+   min-width: 0px;
+   max-width: 100%;
+   max-height: 100%;
+   width: auto;
+   height: auto;
+   background-color: var(--app-windows-toolbar-backColor) !important;
+}
+
 .WND_panel_container_side {
-  flex: 0 0 auto;
-  min-height: 0px;
-  min-width: 0px;
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
+   flex: 0 0 auto;
+   min-height: 0px;
+   min-width: 0px;
+   max-width: 100%;
+   max-height: 100%;
+   width: 100%;
+   height: 100%;
 }
 
 .WND_panel_container_center {
-  flex: 1 1 auto;
-  min-height: 0px;
-  min-width: 0px;
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
+   flex: 1 1 auto;
+   min-height: 0px;
+   min-width: 0px;
+   max-width: 100%;
+   max-height: 100%;
+   width: 100%;
+   height: 100%;
 }
 
 .WND_panel_container {
-  outline: none;
-  background-color: var(--window-frame-background);
-  color: var(--window-frame-foreground);
+   outline: none;
+   background-color: var(--window-frame-background);
+   color: var(--window-frame-foreground);
 }
 
 .WND_panel_container_splash {
-  overflow: hidden;
+   overflow: hidden;
+   //background-image: url("../../../favicon.webp");
+   background-blend-mode: lighten;
+   background-repeat: no-repeat;
+   background-color: #111;
+   background-position: center;
 }
 
 div::-webkit-scrollbar {
-  width: 6px;
-  height: 12px;
-  background-color: transparent;
+   width: 6px;
+   height: 12px;
+   background-color: transparent;
 }
-div::-webkit-scrollbar-corner {
-  background-color: transparent;
-}
-div::-webkit-scrollbar-thumb {
-  background-color: var(--vscode-scrollbarSlider-background);
-  border-radius: 1px;
-  border: 0;
-  box-shadow: unset;
 
-  &:hover {
-    background-color: var(--vscode-scrollbarSlider-hoverBackground);
-  }
-  &:active {
-    background-color: var(--vscode-scrollbarSlider-activeBackground);
-    border: 0;
-  }
+div::-webkit-scrollbar-corner {
+   background-color: transparent;
 }
+
+div::-webkit-scrollbar-thumb {
+   background-color: var(--app-windows-scroll-backColor);
+   border-radius: 1px;
+   border: 0;
+   box-shadow: unset;
+
+   &:hover {
+      background-color: var(--app-windows-scroll-hoverColor);
+   }
+
+   &:active {
+      background-color: var(--app-windows-scroll-activeColor);
+      border: 0;
+   }
+}
+
 div::-webkit-scrollbar-track {
-  background-color: transparent;
-  border-radius: 2px;
-  border: 0;
-  box-shadow: unset;
+   background-color: transparent;
+   border-radius: 2px;
+   border: 0;
+   box-shadow: unset;
 }

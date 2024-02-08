@@ -1,34 +1,34 @@
-.wfs-linear-container {
-  display: flex;
-  align-items: stretch;
+.rvframe-linear-container {
+   display: flex;
+   align-items: stretch;
 }
 
-.wfs-linear-container.vertical {
-  flex-direction: row;
+.rvframe-linear-container.vertical {
+   flex-direction: row;
 }
 
-.wfs-linear-container.horizontal {
-  flex-direction: column;
+.rvframe-linear-container.horizontal {
+   flex-direction: column;
 }
 
-.wfs-linear-container> :nth-child(2n) {
-  flex: 0;
+.rvframe-linear-container> :nth-child(2n) {
+   flex: 0;
 }
 
-.wfs-linear-container> :nth-child(2n+1) {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex: auto 1 1;
-  overflow: auto;
+.rvframe-linear-container> :nth-child(2n+1) {
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   flex: auto 1 1;
+   overflow: auto;
 }
 
-.wfs-linear-container> :nth-child(2n+1)>:first-child {
-  overflow: hidden;
-  flex: 0;
+.rvframe-linear-container> :nth-child(2n+1)>:first-child {
+   overflow: hidden;
+   flex: 0;
 }
 
-.wfs-linear-container> :nth-child(2n+1)> :last-child {
-  overflow: auto;
-  flex: auto 1 1;
+.rvframe-linear-container> :nth-child(2n+1)> :last-child {
+   overflow: auto;
+   flex: auto 1 1;
 }
