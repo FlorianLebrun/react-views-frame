@@ -1,5 +1,4 @@
 import React from "react"
-import "font-awesome/css/font-awesome.min.css"
 import Views, { FeatureInstance, WindowComponent } from "../lib"
 import LinearContainer from "../lib/components/LinearContainer"
 import "./icons-fontawesome"
@@ -77,7 +76,7 @@ Views.declareFeature({
     },
     "toolbox-y": {
       defaultTitle: "Web Page - Web Page",
-      defaultIcon: "fa:globe",
+      defaultIcon: "fa:filter",
       defaultDockId: "center",
       component: ToolboxY,
     },
