@@ -5,7 +5,7 @@
       "web.js",
       "react"
    ],
-   "requirements": [
+   "uses": [
       "@polycuber/core:v1",
       "@polycuber/mui:v1"
    ]
